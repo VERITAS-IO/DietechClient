@@ -1,0 +1,57 @@
+{
+  "common": {
+    "appName": "Dietech",
+    "login": "Giriş Yap",
+    "register": "Başla",
+    "email": "E-posta",
+    "password": "Şifre",
+    "confirmPassword": "Şifre Tekrar",
+    "fullName": "Ad Soyad",
+    "startFreeTrial": "Ücretsiz Dene",
+    "viewDemo": "Demo Görüntüle"
+  },
+  "landing": {
+    "hero": {
+      "title": "Akıllı Beslenme Yönetimi ile Uygulamanızı Dönüştürün",
+      "subtitle": "Kapsamlı müşteri yönetim platformumuzla diyetisyen uygulamanızı kolaylaştırın. İlerlemeyi takip edin, beslenme planlarını yönetin ve işinizi büyütün."
+    },
+    "features": {
+      "clientManagement": {
+        "title": "Müşteri Yönetimi",
+        "description": "Detaylı profiller, ilerleme takibi ve otomatik takip işlemleriyle müşteri tabanınızı verimli bir şekilde yönetin."
+      },
+      "mealPlanning": {
+        "title": "Beslenme Planlaması",
+        "description": "Geniş tarif ve beslenme bilgisi veritabanıyla kişiselleştirilmiş beslenme planları oluşturun ve paylaşın."
+      },
+      "progressTracking": {
+        "title": "İlerleme Takibi",
+        "description": "Görsel grafikler, metrikler ve otomatik ilerleme raporlarıyla müşteri gelişimini izleyin."
+      }
+    },
+    "testimonials": {
+      "title": "Önde Gelen Beslenme Uzmanları Tarafından Güvenilen",
+      "subtitle": "Kullanıcılarımızın Dietech hakkında söylediklerini görün"
+    },
+    "stats": {
+      "clients": "Aktif Müşteri",
+      "dietitians": "Profesyonel Diyetisyen",
+      "mealPlans": "Oluşturulan Beslenme Planı",
+      "success": "Başarı Oranı"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Tekrar Hoşgeldiniz",
+      "subtitle": "Hesabınıza erişmek için bilgilerinizi girin",
+      "noAccount": "Hesabınız yok mu?",
+      "signUp": "Kayıt ol"
+    },
+    "register": {
+      "title": "Hesap oluştur",
+      "subtitle": "Başlamak için bilgilerinizi girin",
+      "haveAccount": "Zaten hesabınız var mı?",
+      "signIn": "Giriş yap"
+    }
+  }
+}

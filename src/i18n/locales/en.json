@@ -1,0 +1,57 @@
+{
+  "common": {
+    "appName": "Dietech",
+    "login": "Sign In",
+    "register": "Get Started",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "fullName": "Full Name",
+    "startFreeTrial": "Start Free Trial",
+    "viewDemo": "View Demo"
+  },
+  "landing": {
+    "hero": {
+      "title": "Transform Your Practice with Smart Nutrition Management",
+      "subtitle": "Streamline your dietician practice with our comprehensive client management platform. Track progress, manage meal plans, and grow your business."
+    },
+    "features": {
+      "clientManagement": {
+        "title": "Client Management",
+        "description": "Efficiently manage your client base with detailed profiles, progress tracking, and automated follow-ups."
+      },
+      "mealPlanning": {
+        "title": "Meal Planning",
+        "description": "Create and share personalized meal plans with an extensive database of recipes and nutritional information."
+      },
+      "progressTracking": {
+        "title": "Progress Tracking",
+        "description": "Monitor client progress with visual charts, metrics, and automated progress reports."
+      }
+    },
+    "testimonials": {
+      "title": "Trusted by Leading Nutritionists",
+      "subtitle": "See what our users have to say about Dietech"
+    },
+    "stats": {
+      "clients": "Active Clients",
+      "dietitians": "Professional Dietitians",
+      "mealPlans": "Meal Plans Created",
+      "success": "Success Rate"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Enter your credentials to access your account",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up"
+    },
+    "register": {
+      "title": "Create an account",
+      "subtitle": "Enter your information to get started",
+      "haveAccount": "Already have an account?",
+      "signIn": "Sign in"
+    }
+  }
+}
