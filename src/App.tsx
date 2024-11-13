@@ -9,6 +9,8 @@ import ClientDetailsPage from "./pages/client-details";
 import { Navbar } from "./components/common/navbar";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "./components/providers/auth-provider";
+import ConfirmEmailPage from "./pages/confirm-email";
+import ForgotPasswordPage from "./pages/forgot-password";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +27,8 @@ function App() {
                   <Route path="/" element={<LandingPage />} />
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/register" element={<RegisterPage />} />
+                  <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                  <Route path="/confirm-email" element={<ConfirmEmailPage />} />
                   <Route path="/client-list" element={<ClientListPage />} />
                   <Route path="/clients/:id" element={<ClientDetailsPage />} />
                 </Routes>

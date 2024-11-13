@@ -12,6 +12,7 @@ import { useAuthStore } from "@/stores/auth-store";
 import { authService } from "@/services/auth-service";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Salad } from "lucide-react";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export function Navbar() {
   const navigate = useNavigate();
@@ -28,12 +29,13 @@ export function Navbar() {
   return (
     <nav className="border-b bg-background">
       <div className="container flex flex-row! h-16 items-center px-4">
-        <Link to="/" className="font-semibold">
-        <Salad className="h-6 w-6 text-primary" />
+        <Link to="/" className="font-semibold flex items-center gap-2">
+          <Salad className="h-6 w-6 text-primary" />
           DieTech
         </Link>
 
         <div className="ml-auto flex items-center space-x-4">
+          <ThemeToggle />
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

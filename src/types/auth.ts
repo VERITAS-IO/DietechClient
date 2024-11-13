@@ -25,3 +25,13 @@ export interface LoginRequest {
     detail: string;
     status: number;
   }
+
+  export interface ConfirmEmailRequest {
+    userId: number;
+    token: string;
+    changedEmail?: string;
+  }
+  
+  export interface ForgotPasswordRequest {
+    email: string;
+  }

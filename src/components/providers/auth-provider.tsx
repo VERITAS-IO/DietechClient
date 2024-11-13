@@ -10,15 +10,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const { isAuthenticated } = useAuthStore();
   const location = useLocation();
 
-  const publicPaths = ["/", "/login", "/register"];
+  const publicPaths = ["/", "/login", "/register", "/confirm-email", "/forgot-password"];
+  
   const isPublicPath = publicPaths.includes(location.pathname);
 
   if (!isAuthenticated && !isPublicPath) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (isAuthenticated && isPublicPath) {
-    return <Navigate to="/dashboard" replace />;
+  if (isAuthenticated && isPublicPath && location.pathname !== "/" && location.pathname !== "/forgot-password") {
+    return <Navigate to="/" replace />;
   }
 
   return <>{children}</>;

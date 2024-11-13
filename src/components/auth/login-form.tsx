@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -46,7 +47,7 @@ export function LoginForm() {
         title: "Login Successful",
         description: "Welcome back!",
       });
-      navigate("/dashboard");
+      navigate("/");
     },
     onError: (error: any) => {
       toast({
@@ -57,13 +58,24 @@ export function LoginForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    loginMutation.mutate(values);
+  async function onSubmit(values: z.infer<typeof formSchema>, e: React.FormEvent) {
+    e.preventDefault(); 
+    try {
+      await loginMutation.mutateAsync(values);
+    } catch (error) {
+      console.error('Login error:', error);
+    }
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form 
+        onSubmit={(e) => {
+          e.preventDefault();
+          form.handleSubmit((data) => onSubmit(data, e))(e);
+        }} 
+        className="space-y-6"
+      >
         <FormField
           control={form.control}
           name="email"
@@ -71,7 +83,11 @@ export function LoginForm() {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="you@example.com" {...field} />
+                <Input 
+                  placeholder="you@example.com" 
+                  autoComplete="email"
+                  {...field} 
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -88,6 +104,7 @@ export function LoginForm() {
                   <Input
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
+                    autoComplete="current-password"
                     {...field}
                   />
                   <Button
