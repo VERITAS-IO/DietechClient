@@ -9,9 +9,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
 import { ClientSearch } from "@/components/clients/client-search";
 import { ClientStats } from "@/components/clients/client-stats";
+import { CreateClientDialog } from "@/components/clients/create-client-dialog";
 
 // Mock data for client list
 const mockClients = [
@@ -68,9 +68,7 @@ export default function ClientListPage() {
               Manage and monitor your client base
             </p>
           </div>
-          <Button className="shadow-lg hover:shadow-xl transition-shadow">
-            <Plus className="mr-2 h-4 w-4" /> Add New Client
-          </Button>
+          <CreateClientDialog />
         </div>
 
         <ClientStats />

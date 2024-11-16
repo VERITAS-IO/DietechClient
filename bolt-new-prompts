@@ -94,6 +94,158 @@ export default {
   plugins: [require('tailwindcss-animate')],
 };
 
+Our application also has a localization implementation, we are doing it for turkish and english.
+
+Here's our i18n/locales/en.json:
+
+{
+  "common": {
+    "appName": "Dietech",
+    "login": "Sign In",
+    "register": "Get Started",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "fullName": "Full Name",
+    "startFreeTrial": "Start Free Trial",
+    "viewDemo": "View Demo"
+  },
+  "landing": {
+    "hero": {
+      "title": "Transform Your Practice with Smart Nutrition Management",
+      "subtitle": "Streamline your dietician practice with our comprehensive client management platform. Track progress, manage meal plans, and grow your business."
+    },
+    "features": {
+      "clientManagement": {
+        "title": "Client Management",
+        "description": "Efficiently manage your client base with detailed profiles, progress tracking, and automated follow-ups."
+      },
+      "mealPlanning": {
+        "title": "Meal Planning",
+        "description": "Create and share personalized meal plans with an extensive database of recipes and nutritional information."
+      },
+      "progressTracking": {
+        "title": "Progress Tracking",
+        "description": "Monitor client progress with visual charts, metrics, and automated progress reports."
+      }
+    },
+    "testimonials": {
+      "title": "Trusted by Leading Nutritionists",
+      "subtitle": "See what our users have to say about Dietech"
+    },
+    "stats": {
+      "clients": "Active Clients",
+      "dietitians": "Professional Dietitians",
+      "mealPlans": "Meal Plans Created",
+      "success": "Success Rate"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Enter your credentials to access your account",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up"
+    },
+    "register": {
+      "title": "Create an account",
+      "subtitle": "Enter your information to get started",
+      "haveAccount": "Already have an account?",
+      "signIn": "Sign in"
+    }
+  }
+}
+
+here's our i18n/locales/tr.json:
+
+{
+  "common": {
+    "appName": "Dietech",
+    "login": "Giriş Yap",
+    "register": "Başla",
+    "email": "E-posta",
+    "password": "Şifre",
+    "confirmPassword": "Şifre Tekrar",
+    "fullName": "Ad Soyad",
+    "startFreeTrial": "Ücretsiz Dene",
+    "viewDemo": "Demo Görüntüle"
+  },
+  "landing": {
+    "hero": {
+      "title": "Akıllı Beslenme Yönetimi ile Uygulamanızı Dönüştürün",
+      "subtitle": "Kapsamlı müşteri yönetim platformumuzla diyetisyen uygulamanızı kolaylaştırın. İlerlemeyi takip edin, beslenme planlarını yönetin ve işinizi büyütün."
+    },
+    "features": {
+      "clientManagement": {
+        "title": "Müşteri Yönetimi",
+        "description": "Detaylı profiller, ilerleme takibi ve otomatik takip işlemleriyle müşteri tabanınızı verimli bir şekilde yönetin."
+      },
+      "mealPlanning": {
+        "title": "Beslenme Planlaması",
+        "description": "Geniş tarif ve beslenme bilgisi veritabanıyla kişiselleştirilmiş beslenme planları oluşturun ve paylaşın."
+      },
+      "progressTracking": {
+        "title": "İlerleme Takibi",
+        "description": "Görsel grafikler, metrikler ve otomatik ilerleme raporlarıyla müşteri gelişimini izleyin."
+      }
+    },
+    "testimonials": {
+      "title": "Önde Gelen Beslenme Uzmanları Tarafından Güvenilen",
+      "subtitle": "Kullanıcılarımızın Dietech hakkında söylediklerini görün"
+    },
+    "stats": {
+      "clients": "Aktif Müşteri",
+      "dietitians": "Profesyonel Diyetisyen",
+      "mealPlans": "Oluşturulan Beslenme Planı",
+      "success": "Başarı Oranı"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Tekrar Hoşgeldiniz",
+      "subtitle": "Hesabınıza erişmek için bilgilerinizi girin",
+      "noAccount": "Hesabınız yok mu?",
+      "signUp": "Kayıt ol"
+    },
+    "register": {
+      "title": "Hesap oluştur",
+      "subtitle": "Başlamak için bilgilerinizi girin",
+      "haveAccount": "Zaten hesabınız var mı?",
+      "signIn": "Giriş yap"
+    }
+  }
+}
+
+and our i18n implementation ın ı18n/index.ts:
+
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import LanguageDetector from 'i18next-browser-languagedetector';
+import en from './locales/en.json';
+import tr from './locales/tr.json';
+
+i18n
+  .use(LanguageDetector)
+  .use(initReactI18next)
+  .init({
+    resources: {
+      en: {
+        translation: en,
+      },
+      tr: {
+        translation: tr,
+      },
+    },
+    fallbackLng: 'en',
+    interpolation: {
+      escapeValue: false,
+    },
+  });
+
+export default i18n;
+
+
+SO PLEASE, IMPLEMENT LOCALIZATION FOR ENGLISH AND TURKISH IN THE PAGES AND COMPONENTS YOU create.
 
 And here's our landing page:
 
@@ -111,6 +263,7 @@ import {
   Utensils,
   TrendingUp,
 } from "lucide-react";
+import { create } from 'domain'
 
 export default function LandingPage() {
   const { t } = useTranslation();

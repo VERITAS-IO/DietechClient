@@ -10,7 +10,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const { isAuthenticated } = useAuthStore();
   const location = useLocation();
 
-  const publicPaths = ["/", "/login", "/register", "/confirm-email", "/forgot-password"];
+  const publicPaths = ["/", "/login", "/register", "/confirm-email", "/forgot-password", "/reset-password"];
   
   const isPublicPath = publicPaths.includes(location.pathname);
 

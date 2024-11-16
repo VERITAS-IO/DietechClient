@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { api } from '@/lib/axios';
-import { ConfirmEmailRequest, ForgotPasswordRequest, LoginRequest, UserRegistrationRequest, UserResponse } from '@/types/auth';
+import { ConfirmEmailRequest, ForgotPasswordRequest, LoginRequest, ResetPasswordRequest, UserRegistrationRequest, UserResponse } from '@/types/auth';
 
 export const authService = {
 
@@ -33,8 +33,9 @@ export const authService = {
 
   async confirmEmail(data: ConfirmEmailRequest): Promise<void> {
     try {
-      await api.post('/authentication/confirm-email', data);
+      await api.post('/authentication/confirmEmail', data);
     } catch (error: any) {
+      console.log("error tach of confirmEmail triggered, error:", error);
       if (error.response) {
         throw new Error(error.response.data.detail || 'Email confirmation failed');
       }
@@ -55,10 +56,21 @@ export const authService = {
 
   async forgotPassword(data: ForgotPasswordRequest): Promise<void> {
     try {
-      await api.post('/authentication/forgot-password', data);
+      await api.post('/authentication/forgotPassword', data);
     } catch (error: any) {
       if (error.response) {
         throw new Error(error.response.data.detail || 'Password reset request failed');
+      }
+      throw new Error('Network error occurred');
+    }
+  },
+
+  async resetPassword(data: ResetPasswordRequest): Promise<void> {
+    try {
+      await api.post('/authentication/resetPassword', data);
+    } catch (error: any) {
+      if (error.response) {
+        throw new Error(error.response.data.detail || 'Password reset failed');
       }
       throw new Error('Network error occurred');
     }

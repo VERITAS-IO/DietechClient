@@ -18,34 +18,48 @@ import { useToast } from "@/hooks/use-toast";
 import { authService } from "@/services/auth-service";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-
-const formSchema = z
-  .object({
-    firstName: z.string().min(2, "First name must be at least 2 characters"),
-    lastName: z.string().min(2, "Last name must be at least 2 characters"),
-    userName: z.string()
-      .min(3, "Username must be at least 3 characters")
-      .regex(/^[a-zA-Z0-9_-]+$/, "Username can only contain letters, numbers, underscores, and hyphens"),
-    email: z.string().email("Invalid email address"),
-    password: z.string()
-      .min(6, "Password must be at least 6 characters")
-      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-      .regex(/[a-z]/, "Password must contain at least one lowercase letter")
-      .regex(/[0-9]/, "Password must contain at least one number"),
-    confirmPassword: z.string(),
-    phoneNumber: z.string()
-      .regex(/^\+?[1-9]\d{1,14}$/, "Invalid phone number format")
-      .optional()
-      .or(z.literal("")),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"],
-  });
-
-type FormValues = z.infer<typeof formSchema>;
+import { useTranslation } from "react-i18next";
 
 export function RegisterForm() {
+  const { t } = useTranslation();
+
+  const formSchema = z
+    .object({
+      firstName: z
+        .string()
+        .min(2, t("auth.register.form.validation.firstName")),
+      lastName: z.string().min(2, t("auth.register.form.validation.lastName")),
+      userName: z
+        .string()
+        .min(3, t("auth.register.form.validation.userName.min"))
+        .regex(
+          /^[a-zA-Z0-9_-]+$/,
+          t("auth.register.form.validation.userName.pattern")
+        ),
+      email: z.string().email(t("auth.register.form.validation.email")),
+      password: z
+        .string()
+        .min(6, t("auth.register.form.validation.password.min"))
+        .regex(/[A-Z]/, t("auth.register.form.validation.password.uppercase"))
+        .regex(/[a-z]/, t("auth.register.form.validation.password.lowercase"))
+        .regex(/[0-9]/, t("auth.register.form.validation.password.number")),
+      confirmPassword: z.string(),
+      phoneNumber: z
+        .string()
+        .regex(
+          /^\+?[1-9]\d{1,14}$/,
+          t("auth.register.form.validation.phoneNumber")
+        )
+        .optional()
+        .or(z.literal("")),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: t("auth.register.form.validation.passwordMatch"),
+      path: ["confirmPassword"],
+    });
+
+  type FormValues = z.infer<typeof formSchema>;
+
   const [showPassword, setShowPassword] = useState(false);
   const [passwordMatchStatus, setPasswordMatchStatus] = useState<
     "idle" | "matching" | "not-matching"
@@ -64,7 +78,7 @@ export function RegisterForm() {
       confirmPassword: "",
       phoneNumber: "",
     },
-    mode: "onChange", 
+    mode: "onChange",
   });
 
   const password = form.watch("password");
@@ -92,15 +106,16 @@ export function RegisterForm() {
     },
     onSuccess: () => {
       toast({
-        title: "Registration Successful",
-        description: "Your account has been created. Please log in.",
+        title: t("auth.register.toast.success.title"),
+        description: t("auth.register.toast.success.description"),
       });
       navigate("/login");
     },
     onError: (error: Error) => {
       toast({
-        title: "Registration Failed",
-        description: error.message || "Please check your registration info.",
+        title: t("auth.register.toast.error.title"),
+        description:
+          error.message || t("auth.register.toast.error.description"),
         variant: "destructive",
       });
     },
@@ -145,9 +160,12 @@ export function RegisterForm() {
             name="firstName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>First Name</FormLabel>
+                <FormLabel>{t("auth.register.form.firstName.label")}</FormLabel>
                 <FormControl>
-                  <Input placeholder="John" autoComplete="given-name" {...field} />
+                  <Input
+                    placeholder={t("auth.register.form.firstName.placeholder")}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -159,9 +177,12 @@ export function RegisterForm() {
             name="lastName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Last Name</FormLabel>
+                <FormLabel>{t("auth.register.form.lastName.label")}</FormLabel>
                 <FormControl>
-                  <Input placeholder="Doe" autoComplete="family-name" {...field} />
+                  <Input
+                    placeholder={t("auth.register.form.lastName.placeholder")}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -175,12 +196,11 @@ export function RegisterForm() {
           name="userName"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
+              <FormLabel>{t("auth.register.form.userName.label")}</FormLabel>
               <FormControl>
-                <Input 
-                  placeholder="johndoe123" 
-                  autoComplete="username"
-                  {...field} 
+                <Input
+                  placeholder={t("auth.register.form.userName.placeholder")}
+                  {...field}
                 />
               </FormControl>
               <FormMessage />
@@ -194,13 +214,12 @@ export function RegisterForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>{t("auth.register.form.email.label")}</FormLabel>
               <FormControl>
-                <Input 
-                  placeholder="you@example.com" 
-                  type="email"
+                <Input
+                  placeholder={t("auth.register.form.email.placeholder")}
                   autoComplete="email"
-                  {...field} 
+                  {...field}
                 />
               </FormControl>
               <FormMessage />
@@ -214,13 +233,13 @@ export function RegisterForm() {
           name="phoneNumber"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Phone Number (Optional)</FormLabel>
+              <FormLabel>{t("auth.register.form.phoneNumber.label")}</FormLabel>
               <FormControl>
-                <Input 
-                  placeholder="+1234567890" 
+                <Input
+                  placeholder={t("auth.register.form.phoneNumber.placeholder")}
                   type="tel"
                   autoComplete="tel"
-                  {...field} 
+                  {...field}
                 />
               </FormControl>
               <FormMessage />
@@ -229,17 +248,17 @@ export function RegisterForm() {
         />
 
         <FormField
-            disabled={isPending}
+          disabled={isPending}
           control={form.control}
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
+              <FormLabel>{t("auth.register.form.password.label")}</FormLabel>
               <FormControl>
                 <div className="relative">
                   <Input
                     type={showPassword ? "text" : "password"}
-                    placeholder="Create a password"
+                    placeholder={t("auth.register.form.password.placeholder")}
                     autoComplete="new-password"
                     {...field}
                   />
@@ -264,25 +283,29 @@ export function RegisterForm() {
         />
 
         <FormField
-            disabled={isPending}
+          disabled={isPending}
           control={form.control}
           name="confirmPassword"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Confirm Password</FormLabel>
+              <FormLabel>
+                {t("auth.register.form.confirmPassword.label")}
+              </FormLabel>
               <FormControl>
                 <div className="relative">
                   <Input
                     type={showPassword ? "text" : "password"}
-                    placeholder="Confirm your password"
+                    placeholder={t(
+                      "auth.register.form.confirmPassword.placeholder"
+                    )}
                     autoComplete="new-password"
                     {...field}
                   />
                   {confirmPassword && (
                     <div className={`text-sm mt-1 ${getPasswordMatchColor()}`}>
-                      {passwordMatchStatus === "matching" 
-                        ? "✓ Passwords match" 
-                        : "✗ Passwords don't match"}
+                      {passwordMatchStatus === "matching"
+                        ? t("auth.register.form.confirmPassword.matching")
+                        : t("auth.register.form.confirmPassword.notMatching")}
                     </div>
                   )}
                 </div>
@@ -292,12 +315,16 @@ export function RegisterForm() {
           )}
         />
 
-        <Button 
-          type="submit" 
+        <Button
+          type="submit"
           className="w-full"
-          disabled={registerMutation.isPending || passwordMatchStatus === "not-matching"}
+          disabled={
+            registerMutation.isPending || passwordMatchStatus === "not-matching"
+          }
         >
-          {registerMutation.isPending ? "Creating Account..." : "Create Account"}
+          {registerMutation.isPending
+            ? t("auth.register.form.submit.loading")
+            : t("auth.register.form.submit.default")}
         </Button>
       </form>
     </Form>

@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { authService } from "@/services/auth-service";
 import { useAuthStore } from "@/stores/auth-store";
+import { useTranslation } from "react-i18next";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -26,6 +27,8 @@ const formSchema = z.object({
 });
 
 export function LoginForm() {
+  const { t } = useTranslation();
+
   const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -44,36 +47,41 @@ export function LoginForm() {
     onSuccess: (data) => {
       setUser(data);
       toast({
-        title: "Login Successful",
-        description: "Welcome back!",
+        title: t("auth.login.toast.success.title"),
+        description: t("auth.login.toast.success.description"),
       });
       navigate("/");
     },
     onError: (error: any) => {
       toast({
-        title: "Login Failed",
-        description: error.response?.data?.detail || "Please check your credentials",
+        title: t("auth.login.toast.error.title"),
+        description:
+          error.response?.data?.detail ||
+          t("auth.login.toast.error.description"),
         variant: "destructive",
       });
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>, e: React.FormEvent) {
-    e.preventDefault(); 
+  async function onSubmit(
+    values: z.infer<typeof formSchema>,
+    e: React.FormEvent
+  ) {
+    e.preventDefault();
     try {
       await loginMutation.mutateAsync(values);
     } catch (error) {
-      console.error('Login error:', error);
+      console.error("Login error:", error);
     }
   }
 
   return (
     <Form {...form}>
-      <form 
+      <form
         onSubmit={(e) => {
           e.preventDefault();
           form.handleSubmit((data) => onSubmit(data, e))(e);
-        }} 
+        }}
         className="space-y-6"
       >
         <FormField
@@ -81,12 +89,12 @@ export function LoginForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>{t("auth.login.form.email.label")}</FormLabel>
               <FormControl>
-                <Input 
-                  placeholder="you@example.com" 
+                <Input
+                  placeholder={t("auth.login.form.email.placeholder")}
                   autoComplete="email"
-                  {...field} 
+                  {...field}
                 />
               </FormControl>
               <FormMessage />
@@ -98,12 +106,12 @@ export function LoginForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
+              <FormLabel>{t("auth.login.form.password.label")}</FormLabel>
               <FormControl>
                 <div className="relative">
                   <Input
                     type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
+                    placeholder={t("auth.login.form.password.placeholder")}
                     autoComplete="current-password"
                     {...field}
                   />
@@ -126,12 +134,14 @@ export function LoginForm() {
             </FormItem>
           )}
         />
-        <Button 
-          type="submit" 
+        <Button
+          type="submit"
           className="w-full"
           disabled={loginMutation.isPending}
         >
-          {loginMutation.isPending ? "Signing in..." : "Sign In"}
+          {loginMutation.isPending
+            ? t("auth.login.form.submit.loading")
+            : t("auth.login.form.submit.default")}
         </Button>
       </form>
     </Form>

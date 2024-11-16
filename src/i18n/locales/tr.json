@@ -44,14 +44,120 @@
     "login": {
       "title": "Tekrar Hoşgeldiniz",
       "subtitle": "Hesabınıza erişmek için bilgilerinizi girin",
+      "forgotPassword": "Şifrenizi mi unuttunuz?",
       "noAccount": "Hesabınız yok mu?",
-      "signUp": "Kayıt ol"
+      "signUp": "Kayıt ol",
+      "form": {
+        "email": {
+          "label": "E-posta",
+          "placeholder": "siz@ornek.com"
+        },
+        "password": {
+          "label": "Şifre",
+          "placeholder": "Şifrenizi girin"
+        },
+        "submit": {
+          "loading": "Giriş yapılıyor...",
+          "default": "Giriş Yap"
+        }
+      },
+      "toast": {
+        "success": {
+          "title": "Giriş Başarılı",
+          "description": "Tekrar hoşgeldiniz!"
+        },
+        "error": {
+          "title": "Giriş Başarısız",
+          "description": "Lütfen bilgilerinizi kontrol edin"
+        }
+      }
     },
-    "register": {
+"register": {
       "title": "Hesap oluştur",
       "subtitle": "Başlamak için bilgilerinizi girin",
       "haveAccount": "Zaten hesabınız var mı?",
-      "signIn": "Giriş yap"
+      "signIn": "Giriş yap",
+      "form": {
+        "firstName": {
+          "label": "Ad",
+          "placeholder": "Ahmet"
+        },
+        "lastName": {
+          "label": "Soyad",
+          "placeholder": "Yılmaz"
+        },
+        "userName": {
+          "label": "Kullanıcı Adı",
+          "placeholder": "ahmetyilmaz123"
+        },
+        "email": {
+          "label": "E-posta",
+          "placeholder": "siz@ornek.com"
+        },
+        "phoneNumber": {
+          "label": "Telefon Numarası (İsteğe bağlı)",
+          "placeholder": "+901234567890"
+        },
+        "password": {
+          "label": "Şifre",
+          "placeholder": "Şifre oluşturun"
+        },
+        "confirmPassword": {
+          "label": "Şifre Tekrar",
+          "placeholder": "Şifrenizi tekrar girin",
+          "matching": "✓ Şifreler eşleşiyor",
+          "notMatching": "✗ Şifreler eşleşmiyor"
+        },
+        "submit": {
+          "loading": "Hesap Oluşturuluyor...",
+          "default": "Hesap Oluştur"
+        },
+        "validation": {
+          "firstName": "Ad en az 2 karakter olmalıdır",
+          "lastName": "Soyad en az 2 karakter olmalıdır",
+          "userName": {
+            "min": "Kullanıcı adı en az 3 karakter olmalıdır",
+            "pattern": "Kullanıcı adı sadece harf, rakam, alt çizgi ve tire içerebilir"
+          },
+          "email": "Geçersiz e-posta adresi",
+          "password": {
+            "min": "Şifre en az 6 karakter olmalıdır",
+            "uppercase": "Şifre en az bir büyük harf içermelidir",
+            "lowercase": "Şifre en az bir küçük harf içermelidir",
+            "number": "Şifre en az bir rakam içermelidir"
+          },
+          "phoneNumber": "Geçersiz telefon numarası formatı",
+          "passwordMatch": "Şifreler eşleşmiyor"
+        }
+      },
+      "toast": {
+        "success": {
+          "title": "Kayıt Başarılı",
+          "description": "Hesabınız oluşturuldu. Lütfen giriş yapın."
+        },
+        "error": {
+          "title": "Kayıt Başarısız",
+          "description": "Lütfen kayıt bilgilerinizi kontrol edin."
+        }
+      }
+    },
+    "resetPassword": {
+      "title": "Şifre Sıfırlama",
+      "subtitle": "Yeni şifrenizi girin",
+      "backToLogin": "Girişe Dön",
+      "newPassword": "Yeni Şifre",
+      "confirmPassword": "Şifre Tekrar",
+      "resetButton": "Şifreyi Sıfırla",
+      "success": {
+        "title": "Şifre Başarıyla Sıfırlandı",
+        "description": "Şifreniz başarıyla sıfırlandı. Artık yeni şifrenizle giriş yapabilirsiniz.",
+        "loginButton": "Girişe Git"
+      },
+      "validation": {
+        "passwordRequirements": "Şifre en az bir büyük harf, bir küçük harf, bir rakam ve bir özel karakter içermelidir",
+        "minLength": "Şifre en az 8 karakter olmalıdır",
+        "passwordMatch": "Şifreler eşleşmiyor"
+      }
     }
   }
 }

@@ -27,21 +27,24 @@ export default function LandingPage() {
     {
       name: "Dr. Sarah Johnson",
       role: "Clinical Dietitian",
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&auto=format&fit=crop&crop=face",
+      image:
+        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&auto=format&fit=crop&crop=face",
       content:
         "Dietech has revolutionized how I manage my nutrition practice. The automated tracking and meal planning features save me hours each week.",
     },
     {
       name: "Michael Chen",
       role: "Sports Nutritionist",
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&auto=format&fit=crop&crop=face",
+      image:
+        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&auto=format&fit=crop&crop=face",
       content:
         "The platform's intuitive interface and comprehensive features have helped me provide better service to my athletic clients.",
     },
     {
       name: "Emma Davis",
       role: "Wellness Coach",
-      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&auto=format&fit=crop&crop=face",
+      image:
+        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&auto=format&fit=crop&crop=face",
       content:
         "I love how Dietech combines client management with detailed nutrition tracking. It's the all-in-one solution I've been looking for.",
     },
@@ -54,9 +57,19 @@ export default function LandingPage() {
         <section className="py-20 sm:py-32">
           <div className="container px-4 sm:px-8 text-center">
             <h1 className="text-4xl sm:text-6xl font-bold tracking-tight mb-8">
-              {t("landing.hero.title").split("Smart")[0]}{" "}
-              <span className="text-primary">Smart</span>
-              {t("landing.hero.title").split("Smart")[1]}
+              {t("landing.hero.title").includes("Smart") ? (
+                <>
+                  {t("landing.hero.title").split("Smart")[0]}
+                  <span className="text-primary">Smart</span>
+                  {t("landing.hero.title").split("Smart")[1]}
+                </>
+              ) : (
+                <>
+                  {t("landing.hero.title").split("Akıllı Beslenme Yönetimi")[0]}
+                  <span className="text-primary">Akıllı Beslenme Yönetimi</span>
+                  {t("landing.hero.title").split("Akıllı Beslenme Yönetimi")[1]}
+                </>
+              )}
             </h1>
             <p className="text-xl text-muted-foreground mb-12 max-w-[800px] mx-auto">
               {t("landing.hero.subtitle")}
@@ -182,8 +195,8 @@ export default function LandingPage() {
               Ready to Transform Your Practice?
             </h2>
             <p className="text-xl text-muted-foreground mb-8 max-w-[600px] mx-auto">
-              Join thousands of nutrition professionals who trust Dietech to manage
-              their practice efficiently.
+              Join thousands of nutrition professionals who trust Dietech to
+              manage their practice efficiently.
             </p>
             <Link to="/register">
               <Button size="lg" className="h-12 px-8">

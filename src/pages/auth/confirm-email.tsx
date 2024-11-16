@@ -18,6 +18,7 @@ export default function ConfirmEmailPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [validationError, setValidationError] = useState<string | null>(null);
+  const [isRequestSent, setIsRequestSent] = useState<boolean>(false);
 
   const confirmEmailMutation = useMutation({
     mutationFn: authService.confirmEmail,
@@ -34,37 +35,49 @@ export default function ConfirmEmailPage() {
         variant: "destructive",
       });
     },
+    retry: false,
   });
 
   useEffect(() => {
-    const userId = searchParams.get("userId");
-    const token = searchParams.get("token");
-    const changedEmail = searchParams.get("changedEmail") || "";
+    const handleEmailConfirmation = () => {
+      if(isRequestSent) {
+        return; 
+      }
 
-    console.log(`userId:${userId}\ntoken:${token}\nchangedEmail:${changedEmail}`);
+      setIsRequestSent(true);
+      const userId = searchParams.get("userId");
+      const token = searchParams.get("token");
+      const changedEmail = searchParams.get("changedEmail") || "";
 
-    if (!userId || !token) {
-      setValidationError("Missing required parameters in the confirmation link.");
-      return;
-    }
+      console.log(`userId:${userId}\ntoken:${token}\nchangedEmail:${changedEmail}`);
 
-    const parsedUserId = parseInt(userId);
-    if (isNaN(parsedUserId) || parsedUserId <= 0) {
-      setValidationError("Invalid user ID format in the confirmation link.");
-      return;
-    }
+      if (!userId || !token) {
+        setValidationError("Missing required parameters in the confirmation link.");
+        return;
+      }
 
-    if (token.trim().length === 0) {
-      setValidationError("Invalid token format in the confirmation link.");
-      return;
-    }
+      const parsedUserId = parseInt(userId);
+      if (isNaN(parsedUserId) || parsedUserId <= 0) {
+        setValidationError("Invalid user ID format in the confirmation link.");
+        return;
+      }
 
-    confirmEmailMutation.mutate({
-      userId: parsedUserId,
-      token,
-      changedEmail: changedEmail || "",
-    });
-  }, [searchParams, navigate, toast]);
+      if (token.trim().length === 0) {
+        setValidationError("Invalid token format in the confirmation link.");
+        return;
+      }
+      
+      if (!confirmEmailMutation.isPending && !confirmEmailMutation.isSuccess && !confirmEmailMutation.isError) {
+        confirmEmailMutation.mutate({
+          userId: parsedUserId,
+          token,
+          changedEmail: changedEmail || "",
+        });
+      }
+    };
+
+    handleEmailConfirmation();
+  }, []);
 
   const handleReturnToLogin = () => {
     navigate("/login");

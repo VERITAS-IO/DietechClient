@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { CreateClientDialog } from '@/components/clients/create-client-dialog';
 
 const mockClientData = {
   personalInfo: {
@@ -86,7 +85,6 @@ export default function ClientDetailsPage() {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <CreateClientDialog />
               <Button>
                 <Edit className="h-4 w-4 mr-2" />
                 Edit Profile

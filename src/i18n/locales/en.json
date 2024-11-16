@@ -41,17 +41,123 @@
     }
   },
   "auth": {
-    "login": {
-      "title": "Welcome back",
-      "subtitle": "Enter your credentials to access your account",
-      "noAccount": "Don't have an account?",
-      "signUp": "Sign up"
-    },
-    "register": {
-      "title": "Create an account",
-      "subtitle": "Enter your information to get started",
-      "haveAccount": "Already have an account?",
-      "signIn": "Sign in"
+      "login": {
+        "title": "Welcome back",
+        "subtitle": "Enter your credentials to access your account",
+        "forgotPassword": "Forgot your password?",
+        "noAccount": "Don't have an account?",
+        "signUp": "Sign up",
+        "form": {
+          "email": {
+            "label": "Email",
+            "placeholder": "you@example.com"
+          },
+          "password": {
+            "label": "Password",
+            "placeholder": "Enter your password"
+          },
+          "submit": {
+            "loading": "Signing in...",
+            "default": "Sign In"
+          }
+        },
+        "toast": {
+          "success": {
+            "title": "Login Successful",
+            "description": "Welcome back!"
+          },
+          "error": {
+            "title": "Login Failed",
+            "description": "Please check your credentials"
+          }
+        }
+      },
+      "register": {
+        "title": "Create an account",
+        "subtitle": "Enter your information to get started",
+        "haveAccount": "Already have an account?",
+        "signIn": "Sign in",
+        "form": {
+          "firstName": {
+            "label": "First Name",
+            "placeholder": "John"
+          },
+          "lastName": {
+            "label": "Last Name",
+            "placeholder": "Doe"
+          },
+          "userName": {
+            "label": "Username",
+            "placeholder": "johndoe123"
+          },
+          "email": {
+            "label": "Email",
+            "placeholder": "you@example.com"
+          },
+          "phoneNumber": {
+            "label": "Phone Number (Optional)",
+            "placeholder": "+1234567890"
+          },
+          "password": {
+            "label": "Password",
+            "placeholder": "Create a password"
+          },
+          "confirmPassword": {
+            "label": "Confirm Password",
+            "placeholder": "Confirm your password",
+            "matching": "✓ Passwords match",
+            "notMatching": "✗ Passwords don't match"
+          },
+          "submit": {
+            "loading": "Creating Account...",
+            "default": "Create Account"
+          },
+          "validation": {
+            "firstName": "First name must be at least 2 characters",
+            "lastName": "Last name must be at least 2 characters",
+            "userName": {
+              "min": "Username must be at least 3 characters",
+              "pattern": "Username can only contain letters, numbers, underscores, and hyphens"
+            },
+            "email": "Invalid email address",
+            "password": {
+              "min": "Password must be at least 6 characters",
+              "uppercase": "Password must contain at least one uppercase letter",
+              "lowercase": "Password must contain at least one lowercase letter",
+              "number": "Password must contain at least one number"
+            },
+            "phoneNumber": "Invalid phone number format",
+            "passwordMatch": "Passwords don't match"
+          }
+        },
+        "toast": {
+          "success": {
+            "title": "Registration Successful",
+            "description": "Your account has been created. Please log in."
+          },
+          "error": {
+            "title": "Registration Failed",
+            "description": "Please check your registration info."
+          }
+        }
+      },
+    "resetPassword": {
+      "title": "Reset Password",
+      "subtitle": "Enter your new password",
+      "backToLogin": "Back to Login",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password",
+      "resetButton": "Reset Password",
+      "success": {
+        "title": "Password Reset Successful",
+        "description": "Your password has been successfully reset. You can now log in with your new password.",
+        "loginButton": "Go to Login"
+      },
+      "validation": {
+        "passwordRequirements": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+        "minLength": "Password must be at least 8 characters",
+        "passwordMatch": "Passwords don't match"
+      }
     }
   }
 }

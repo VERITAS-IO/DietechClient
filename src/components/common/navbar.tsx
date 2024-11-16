@@ -13,6 +13,7 @@ import { authService } from "@/services/auth-service";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Salad } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { LanguageToggle } from "../language-toggle";
 
 export function Navbar() {
   const navigate = useNavigate();
@@ -36,6 +37,7 @@ export function Navbar() {
 
         <div className="ml-auto flex items-center space-x-4">
           <ThemeToggle />
+          <LanguageToggle/>
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
