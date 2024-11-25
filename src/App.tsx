@@ -12,6 +12,7 @@ import { AuthProvider } from "./components/providers/auth-provider";
 import ConfirmEmailPage from "./pages/auth/confirm-email";
 import ForgotPasswordPage from "./pages/auth/forgot-password";
 import ResetPasswordPage from "./pages/auth/reset-password";
+import AppointmentsPage from "./pages/appointments";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ function App() {
                   <Route path="/confirm-email" element={<ConfirmEmailPage />} />
                   <Route path="/client-list" element={<ClientListPage />} />
                   <Route path="/clients/:id" element={<ClientDetailsPage />} />
+                  <Route path="/appointments" element={<AppointmentsPage />} />
                 </Routes>
               </div>
             </div>

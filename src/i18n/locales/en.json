@@ -8,7 +8,10 @@
     "confirmPassword": "Confirm Password",
     "fullName": "Full Name",
     "startFreeTrial": "Start Free Trial",
-    "viewDemo": "View Demo"
+    "viewDemo": "View Demo",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit"
   },
   "landing": {
     "hero": {
@@ -159,5 +162,47 @@
         "passwordMatch": "Passwords don't match"
       }
     }
+  },
+  "appointment": {
+    "title": "Appointments",
+    "calendarView": "Calendar",
+    "tableView": "List",
+    "create": "Create Appointment",
+    "edit": "Edit Appointment",
+    "clientName": "Client Name",
+    "date": "Date",
+    "time": "Time",
+    "type": "Type",
+    "status": "Status",
+    "notes": "Notes",
+    "preparationInstructions": "Preparation Instructions",
+    "search": "Search appointments...",
+    "filterByStatus": "Filter by Status",
+    "filterByType": "Filter by Type",
+    "allStatuses": "All Statuses",
+    "allTypes": "All Types",
+    "selectType": "Select type",
+    "selectStatus": "Select status",
+    "types": {
+      "initial": "Initial Consultation",
+      "followUp": "Follow-up",
+      "assessment": "Assessment",
+      "emergency": "Emergency"
+    },
+    "statuses": {
+      "scheduled": "Scheduled",
+      "confirmed": "Confirmed",
+      "cancelled": "Cancelled",
+      "completed": "Completed"
+    }
+  },
+  "calendar": {
+    "next": "Next",
+    "previous": "Previous",
+    "today": "Today",
+    "month": "Month",
+    "week": "Week",
+    "day": "Day",
+    "agenda": "Agenda"
   }
 }

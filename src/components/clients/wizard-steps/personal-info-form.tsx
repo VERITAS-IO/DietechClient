@@ -18,6 +18,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useEffect } from "react";
+import { useClientStore } from "@/stores/client-store";
 
 const formSchema = z.object({
   createPersonaInfoRequest: z.object({
@@ -30,32 +32,78 @@ const formSchema = z.object({
   }),
 });
 
-export function PersonalInfoForm({ data, onSubmit }) {
+export function PersonalInfoForm({ data, onSubmit, isSubmitting = false }) {
+  const { formData } = useClientStore();
+  
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       createPersonaInfoRequest: {
         gender: "Unknown",
         dateOfBirth: "",
-        firstName: "",
-        lastName: "",
-        email: "",
-        phoneNumber: "",
-        ...data,
+        firstName: formData.userRegistrationRequest.firstName,
+        lastName: formData.userRegistrationRequest.lastName,
+        email: formData.userRegistrationRequest.email,
+        phoneNumber: formData.userRegistrationRequest.phoneNumber,
+        ...data, 
       },
     },
   });
 
+  useEffect(() => {
+    const newData = {
+      ...data,
+      firstName: data?.firstName || formData.userRegistrationRequest.firstName,
+      lastName: data?.lastName || formData.userRegistrationRequest.lastName,
+      email: data?.email || formData.userRegistrationRequest.email,
+      phoneNumber: data?.phoneNumber || formData.userRegistrationRequest.phoneNumber,
+    };
+    
+    form.reset({
+      createPersonaInfoRequest: newData,
+    });
+  }, [data, formData.userRegistrationRequest, form]);
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="createPersonaInfoRequest.firstName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>First Name</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="createPersonaInfoRequest.lastName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Last Name</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
         <FormField
           control={form.control}
           name="createPersonaInfoRequest.gender"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Gender</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select gender" />
@@ -87,35 +135,6 @@ export function PersonalInfoForm({ data, onSubmit }) {
           )}
         />
 
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="createPersonaInfoRequest.firstName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>First Name</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="createPersonaInfoRequest.lastName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Last Name</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
         <FormField
           control={form.control}
           name="createPersonaInfoRequest.email"
@@ -144,7 +163,9 @@ export function PersonalInfoForm({ data, onSubmit }) {
           )}
         />
 
-        <Button type="submit" className="w-full">Next</Button>
+        <Button type="submit" className="w-full" disabled={isSubmitting}>
+          Next
+        </Button>
       </form>
     </Form>
   );

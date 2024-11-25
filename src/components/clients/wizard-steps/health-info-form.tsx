@@ -1,24 +1,12 @@
-import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { useEffect } from "react";
 
 const formSchema = z.object({
   createHealthInfoRequest: z.object({
@@ -44,22 +32,42 @@ const formSchema = z.object({
 });
 
 export function HealthInfoForm({ data, onSubmit }) {
+  const { formData } = useClientStore();
+  
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       createHealthInfoRequest: {
-        bloodPressure: "Unknown",
-        bloodType: "Unknown",
-        bloodSugarLevel: "",
-        weight: "70",
-        height: "170",
-        chronicConditions: "",
-        allergies: "",
-        activelyUsedDrugs: "",
+        bloodPressure: formData.createHealthInfoRequest.bloodPressure,
+        bloodType: formData.createHealthInfoRequest.bloodType,
+        bloodSugarLevel: formData.createHealthInfoRequest.bloodSugarLevel?.toString() || "",
+        weight: formData.createHealthInfoRequest.weight.toString(),
+        height: formData.createHealthInfoRequest.height.toString(),
+        chronicConditions: formData.createHealthInfoRequest.chronicConditions,
+        allergies: formData.createHealthInfoRequest.allergies,
+        activelyUsedDrugs: formData.createHealthInfoRequest.activelyUsedDrugs,
         ...data,
       },
     },
   });
+
+  useEffect(() => {
+    const newData = {
+      ...data,
+      bloodPressure: data?.bloodPressure || formData.createHealthInfoRequest.bloodPressure,
+      bloodType: data?.bloodType || formData.createHealthInfoRequest.bloodType,
+      bloodSugarLevel: (data?.bloodSugarLevel || formData.createHealthInfoRequest.bloodSugarLevel)?.toString() || "",
+      weight: (data?.weight || formData.createHealthInfoRequest.weight).toString(),
+      height: (data?.height || formData.createHealthInfoRequest.height).toString(),
+      chronicConditions: data?.chronicConditions || formData.createHealthInfoRequest.chronicConditions,
+      allergies: data?.allergies || formData.createHealthInfoRequest.allergies,
+      activelyUsedDrugs: data?.activelyUsedDrugs || formData.createHealthInfoRequest.activelyUsedDrugs,
+    };
+    
+    form.reset({
+      createHealthInfoRequest: newData,
+    });
+  }, [data, formData.createHealthInfoRequest, form]);
 
   return (
     <Form {...form}>
@@ -71,7 +79,7 @@ export function HealthInfoForm({ data, onSubmit }) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Blood Pressure</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select blood pressure" />
@@ -96,7 +104,7 @@ export function HealthInfoForm({ data, onSubmit }) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Blood Type</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select blood type" />

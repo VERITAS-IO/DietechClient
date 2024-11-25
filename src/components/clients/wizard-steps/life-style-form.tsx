@@ -1,23 +1,12 @@
-import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useEffect } from "react";
+import { useClientStore } from "@/stores/client-store";
 
 const formSchema = z.object({
   createLifeStyleInfoRequest: z.object({
@@ -30,19 +19,37 @@ const formSchema = z.object({
 });
 
 export function LifeStyleForm({ data, onSubmit }) {
+  const { formData } = useClientStore();
+  
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       createLifeStyleInfoRequest: {
-        physicalActivity: "Unknown",
-        sleepHours: "7",
-        stressLevel: "Unknown",
-        smoking: "Unknown",
-        alcohol: "Unknown",
+        physicalActivity: formData.createLifeStyleInfoRequest.physicalActivity,
+        sleepHours: formData.createLifeStyleInfoRequest.sleepHours.toString(),
+        stressLevel: formData.createLifeStyleInfoRequest.stressLevel,
+        smoking: formData.createLifeStyleInfoRequest.smoking,
+        alcohol: formData.createLifeStyleInfoRequest.alcohol,
         ...data,
       },
     },
   });
+
+  useEffect(() => {
+    const newData = {
+      ...data,
+      physicalActivity: data?.physicalActivity || formData.createLifeStyleInfoRequest.physicalActivity,
+      sleepHours: (data?.sleepHours || formData.createLifeStyleInfoRequest.sleepHours).toString(),
+      stressLevel: data?.stressLevel || formData.createLifeStyleInfoRequest.stressLevel,
+      smoking: data?.smoking || formData.createLifeStyleInfoRequest.smoking,
+      alcohol: data?.alcohol || formData.createLifeStyleInfoRequest.alcohol,
+    };
+    
+    form.reset({
+      createLifeStyleInfoRequest: newData,
+    });
+  }, [data, formData.createLifeStyleInfoRequest, form]);
+
 
   return (
     <Form {...form}>
@@ -53,7 +60,7 @@ export function LifeStyleForm({ data, onSubmit }) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Physical Activity Level</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select activity level" />
@@ -93,7 +100,7 @@ export function LifeStyleForm({ data, onSubmit }) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Stress Level</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select stress level" />
@@ -118,7 +125,7 @@ export function LifeStyleForm({ data, onSubmit }) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Smoking Habits</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select smoking habits" />
@@ -143,7 +150,7 @@ export function LifeStyleForm({ data, onSubmit }) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Alcohol Consumption</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select alcohol consumption" />

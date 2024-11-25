@@ -8,7 +8,10 @@
     "confirmPassword": "Şifre Tekrar",
     "fullName": "Ad Soyad",
     "startFreeTrial": "Ücretsiz Dene",
-    "viewDemo": "Demo Görüntüle"
+    "viewDemo": "Demo Görüntüle",
+    "save": "Kaydet",
+    "delete": "Sil",
+    "edit": "Düzenle"
   },
   "landing": {
     "hero": {
@@ -159,5 +162,47 @@
         "passwordMatch": "Şifreler eşleşmiyor"
       }
     }
+  },
+  "appointment": {
+    "title": "Randevular",
+    "calendarView": "Takvim",
+    "tableView": "Liste",
+    "create": "Randevu Oluştur",
+    "edit": "Randevu Düzenle",
+    "clientName": "Danışan Adı",
+    "date": "Tarih",
+    "time": "Saat",
+    "type": "Tür",
+    "status": "Durum",
+    "notes": "Notlar",
+    "preparationInstructions": "Hazırlık Talimatları",
+    "search": "Randevularda ara...",
+    "filterByStatus": "Duruma Göre Filtrele",
+    "filterByType": "Türe Göre Filtrele",
+    "allStatuses": "Tüm Durumlar",
+    "allTypes": "Tüm Türler",
+    "selectType": "Tür seçin",
+    "selectStatus": "Durum seçin",
+    "types": {
+      "initial": "İlk Görüşme",
+      "followUp": "Kontrol",
+      "assessment": "Değerlendirme",
+      "emergency": "Acil"
+    },
+    "statuses": {
+      "scheduled": "Planlandı",
+      "confirmed": "Onaylandı",
+      "cancelled": "İptal Edildi",
+      "completed": "Tamamlandı"
+    }
+  },
+  "calendar": {
+    "next": "İleri",
+    "previous": "Geri",
+    "today": "Bugün",
+    "month": "Ay",
+    "week": "Hafta",
+    "day": "Gün",
+    "agenda": "Ajanda"
   }
 }
