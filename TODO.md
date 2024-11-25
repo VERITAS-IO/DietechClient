@@ -14,6 +14,6 @@
 ## DEVELOPMENT FLOW:
 1.Aside development.
 2.Changing main page when user  is authenticated
-3.api & db should be deployed.
+3.Connect pages to backend with real data.
 4.CREATE A DIET CREATION PAGE.
-5.CONNECT CREATE CLIENT, CLIENT LIST, CLIENT DETAILS TO BACKEND,
+5.api & db should be deployed.
