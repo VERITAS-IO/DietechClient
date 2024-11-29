@@ -204,5 +204,41 @@
     "week": "Hafta",
     "day": "Gün",
     "agenda": "Ajanda"
+  },
+  "dashboard": {
+    "menu": {
+      "dashboard": "Panel",
+      "overview": "Genel Bakış",
+      "schedule": "Program",
+      "clients": "Müşteriler",
+      "clientList": "Müşteri Listesi",
+      "addClient": "Müşteri Ekle",
+      "progress": "İlerleme",
+      "dietPlans": "Diyet Planları",
+      "createPlan": "Plan Oluştur",
+      "managePlans": "Planları Yönet",
+      "templates": "Şablonlar",
+      "appointments": "Randevular",
+      "calendar": "Takvim",
+      "history": "Geçmiş",
+      "analytics": "Analizler",
+      "financial": "Finansal",
+      "reports": "Raporlar",
+      "statistics": "İstatistikler",
+      "resources": "Kaynaklar",
+      "materials": "Materyaller",
+      "resourceTemplates": "Şablonlar",
+      "documents": "Dökümanlar",
+      "settings": "Ayarlar",
+      "profile": "Profil",
+      "business": "İşletme",
+      "preferences": "Tercihler"
+    },
+    "stats": {
+      "totalClients": "Toplam Müşteri",
+      "appointments": "Randevular",
+      "clientGrowth": "Müşteri Büyümesi",
+      "revenue": "Gelir"
+    }
   }
 }

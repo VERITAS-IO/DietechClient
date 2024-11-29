@@ -204,5 +204,41 @@
     "week": "Week",
     "day": "Day",
     "agenda": "Agenda"
+  },
+"dashboard": {
+    "menu": {
+      "dashboard": "Dashboard",
+      "overview": "Overview",
+      "schedule": "Schedule",
+      "clients": "Clients",
+      "clientList": "Client List",
+      "addClient": "Add Client",
+      "progress": "Progress",
+      "dietPlans": "Diet Plans",
+      "createPlan": "Create Plan",
+      "managePlans": "Manage Plans",
+      "templates": "Templates",
+      "appointments": "Appointments",
+      "calendar": "Calendar",
+      "history": "History",
+      "analytics": "Analytics",
+      "financial": "Financial",
+      "reports": "Reports",
+      "statistics": "Statistics",
+      "resources": "Resources",
+      "materials": "Materials",
+      "resourceTemplates": "Templates",
+      "documents": "Documents",
+      "settings": "Settings",
+      "profile": "Profile",
+      "business": "Business",
+      "preferences": "Preferences"
+    },
+    "stats": {
+      "totalClients": "Total Clients",
+      "appointments": "Appointments",
+      "clientGrowth": "Client Growth",
+      "revenue": "Revenue"
+    }
   }
 }

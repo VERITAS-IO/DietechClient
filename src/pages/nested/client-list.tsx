@@ -60,7 +60,7 @@ export default function ClientListPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container px-4 sm:px-6 lg:px-8 py-8">
+      <div className="container m-0">
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold">Client Management</h1>
@@ -107,7 +107,7 @@ export default function ClientListPage() {
                   <TableCell>{client.lastVisit}</TableCell>
                   <TableCell>{client.nextAppointment}</TableCell>
                   <TableCell className="text-right">
-                    <Link to={`/clients/${client.id}`}>
+                    <Link to={`/dashboard/clients/${client.id}`}>
                       <Button variant="ghost" size="sm" className="hover:bg-primary/10">
                         View Details
                       </Button>
