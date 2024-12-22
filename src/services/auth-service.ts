@@ -24,6 +24,7 @@ export const authService = {
         roles: ['Client'],
       });
     } catch (error: any) {
+      
       if (error.response) {
         throw new Error(error.response.data.detail || 'Registration failed');
       }

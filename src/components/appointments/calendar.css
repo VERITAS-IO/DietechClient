@@ -1,0 +1,59 @@
+/* Dark mode styles for FullCalendar */
+.dark .fc {
+    /* General dark mode background and text */
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+  
+  .dark .fc-toolbar-title {
+    color: hsl(var(--primary));
+  }
+  
+  .dark .fc-button {
+    background-color: hsl(var(--secondary));
+    color: hsl(var(--secondary-foreground));
+    border-color: hsl(var(--border));
+  }
+  
+  .dark .fc-button-primary {
+    background-color: hsl(var(--primary));
+    border-color: hsl(var(--primary));
+  }
+  
+  .dark .fc-button:hover {
+    background-color: hsl(var(--secondary-foreground));
+    color: hsl(var(--secondary));
+  }
+  
+  .dark .fc-col-header {
+    background-color: hsl(var(--muted) / 0.2);
+  }
+  
+  .dark .fc-col-header-cell {
+    border-color: hsl(var(--border));
+    color: hsl(var(--muted-foreground));
+  }
+  
+  .dark .fc-daygrid-day {
+    background-color: hsl(var(--background));
+  }
+  
+  .dark .fc-daygrid-day-number {
+    color: hsl(var(--foreground));
+  }
+  
+  .dark .fc-daygrid-day.fc-day-today {
+    background-color: hsl(var(--primary) / 0.1);
+  }
+  
+  .dark .fc-timegrid-slot {
+    border-color: hsl(var(--border));
+  }
+  
+  .dark .fc-timegrid-slot-lane {
+    border-color: hsl(var(--border));
+  }
+  
+  .dark .fc-timegrid-slot-label {
+    color: hsl(var(--muted-foreground));
+  }

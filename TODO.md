@@ -10,10 +10,25 @@
 ## 1.Problem details response body does not return after token refresh middleawre executed, it goes to the exception middleware but response does not have body, only response code.
 ## 2.Confirm email page sends two request, therefore a concurrency error occurs.
 
-
 ## DEVELOPMENT FLOW:
 1.Aside development.
 2.Changing main page when user  is authenticated
 3.Connect pages to backend with real data.
 4.CREATE A DIET CREATION PAGE.
 5.api & db should be deployed.
+
+
+    ### APPOINTMENTS
+    1.AppointmentNotes should be a seperate table.
+
+    ### TENANTS
+    1.How to add users to tenants
+        1.A user registers.
+        2.User adds emails as users to tenant.
+        3.An invitation link sent to these emails.
+        4.Invited emails click the link and register.
+        5.When we create the user, we set the user's tenant id as the value we sent within the invitation token.
+
+## HTTP 
+
+-RETURN 412 - PRECONDITION FAILED IN THE SERVICES WITH PRECONDITIONS.

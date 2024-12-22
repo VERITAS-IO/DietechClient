@@ -11,11 +11,11 @@ import ResetPasswordPage from "@/pages/auth/reset-password";
 import ConfirmEmailPage from "@/pages/auth/confirm-email";
 import ClientListPage from "@/pages/nested/client-list";
 import ClientDetailsPage from "@/pages/nested/client-details";
-import AppointmentsPage from "@/pages/nested/appointments";
 import Dashboard from "@/pages/dashboard";
 import { useAuthStore } from "./stores/auth-store"; 
 import DashboardLayout from "./layouts/DashboadLayouts";
 import { Navbar } from "./components/common/navbar";
+import AppointmentsPage from "./pages/nested/appointments";
 
 const queryClient = new QueryClient();
 
@@ -60,9 +60,7 @@ function App() {
                 </Route>
 
                 <Route path="appointments">
-                  <Route index element={<AppointmentsPage />} />
-                  <Route path="schedule" element={<Navigate to="/dashboard/appointments" replace />} />
-                  <Route path="history" element={<Navigate to="/dashboard/appointments" replace />} />
+                 <Route index element={<AppointmentsPage />} />
                 </Route>
 
                 <Route path="diet-plans/*" element={<Navigate to="/dashboard" replace />} />
