@@ -164,25 +164,41 @@
     }
   },
   "appointment": {
-    "title": "Appointments",
-    "calendarView": "Calendar",
-    "tableView": "List",
+    "title": "Appointment",
     "create": "Create Appointment",
     "edit": "Edit Appointment",
+    "delete": "Delete Appointment",
     "clientName": "Client Name",
-    "date": "Date",
-    "time": "Time",
+    "newClient": "New Client",
+    "searchClient": "Search for a client...",
+    "searchExistingClient": "Search or select an existing client",
+    "enterClientName": "Enter new client name",
+    "noClientsFound": "No clients found",
+    "startTime": "Start Time",
+    "endTime": "End Time",
     "type": "Type",
     "status": "Status",
-    "notes": "Notes",
     "preparationInstructions": "Preparation Instructions",
     "search": "Search appointments...",
+    "calendarView": "Calendar",
+    "tableView": "List",
+    "update": "Update Appointment",
+    "cancel": "Cancel",
+    "clientId": "Client ID",
+    "date": "Date",
+    "time": "Time",
     "filterByStatus": "Filter by Status",
     "filterByType": "Filter by Type",
     "allStatuses": "All Statuses",
     "allTypes": "All Types",
-    "selectType": "Select type",
+    "selectType": "Select appointment type",
     "selectStatus": "Select status",
+    "validation": {
+      "clientNameRequired": "Client name is required",
+      "clientIdRequired": "Client ID is required",
+      "startTimeRequired": "Start time is required",
+      "endTimeRequired": "End time is required"
+    },
     "types": {
       "initial": "Initial Consultation",
       "followUp": "Follow-up",
@@ -194,6 +210,28 @@
       "confirmed": "Confirmed",
       "cancelled": "Cancelled",
       "completed": "Completed"
+    },
+    "notFound": "Appointment not found",
+    "notes": {
+      "title": "Notes",
+      "add": "Add Note",
+      "edit": "Edit Note",
+      "type": "Note Type",
+      "content": "Note Content",
+      "createSuccess": "Note Added",
+      "createSuccessDesc": "The note has been added successfully",
+      "updateSuccess": "Note Updated",
+      "updateSuccessDesc": "The note has been updated successfully",
+      "deleteSuccess": "Note Deleted",
+      "deleteSuccessDesc": "The note has been deleted successfully",
+      "saveFailed": "Failed to save note",
+      "deleteFailed": "Failed to delete note",
+      "types": {
+        "pre": "Pre-Appointment",
+        "during": "During Appointment",
+        "after": "After Appointment",
+        "unknown": "Unknown"
+      }
     }
   },
   "calendar": {
@@ -205,7 +243,7 @@
     "day": "Day",
     "agenda": "Agenda"
   },
-"dashboard": {
+  "dashboard": {
     "menu": {
       "dashboard": "Dashboard",
       "overview": "Overview",
@@ -238,7 +276,14 @@
       "totalClients": "Total Clients",
       "appointments": "Appointments",
       "clientGrowth": "Client Growth",
-      "revenue": "Revenue"
+      "revenue": "Revenue",
+      "vsLastMonth": "vs. last month",
+      "thisWeek": "this week",
+      "vsLastQuarter": "vs. last quarter"
+    },
+    "charts": {
+      "overview": "Overview",
+      "description": "Client Growth and Revenue Overview"
     }
   }
 }

@@ -5,15 +5,17 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { Button } from '@/components/ui/button';
 import { Calendar, Plus } from 'lucide-react';
-import { Appointment } from '@/types/appointment';
+import { Appointment, AppointmentType } from '@/types/appointment';
 import { useAppointmentStore } from '@/stores/appointment-store';
 import { cn } from '@/lib/utils/utils';
 import { AppointmentDialog } from './AppointmentDialog';
 import trLocale from '@fullcalendar/core/locales/tr';
+import { useTranslation } from 'react-i18next';
 
 import './calendar.css';
 
 export function AppointmentCalendar() {
+  const { t } = useTranslation();
   const { appointments } = useAppointmentStore();
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
@@ -26,7 +28,7 @@ export function AppointmentCalendar() {
   };
 
   const handleEventClick = (clickInfo: any) => {
-    const appointment = appointments.find(apt => apt.id === clickInfo.event.id);
+    const appointment = appointments.find(apt => apt.id === parseInt(clickInfo.event.id));
     if (appointment) {
       setSelectedAppointment(appointment);
       setIsDialogOpen(true);
@@ -35,13 +37,13 @@ export function AppointmentCalendar() {
 
   const getEventColor = (appointment: Appointment) => {
     switch (appointment.type) {
-      case 'initial':
+      case AppointmentType.Initial:
         return 'dark:bg-red-700 bg-[#FF5A5F]';
-      case 'followUp':
+      case AppointmentType.FollowUp:
         return 'dark:bg-teal-700 bg-[#00A699]';
-      case 'assessment':
+      case AppointmentType.Assessment:
         return 'dark:bg-orange-700 bg-[#FC642D]';
-      case 'emergency':
+      case AppointmentType.Emergency:
         return 'dark:bg-gray-700 bg-[#484848]';
       default:
         return 'dark:bg-gray-600 bg-[#767676]';
@@ -49,7 +51,7 @@ export function AppointmentCalendar() {
   };
 
   const events = appointments.map(appointment => ({
-    id: appointment.id,
+    id: appointment.id.toString(),
     title: `${appointment.clientName} - ${appointment.type}`,
     start: appointment.start,
     end: appointment.end,
@@ -61,11 +63,12 @@ export function AppointmentCalendar() {
   }));
 
   return (
+    
     <div className="h-full flex flex-col gap-4 p-4">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
           <Calendar className="h-5 w-5 text-primary" />
-          <h1 className="text-2xl font-semibold text-primary">Appointments</h1>
+          <h1 className="text-2xl font-semibold text-primary">{t('appointment.title')}</h1>
         </div>
         <Button
           onClick={() => {
@@ -76,7 +79,7 @@ export function AppointmentCalendar() {
           className="bg-[#FF5A5F] hover:bg-[#FF5A5F]/90"
         >
           <Plus className="h-4 w-4 mr-2" />
-          New Appointment
+          {t('appointment.create')}
         </Button>
       </div>
 

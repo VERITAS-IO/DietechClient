@@ -19,7 +19,7 @@
       "subtitle": "Kapsamlı müşteri yönetim platformumuzla diyetisyen uygulamanızı kolaylaştırın. İlerlemeyi takip edin, beslenme planlarını yönetin ve işinizi büyütün."
     },
     "features": {
-      "clientManagement": {
+      "clientManagement": { 
         "title": "Müşteri Yönetimi",
         "description": "Detaylı profiller, ilerleme takibi ve otomatik takip işlemleriyle müşteri tabanınızı verimli bir şekilde yönetin."
       },
@@ -75,7 +75,7 @@
         }
       }
     },
-"register": {
+    "register": {
       "title": "Hesap oluştur",
       "subtitle": "Başlamak için bilgilerinizi girin",
       "haveAccount": "Zaten hesabınız var mı?",
@@ -167,22 +167,33 @@
     "title": "Randevular",
     "calendarView": "Takvim",
     "tableView": "Liste",
-    "create": "Randevu Oluştur",
+    "create": "Yeni Randevu",
     "edit": "Randevu Düzenle",
+    "update": "Randevu Güncelle",
+    "delete": "Randevu Sil",
+    "cancel": "İptal",
     "clientName": "Danışan Adı",
+    "clientId": "Danışan ID",
     "date": "Tarih",
     "time": "Saat",
+    "startTime": "Başlangıç Saati",
+    "endTime": "Bitiş Saati",
     "type": "Tür",
     "status": "Durum",
-    "notes": "Notlar",
     "preparationInstructions": "Hazırlık Talimatları",
     "search": "Randevularda ara...",
     "filterByStatus": "Duruma Göre Filtrele",
     "filterByType": "Türe Göre Filtrele",
     "allStatuses": "Tüm Durumlar",
     "allTypes": "Tüm Türler",
-    "selectType": "Tür seçin",
+    "selectType": "Randevu türü seçin",
     "selectStatus": "Durum seçin",
+    "validation": {
+      "clientNameRequired": "Danışan adı gereklidir",
+      "clientIdRequired": "Danışan ID gereklidir",
+      "startTimeRequired": "Başlangıç saati gereklidir",
+      "endTimeRequired": "Bitiş saati gereklidir"
+    },
     "types": {
       "initial": "İlk Görüşme",
       "followUp": "Kontrol",
@@ -194,6 +205,33 @@
       "confirmed": "Onaylandı",
       "cancelled": "İptal Edildi",
       "completed": "Tamamlandı"
+    },
+    "notFound": "Randevu bulunamadı",
+    "newClient": "Yeni Danışan",
+    "searchClient": "Danışan ara...",
+    "searchExistingClient": "Mevcut danışan ara veya seç",
+    "enterClientName": "Yeni danışan adını girin",
+    "noClientsFound": "Danışan bulunamadı",
+    "notes": {
+      "title": "Notlar",
+      "add": "Not Ekle",
+      "edit": "Not Düzenle",
+      "type": "Not Türü",
+      "content": "Not İçeriği",
+      "createSuccess": "Not Eklendi",
+      "createSuccessDesc": "Not başarıyla eklendi",
+      "updateSuccess": "Not Güncellendi",
+      "updateSuccessDesc": "Not başarıyla güncellendi",
+      "deleteSuccess": "Not Silindi",
+      "deleteSuccessDesc": "Not başarıyla silindi",
+      "saveFailed": "Not kaydedilemedi",
+      "deleteFailed": "Not silinemedi",
+      "types": {
+        "pre": "Randevu Öncesi",
+        "during": "Randevu Sırası",
+        "after": "Randevu Sonrası",
+        "unknown": "Bilinmiyor"
+      }
     }
   },
   "calendar": {
@@ -210,9 +248,9 @@
       "dashboard": "Panel",
       "overview": "Genel Bakış",
       "schedule": "Program",
-      "clients": "Müşteriler",
-      "clientList": "Müşteri Listesi",
-      "addClient": "Müşteri Ekle",
+      "clients": "Danışanlar",
+      "clientList": "Danışan Listesi",
+      "addClient": "Danışan Ekle",
       "progress": "İlerleme",
       "dietPlans": "Diyet Planları",
       "createPlan": "Plan Oluştur",
@@ -235,10 +273,17 @@
       "preferences": "Tercihler"
     },
     "stats": {
-      "totalClients": "Toplam Müşteri",
+      "totalClients": "Toplam Danışan Sayısı",
       "appointments": "Randevular",
-      "clientGrowth": "Müşteri Büyümesi",
-      "revenue": "Gelir"
+      "clientGrowth": "Danışan Artışı",
+      "revenue": "Gelir",
+      "vsLastMonth": "geçen aya göre",
+      "thisWeek": "bu hafta",
+      "vsLastQuarter": "geçen çeyreğe göre"
+    },
+    "charts": {
+      "overview": "Genel Bakış",
+      "description": "Danışan Artışı ve Gelir Genel Bakışı"
     }
   }
 }

@@ -1,3 +1,5 @@
+import { Gender } from "@/enums/gender";
+
 export interface CreateClientRequest {
   userRegistrationRequest: {
     firstName: string;
@@ -31,4 +33,22 @@ export interface CreateClientRequest {
     allergies: string;
     activelyUsedDrugs: string;
   };
+}
+
+export interface PagedRequest {
+  pageNumber: number;
+  pageSize: number;
+}
+
+export interface QueryClientRequest extends PagedRequest {
+  tenantId?: number;
+}
+
+export interface QueryClientResponse {
+  id: number;
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  gender: Gender;
+  dateOfBirth: Date;
 }

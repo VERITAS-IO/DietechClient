@@ -9,6 +9,7 @@
 #REQUEST RESPONSE CYCLE
 ## 1.Problem details response body does not return after token refresh middleawre executed, it goes to the exception middleware but response does not have body, only response code.
 ## 2.Confirm email page sends two request, therefore a concurrency error occurs.
+## 3.RepositoryBase methods in should get a TenantId as a parameter, and this should be get from token claims.
 
 ## DEVELOPMENT FLOW:
 1.Aside development.
@@ -32,3 +33,5 @@
 ## HTTP 
 
 -RETURN 412 - PRECONDITION FAILED IN THE SERVICES WITH PRECONDITIONS.
+
+
