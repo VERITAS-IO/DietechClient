@@ -30,6 +30,7 @@ export interface CreateAppointmentRequest {
   type: AppointmentType;
   status: AppointmentStatus;
   preparationInstructions?: string;
+  note?:CreateAppointmentNoteRequest;
 }
 
 export interface UpdateAppointmentRequest {
@@ -76,7 +77,6 @@ export interface AppointmentNote {
 }
 
 export interface CreateAppointmentNoteRequest {
-  appointmentId: number;
   note: string;
   noteType: NoteType;
 }

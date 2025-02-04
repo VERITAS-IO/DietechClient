@@ -42,9 +42,12 @@ export function AppointmentNotes({ appointmentId }: AppointmentNotesProps) {
     isLoading,
   } = useAppointmentStore();
 
+  console.log('appointmentNotes:', appointmentNotes);
+
   const handleSubmit = async () => {
     try {
       if (selectedNote) {
+        console.log('selectedNote:', selectedNote);
         await updateAppointmentNote({
           noteId: selectedNote.id,
           note: noteText,
@@ -56,7 +59,6 @@ export function AppointmentNotes({ appointmentId }: AppointmentNotesProps) {
         });
       } else {
         await createAppointmentNote({
-          appointmentId,
           note: noteText,
           noteType,
         });

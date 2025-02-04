@@ -15,7 +15,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useTranslation } from 'react-i18next';
-import { Appointment } from '@/types/appointment';
+import { Appointment, CreateAppointmentNoteRequest, NoteType } from '@/types/appointment';
 import { QueryClientResponse } from '@/types/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
@@ -117,6 +117,12 @@ export function AppointmentDialog({
   }, [appointment, selectedDate, form]);
 
   const onSubmit = (values: z.infer<typeof appointmentSchema>) => {
+    
+    const note: CreateAppointmentNoteRequest = {
+      note: values.notes ?? '',
+      noteType: NoteType.PreAppointment
+    };
+
     const baseAppointmentData = {
       title: `${values.clientName} - ${values.type}`,
       start: new Date(values.start),
@@ -125,6 +131,7 @@ export function AppointmentDialog({
       clientName: values.clientName,
       type: values.type,
       preparationInstructions: values.preparationInstructions,
+      note: note
     };
 
     if (appointment) {
@@ -140,6 +147,7 @@ export function AppointmentDialog({
         status: AppointmentStatus.Scheduled
       };
       createAppointment(createData);
+      
     }
 
     onClose();
@@ -309,19 +317,21 @@ export function AppointmentDialog({
               />
             </div>
 
-            <FormField
-              control={form.control}
-              name="notes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('appointment.notes.add')}</FormLabel>
-                  <FormControl>
-                    <Textarea {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {!appointment && (
+              <FormField
+                control={form.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('appointment.notes.add')}</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
             <FormField
               control={form.control}

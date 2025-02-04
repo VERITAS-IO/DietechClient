@@ -136,20 +136,53 @@ export const useAppointmentStore = create<AppointmentState>()(
       createAppointment: async (request) => {
         set({ isLoading: true });
         try {
+          const tempAppointmentId = Date.now(); 
+      
           const newAppointment: Appointment = {
-            id: Math.max(...mockAppointments.map(a => a.id)) + 1,
-            ...request,
+            id: tempAppointmentId,
+            title: request.title,
+            start: request.start,
+            end: request.end,
+            clientId: request.clientId,
+            clientName: request.clientName,
+            type: request.type,
+            status: request.status,
+            preparationInstructions: request.preparationInstructions,
+            appointmentNotes: [] 
           };
+      
+          if (request.note) {
+            const newNote: AppointmentNote = {
+              id: tempAppointmentId, 
+              appointmentId: tempAppointmentId, 
+              note: request.note.note,
+              noteType: request.note.noteType
+            };
+            
+            newAppointment.appointmentNotes = [newNote];
+          }
+      
           set(state => ({
             appointments: [...state.appointments, newAppointment],
+            appointmentNotes: [
+              ...state.appointmentNotes,
+              ...(newAppointment.appointmentNotes || [])
+            ],
             error: null,
           }));
+      
+          // In a real application, you would:
+          // 1. Send the appointment data to the backend
+          // 2. Get the real IDs back
+          // 3. Update the store with the real IDs
+          
         } catch (error) {
           set({ error: (error as Error).message });
         } finally {
           set({ isLoading: false });
         }
       },
+      
 
       updateAppointment: async (id, request) => {
         set({ isLoading: true });
@@ -204,6 +237,7 @@ export const useAppointmentStore = create<AppointmentState>()(
         try {
           const newNote: AppointmentNote = {
             id: Math.max(...mockAppointmentNotes.map(n => n.id)) + 1,
+            appointmentId: 0,
             ...request,
           };
           set(state => ({

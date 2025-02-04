@@ -9,8 +9,11 @@ import { Appointment, AppointmentType } from '@/types/appointment';
 import { useAppointmentStore } from '@/stores/appointment-store';
 import { cn } from '@/lib/utils/utils';
 import { AppointmentDialog } from './AppointmentDialog';
+import { AppointmentNotesDialog } from './AppointmentNotesDialog';
+import { AppointmentDropdownMenu } from './AppointmentDropdownMenu';
 import trLocale from '@fullcalendar/core/locales/tr';
 import { useTranslation } from 'react-i18next';
+import { createRoot } from 'react-dom/client';
 
 import './calendar.css';
 
@@ -19,22 +22,23 @@ export function AppointmentCalendar() {
   const { appointments } = useAppointmentStore();
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isAppointmentDialogOpen, setIsAppointmentDialogOpen] = useState(false);
+  const [isNotesDialogOpen, setIsNotesDialogOpen] = useState(false);
 
   const handleDateSelect = (selectInfo: any) => {
     setSelectedDate(selectInfo.start);
     setSelectedAppointment(null);
-    setIsDialogOpen(true);
+    setIsAppointmentDialogOpen(true);
   };
 
   const handleEventClick = (clickInfo: any) => {
+    clickInfo.jsEvent.preventDefault();
     const appointment = appointments.find(apt => apt.id === parseInt(clickInfo.event.id));
     if (appointment) {
       setSelectedAppointment(appointment);
-      setIsDialogOpen(true);
     }
   };
-
+  
   const getEventColor = (appointment: Appointment) => {
     switch (appointment.type) {
       case AppointmentType.Initial:
@@ -58,12 +62,48 @@ export function AppointmentCalendar() {
     classNames: [getEventColor(appointment)],
     textColor: '#FFFFFF',
     extendedProps: {
-      status: appointment.status
+      status: appointment.status,
+      appointment: appointment,
     }
   }));
 
-  return (
+  const renderEventContent = (eventInfo: any) => {
+    const appointment = eventInfo.event.extendedProps.appointment;
     
+    // Create a container for the event content
+    const container = document.createElement('div');
+    container.className = 'fc-event-main-content relative';
+    
+    // Create a text element for the title
+    const titleElement = document.createElement('div');
+    titleElement.textContent = eventInfo.event.title;
+    container.appendChild(titleElement);
+    
+    // Create a container for the dropdown
+    const dropdownContainer = document.createElement('div');
+    dropdownContainer.className = 'absolute top-1 right-1';
+    container.appendChild(dropdownContainer);
+    
+    // Use createRoot to render the React component
+    const root = createRoot(dropdownContainer);
+    root.render(
+      <AppointmentDropdownMenu
+        appointment={appointment}
+        onEditClick={() => {
+          setSelectedAppointment(appointment);
+          setIsAppointmentDialogOpen(true);
+        }}
+        onNotesClick={() => {
+          setSelectedAppointment(appointment);
+          setIsNotesDialogOpen(true);
+        }}
+      />
+    );
+
+    return { domNodes: [container] };
+  };
+
+  return (
     <div className="h-full flex flex-col gap-4 p-4">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
@@ -74,7 +114,7 @@ export function AppointmentCalendar() {
           onClick={() => {
             setSelectedDate(new Date());
             setSelectedAppointment(null);
-            setIsDialogOpen(true);
+            setIsAppointmentDialogOpen(true);
           }}
           className="bg-[#FF5A5F] hover:bg-[#FF5A5F]/90"
         >
@@ -107,15 +147,24 @@ export function AppointmentCalendar() {
           slotMinTime="08:00:00"
           slotMaxTime="20:00:00"
           locale={trLocale}
+          eventContent={renderEventContent}
         />
       </div>
 
       <AppointmentDialog
-        isOpen={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
+        isOpen={isAppointmentDialogOpen}
+        onClose={() => setIsAppointmentDialogOpen(false)}
         selectedDate={selectedDate}
         appointment={selectedAppointment}
       />
+
+      {selectedAppointment && (
+        <AppointmentNotesDialog
+          isOpen={isNotesDialogOpen}
+          onClose={() => setIsNotesDialogOpen(false)}
+          appointmentId={selectedAppointment.id}
+        />
+      )}
     </div>
   );
 }
