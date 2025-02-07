@@ -29,18 +29,26 @@ interface AppointmentState {
 
   // Appointment Note Actions
   getAppointmentNotes: (query: QueryAppointmentNotesRequest) => Promise<void>;
-  createAppointmentNote: (request: CreateAppointmentNoteRequest) => Promise<void>;
-  updateAppointmentNote: (request: UpdateAppointmentNoteRequest) => Promise<void>;
+  createAppointmentNote: (request: CreateAppointmentNoteRequest & { appointmentId: number }) => Promise<void>;
+  updateAppointmentNote: (request: UpdateAppointmentNoteRequest) => Promise<void>;  
   deleteAppointmentNote: (id: number) => Promise<void>;
 }
 
-// Mock data
+// Helper function to preserve timezone when creating Date objects
+const createDateWithTimezone = (dateString: string | Date): Date => {
+  const date = new Date(dateString);
+  return new Date(
+    date.getTime() - (date.getTimezoneOffset() * 60000)
+  );
+};
+
+// Mock data with timezone-aware dates
 const mockAppointments: Appointment[] = [
   {
     id: 1,
     title: "Initial Consultation - John Doe",
-    start: new Date("2024-02-01T10:00:00"),
-    end: new Date("2024-02-01T11:00:00"),
+    start: createDateWithTimezone("2024-02-01T10:00:00"),
+    end: createDateWithTimezone("2024-02-01T11:00:00"),
     clientId: 1,
     clientName: "John Doe",
     type: AppointmentType.Initial,
@@ -50,8 +58,8 @@ const mockAppointments: Appointment[] = [
   {
     id: 2,
     title: "Follow-up - Jane Smith",
-    start: new Date("2024-02-02T14:00:00"),
-    end: new Date("2024-02-02T15:00:00"),
+    start: createDateWithTimezone("2024-02-02T14:00:00"),
+    end: createDateWithTimezone("2024-02-02T15:00:00"),
     clientId: 2,
     clientName: "Jane Smith",
     type: AppointmentType.FollowUp,
@@ -87,7 +95,6 @@ export const useAppointmentStore = create<AppointmentState>()(
       getAppointments: async (query) => {
         set({ isLoading: true, error: null });
         try {
-          // Mock API call
           const filtered = mockAppointments.filter(apt => {
             if (query.clientId && apt.clientId !== query.clientId) return false;
             if (query.type && apt.type !== query.type) return false;
@@ -97,11 +104,10 @@ export const useAppointmentStore = create<AppointmentState>()(
             return true;
           });
 
-          // Ensure dates are properly parsed
           const parsedAppointments = filtered.map(apt => ({
             ...apt,
-            start: new Date(apt.start),
-            end: new Date(apt.end)
+            start: createDateWithTimezone(apt.start),
+            end: createDateWithTimezone(apt.end)
           }));
 
           set({ appointments: parsedAppointments, isLoading: false });
@@ -118,11 +124,10 @@ export const useAppointmentStore = create<AppointmentState>()(
             appointment.appointmentNotes = mockAppointmentNotes.filter(
               note => note.appointmentId === id
             );
-            // Ensure dates are properly parsed
             return {
               ...appointment,
-              start: new Date(appointment.start),
-              end: new Date(appointment.end)
+              start: createDateWithTimezone(appointment.start),
+              end: createDateWithTimezone(appointment.end)
             };
           }
           return appointment;
@@ -141,8 +146,8 @@ export const useAppointmentStore = create<AppointmentState>()(
           const newAppointment: Appointment = {
             id: tempAppointmentId,
             title: request.title,
-            start: request.start,
-            end: request.end,
+            start: createDateWithTimezone(request.start),
+            end: createDateWithTimezone(request.end),
             clientId: request.clientId,
             clientName: request.clientName,
             type: request.type,
@@ -160,36 +165,36 @@ export const useAppointmentStore = create<AppointmentState>()(
             };
             
             newAppointment.appointmentNotes = [newNote];
+            
+            set(state => ({
+              appointments: [...state.appointments, newAppointment],
+              appointmentNotes: [...state.appointmentNotes, newNote],
+              error: null,
+            }));
+          } else {
+            set(state => ({
+              appointments: [...state.appointments, newAppointment],
+              error: null,
+            }));
           }
-      
-          set(state => ({
-            appointments: [...state.appointments, newAppointment],
-            appointmentNotes: [
-              ...state.appointmentNotes,
-              ...(newAppointment.appointmentNotes || [])
-            ],
-            error: null,
-          }));
-      
-          // In a real application, you would:
-          // 1. Send the appointment data to the backend
-          // 2. Get the real IDs back
-          // 3. Update the store with the real IDs
-          
         } catch (error) {
           set({ error: (error as Error).message });
         } finally {
           set({ isLoading: false });
         }
       },
-      
 
       updateAppointment: async (id, request) => {
         set({ isLoading: true });
         try {
           set(state => ({
             appointments: state.appointments.map(apt =>
-              apt.id === id ? { ...apt, ...request } : apt
+              apt.id === id ? {
+                ...apt,
+                ...request,
+                start: request.start ? createDateWithTimezone(request.start) : apt.start,
+                end: request.end ? createDateWithTimezone(request.end) : apt.end,
+              } : apt
             ),
             error: null,
           }));
@@ -205,6 +210,7 @@ export const useAppointmentStore = create<AppointmentState>()(
         try {
           set(state => ({
             appointments: state.appointments.filter(apt => apt.id !== id),
+            appointmentNotes: state.appointmentNotes.filter(note => note.appointmentId !== id),
             error: null,
           }));
         } catch (error) {
@@ -218,7 +224,7 @@ export const useAppointmentStore = create<AppointmentState>()(
       getAppointmentNotes: async (query) => {
         set({ isLoading: true });
         try {
-          const filtered = mockAppointmentNotes.filter(note => {
+          const filtered = get().appointmentNotes.filter(note => {
             if (query.appointmentId && note.appointmentId !== query.appointmentId) return false;
             if (query.noteType && note.noteType !== query.noteType) return false;
             if (query.note && !note.note.toLowerCase().includes(query.note.toLowerCase())) return false;
@@ -235,11 +241,18 @@ export const useAppointmentStore = create<AppointmentState>()(
       createAppointmentNote: async (request) => {
         set({ isLoading: true });
         try {
+          const currentNotes = get().appointmentNotes;
+          const newNoteId = currentNotes.length > 0 
+            ? Math.max(...currentNotes.map(n => n.id)) + 1 
+            : 1;
+
           const newNote: AppointmentNote = {
-            id: Math.max(...mockAppointmentNotes.map(n => n.id)) + 1,
-            appointmentId: 0,
-            ...request,
+            id: newNoteId,
+            appointmentId: request.appointmentId,
+            note: request.note,
+            noteType: request.noteType,
           };
+
           set(state => ({
             appointmentNotes: [...state.appointmentNotes, newNote],
             error: null,
@@ -254,12 +267,24 @@ export const useAppointmentStore = create<AppointmentState>()(
       updateAppointmentNote: async (request) => {
         set({ isLoading: true });
         try {
-          set(state => ({
-            appointmentNotes: state.appointmentNotes.map(note =>
-              note.id === request.noteId ? { ...note, ...request } : note
-            ),
-            error: null,
-          }));
+          set(state => {
+            const updatedNotes = state.appointmentNotes.map(note => {
+              if (note.id === request.noteId) {
+                return {
+                  ...note,
+                  note: request.note,
+                  noteType: request.noteType as NoteType,
+                };
+              }
+              return note;
+            });
+            
+            return {
+              ...state,
+              appointmentNotes: updatedNotes,
+              error: null,
+            };
+          });
         } catch (error) {
           set({ error: (error as Error).message });
         } finally {

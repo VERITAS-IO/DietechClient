@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -35,19 +35,19 @@ export function AppointmentNotes({ appointmentId }: AppointmentNotesProps) {
 
   const {
     appointmentNotes,
-    getAppointmentNotes,
     createAppointmentNote,
     updateAppointmentNote,
     deleteAppointmentNote,
     isLoading,
   } = useAppointmentStore();
 
-  console.log('appointmentNotes:', appointmentNotes);
+  const filteredNotes = appointmentNotes.filter(
+    (note) => note.appointmentId === appointmentId
+  );
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     try {
       if (selectedNote) {
-        console.log('selectedNote:', selectedNote);
         await updateAppointmentNote({
           noteId: selectedNote.id,
           note: noteText,
@@ -59,6 +59,7 @@ export function AppointmentNotes({ appointmentId }: AppointmentNotesProps) {
         });
       } else {
         await createAppointmentNote({
+          appointmentId,
           note: noteText,
           noteType,
         });
@@ -70,7 +71,7 @@ export function AppointmentNotes({ appointmentId }: AppointmentNotesProps) {
       setIsDialogOpen(false);
       setSelectedNote(null);
       setNoteText('');
-      getAppointmentNotes({ appointmentId });
+      setNoteType(NoteType.PreAppointment);
     } catch (error) {
       toast({
         variant: 'destructive',
@@ -78,16 +79,15 @@ export function AppointmentNotes({ appointmentId }: AppointmentNotesProps) {
         description: t('appointment.notes.saveFailed'),
       });
     }
-  };
+  }, [appointmentId, noteText, noteType, selectedNote, createAppointmentNote, updateAppointmentNote, toast, t]);
 
-  const handleDelete = async (noteId: number) => {
+  const handleDelete = useCallback(async (noteId: number) => {
     try {
       await deleteAppointmentNote(noteId);
       toast({
         title: t('appointment.notes.deleteSuccess'),
         description: t('appointment.notes.deleteSuccessDesc'),
       });
-      getAppointmentNotes({ appointmentId });
     } catch (error) {
       toast({
         variant: 'destructive',
@@ -95,9 +95,9 @@ export function AppointmentNotes({ appointmentId }: AppointmentNotesProps) {
         description: t('appointment.notes.deleteFailed'),
       });
     }
-  };
+  }, [deleteAppointmentNote, toast, t]);
 
-  const getNoteTypeLabel = (type: NoteType) => {
+  const getNoteTypeLabel = useCallback((type: NoteType) => {
     switch (type) {
       case NoteType.PreAppointment:
         return t('appointment.notes.types.pre');
@@ -108,7 +108,21 @@ export function AppointmentNotes({ appointmentId }: AppointmentNotesProps) {
       default:
         return t('appointment.notes.types.unknown');
     }
-  };
+  }, [t]);
+
+  const handleOpenNewNote = useCallback(() => {
+    setSelectedNote(null);
+    setNoteText('');
+    setNoteType(NoteType.PreAppointment);
+    setIsDialogOpen(true);
+  }, []);
+
+  const handleOpenEditNote = useCallback((note: AppointmentNote) => {
+    setSelectedNote(note);
+    setNoteText(note.note);
+    setNoteType(note.noteType);
+    setIsDialogOpen(true);
+  }, []);
 
   return (
     <div className="space-y-4">
@@ -116,13 +130,7 @@ export function AppointmentNotes({ appointmentId }: AppointmentNotesProps) {
         <h3 className="text-lg font-semibold">{t('appointment.notes.title')}</h3>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button
-              onClick={() => {
-                setSelectedNote(null);
-                setNoteText('');
-                setNoteType(NoteType.PreAppointment);
-              }}
-            >
+            <Button onClick={handleOpenNewNote}>
               <Plus className="h-4 w-4 mr-2" />
               {t('appointment.notes.add')}
             </Button>
@@ -183,42 +191,35 @@ export function AppointmentNotes({ appointmentId }: AppointmentNotesProps) {
       </div>
 
       <div className="space-y-4">
-        {appointmentNotes
-          .filter((note) => note.appointmentId === appointmentId)
-          .map((note) => (
-            <div
-              key={note.id}
-              className="p-4 border rounded-lg space-y-2 bg-background"
-            >
-              <div className="flex justify-between items-start">
-                <span className="text-sm font-medium text-muted-foreground">
-                  {getNoteTypeLabel(note.noteType)}
-                </span>
-                <div className="space-x-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setSelectedNote(note);
-                      setNoteText(note.note);
-                      setNoteType(note.noteType);
-                      setIsDialogOpen(true);
-                    }}
-                  >
-                    {t('common.edit')}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDelete(note.id)}
-                  >
-                    {t('common.delete')}
-                  </Button>
-                </div>
+        {filteredNotes.map((note) => (
+          <div
+            key={note.id}
+            className="p-4 border rounded-lg space-y-2 bg-background"
+          >
+            <div className="flex justify-between items-start">
+              <span className="text-sm font-medium text-muted-foreground">
+                {getNoteTypeLabel(note.noteType)}
+              </span>
+              <div className="space-x-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleOpenEditNote(note)}
+                >
+                  {t('common.edit')}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleDelete(note.id)}
+                >
+                  {t('common.delete')}
+                </Button>
               </div>
-              <p className="text-sm whitespace-pre-wrap">{note.note}</p>
             </div>
-          ))}
+            <p className="text-sm whitespace-pre-wrap">{note.note}</p>
+          </div>
+        ))}
       </div>
     </div>
   );

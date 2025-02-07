@@ -1,4 +1,5 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { AppointmentNotes } from './AppointmentNotes';
 import { useTranslation } from 'react-i18next';
 
@@ -17,11 +18,13 @@ export function AppointmentNotesDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px] max-h-[80vh]">
         <DialogHeader>
           <DialogTitle>{t('appointment.notes.title')}</DialogTitle>
         </DialogHeader>
-        <AppointmentNotes appointmentId={appointmentId} />
+        <ScrollArea className="h-[calc(80vh-8rem)] pr-4">
+          <AppointmentNotes appointmentId={appointmentId} />
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -26,7 +26,6 @@ import { Check } from "lucide-react";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from '@/lib/utils/utils';
-import { useRef } from 'react';
 
 const appointmentSchema = z.object({
   clientName: z.string().min(1, 'Client name is required'),
@@ -44,6 +43,20 @@ interface AppointmentDialogProps {
   selectedDate: Date | null;
   appointment: Appointment | null;
 }
+
+// Helper function to format date to local ISO string without timezone offset
+const formatLocalISOString = (date: Date): string => {
+  const offset = date.getTimezoneOffset();
+  const adjustedDate = new Date(date.getTime() - (offset * 60 * 1000));
+  return adjustedDate.toISOString().slice(0, 16);
+};
+
+// Helper function to parse local datetime string to UTC Date
+const parseLocalDateTime = (dateTimeString: string): Date => {
+  const date = new Date(dateTimeString);
+  const offset = date.getTimezoneOffset();
+  return new Date(date.getTime() + (offset * 60 * 1000));
+};
 
 export function AppointmentDialog({
   isOpen,
@@ -71,8 +84,16 @@ export function AppointmentDialog({
       clientName: appointment?.clientName ?? '',
       isNewClient: false,
       type: appointment?.type ?? AppointmentType.Initial,
-      start: appointment?.start ? new Date(appointment.start).toISOString().slice(0, 16) : selectedDate?.toISOString().slice(0, 16) ?? new Date().toISOString().slice(0, 16),
-      end: appointment?.end ? new Date(appointment.end).toISOString().slice(0, 16) : selectedDate ? new Date(selectedDate.getTime() + 3600000).toISOString().slice(0, 16) : new Date(new Date().getTime() + 3600000).toISOString().slice(0, 16),
+      start: appointment?.start 
+        ? formatLocalISOString(new Date(appointment.start))
+        : selectedDate 
+          ? formatLocalISOString(selectedDate)
+          : formatLocalISOString(new Date()),
+      end: appointment?.end 
+        ? formatLocalISOString(new Date(appointment.end))
+        : selectedDate 
+          ? formatLocalISOString(new Date(selectedDate.getTime() + 3600000))
+          : formatLocalISOString(new Date(new Date().getTime() + 3600000)),
       notes: appointment?.appointmentNotes?.map(note => note.note).join('\n') ?? '',
       preparationInstructions: appointment?.preparationInstructions ?? '',
     },
@@ -96,8 +117,8 @@ export function AppointmentDialog({
         clientName: appointment.clientName,
         isNewClient: false,
         type: appointment.type,
-        start: new Date(appointment.start).toISOString().slice(0, 16),
-        end: new Date(appointment.end).toISOString().slice(0, 16),
+        start: formatLocalISOString(new Date(appointment.start)),
+        end: formatLocalISOString(new Date(appointment.end)),
         notes: appointment.appointmentNotes?.map(note => note.note).join('\n') || '',
         preparationInstructions: appointment.preparationInstructions || '',
       });
@@ -108,8 +129,8 @@ export function AppointmentDialog({
         clientName: '',
         isNewClient: false,
         type: AppointmentType.Initial,
-        start: selectedDate.toISOString().slice(0, 16),
-        end: endDate.toISOString().slice(0, 16),
+        start: formatLocalISOString(selectedDate),
+        end: formatLocalISOString(endDate),
         notes: '',
         preparationInstructions: '',
       });
@@ -117,7 +138,6 @@ export function AppointmentDialog({
   }, [appointment, selectedDate, form]);
 
   const onSubmit = (values: z.infer<typeof appointmentSchema>) => {
-    
     const note: CreateAppointmentNoteRequest = {
       note: values.notes ?? '',
       noteType: NoteType.PreAppointment
@@ -125,8 +145,8 @@ export function AppointmentDialog({
 
     const baseAppointmentData = {
       title: `${values.clientName} - ${values.type}`,
-      start: new Date(values.start),
-      end: new Date(values.end),
+      start: parseLocalDateTime(values.start),
+      end: parseLocalDateTime(values.end),
       clientId: selectedClient ? selectedClient.id : undefined,
       clientName: values.clientName,
       type: values.type,
@@ -147,7 +167,6 @@ export function AppointmentDialog({
         status: AppointmentStatus.Scheduled
       };
       createAppointment(createData);
-      
     }
 
     onClose();
@@ -159,10 +178,6 @@ export function AppointmentDialog({
       onClose();
     }
   };
-
-  useEffect(() => {
-    console.log('appointments:', appointments);
-  }, [appointments])
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
