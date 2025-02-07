@@ -1,8 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { 
-  Appointment, 
-  AppointmentNote,
   AppointmentStatus, 
   AppointmentType,
   CreateAppointmentRequest,
@@ -11,18 +9,20 @@ import {
   CreateAppointmentNoteRequest,
   UpdateAppointmentNoteRequest,
   QueryAppointmentNotesRequest,
-  NoteType
+  NoteType,
+  GetAppointmentResponse,
+  GetAppointmentNoteResponse
 } from '@/types/appointment';
 
 interface AppointmentState {
-  appointments: Appointment[];
-  appointmentNotes: AppointmentNote[];
+  appointments: GetAppointmentResponse[];
+  appointmentNotes: GetAppointmentNoteResponse[];
   isLoading: boolean;
   error: string | null;
 
   // Appointment Actions
   getAppointments: (query: QueryAppointmentsRequest) => Promise<void>;
-  getAppointment: (id: number) => Promise<Appointment | undefined>;
+  getAppointment: (id: number) => Promise<GetAppointmentResponse | undefined>;
   createAppointment: (request: CreateAppointmentRequest) => Promise<void>;
   updateAppointment: (id: number, request: UpdateAppointmentRequest) => Promise<void>;
   deleteAppointment: (id: number) => Promise<void>;
@@ -43,7 +43,7 @@ const createDateWithTimezone = (dateString: string | Date): Date => {
 };
 
 // Mock data with timezone-aware dates
-const mockAppointments: Appointment[] = [
+const mockAppointments: GetAppointmentResponse[] = [
   {
     id: 1,
     title: "Initial Consultation - John Doe",
@@ -68,7 +68,7 @@ const mockAppointments: Appointment[] = [
   },
 ];
 
-const mockAppointmentNotes: AppointmentNote[] = [
+const mockAppointmentNotes: GetAppointmentNoteResponse[] = [
   {
     id: 1,
     appointmentId: 1,
@@ -143,7 +143,7 @@ export const useAppointmentStore = create<AppointmentState>()(
         try {
           const tempAppointmentId = Date.now(); 
       
-          const newAppointment: Appointment = {
+          const newAppointment: GetAppointmentResponse = {
             id: tempAppointmentId,
             title: request.title,
             start: createDateWithTimezone(request.start),
@@ -157,7 +157,7 @@ export const useAppointmentStore = create<AppointmentState>()(
           };
       
           if (request.note) {
-            const newNote: AppointmentNote = {
+            const newNote: GetAppointmentNoteResponse = {
               id: tempAppointmentId, 
               appointmentId: tempAppointmentId, 
               note: request.note.note,
@@ -246,7 +246,7 @@ export const useAppointmentStore = create<AppointmentState>()(
             ? Math.max(...currentNotes.map(n => n.id)) + 1 
             : 1;
 
-          const newNote: AppointmentNote = {
+          const newNote: GetAppointmentNoteResponse = {
             id: newNoteId,
             appointmentId: request.appointmentId,
             note: request.note,

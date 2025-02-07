@@ -54,9 +54,9 @@ export interface QueryAppointmentsRequest {
   status?: AppointmentStatus;
   page?: number;
   pageSize?: number;
-}
+} 
 
-export interface Appointment {
+export interface GetAppointmentResponse {
   id: number;
   title: string;
   start: Date;
@@ -66,10 +66,17 @@ export interface Appointment {
   type: AppointmentType;
   status: AppointmentStatus;
   preparationInstructions?: string;
-  appointmentNotes?: AppointmentNote[];
+  appointmentNotes?: GetAppointmentNoteResponse[];
 }
 
-export interface AppointmentNote {
+export interface GetAppointmentNoteResponse {
+  id: number;
+  appointmentId: number;
+  note: string;
+  noteType: NoteType;
+}
+
+export interface QueryAppointmentNoteResponse {
   id: number;
   appointmentId: number;
   note: string;

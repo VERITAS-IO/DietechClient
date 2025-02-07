@@ -2,24 +2,11 @@ import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
+import { DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { useAppointmentStore } from '@/stores/appointment-store';
-import { AppointmentNote, NoteType } from '@/types/appointment';
+import { GetAppointmentNoteResponse, NoteType } from '@/types/appointment';
+import { AppointmentNoteDialog } from './AppointmentNoteDialog';
 
 interface AppointmentNotesProps {
   appointmentId: number;
@@ -29,7 +16,7 @@ export function AppointmentNotes({ appointmentId }: AppointmentNotesProps) {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [selectedNote, setSelectedNote] = useState<AppointmentNote | null>(null);
+  const [selectedNote, setSelectedNote] = useState<GetAppointmentNoteResponse | null>(null);
   const [noteText, setNoteText] = useState('');
   const [noteType, setNoteType] = useState<NoteType>(NoteType.PreAppointment);
 
@@ -117,7 +104,7 @@ export function AppointmentNotes({ appointmentId }: AppointmentNotesProps) {
     setIsDialogOpen(true);
   }, []);
 
-  const handleOpenEditNote = useCallback((note: AppointmentNote) => {
+  const handleOpenEditNote = useCallback((note: GetAppointmentNoteResponse) => {
     setSelectedNote(note);
     setNoteText(note.note);
     setNoteType(note.noteType);
@@ -128,67 +115,25 @@ export function AppointmentNotes({ appointmentId }: AppointmentNotesProps) {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold">{t('appointment.notes.title')}</h3>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={handleOpenNewNote}>
-              <Plus className="h-4 w-4 mr-2" />
-              {t('appointment.notes.add')}
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>
-                {selectedNote
-                  ? t('appointment.notes.edit')
-                  : t('appointment.notes.add')}
-              </DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label>{t('appointment.notes.type')}</label>
-                <Select
-                  value={noteType.toString()}
-                  onValueChange={(value) => setNoteType(Number(value) as NoteType)}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value={NoteType.PreAppointment.toString()}>
-                      {t('appointment.notes.types.pre')}
-                    </SelectItem>
-                    <SelectItem value={NoteType.DuringAppointment.toString()}>
-                      {t('appointment.notes.types.during')}
-                    </SelectItem>
-                    <SelectItem value={NoteType.AfterAppointment.toString()}>
-                      {t('appointment.notes.types.after')}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <label>{t('appointment.notes.content')}</label>
-                <Textarea
-                  value={noteText}
-                  onChange={(e) => setNoteText(e.target.value)}
-                  rows={4}
-                />
-              </div>
-              <div className="flex justify-end space-x-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setIsDialogOpen(false)}
-                >
-                  {t('common.cancel')}
-                </Button>
-                <Button onClick={handleSubmit} disabled={isLoading}>
-                  {selectedNote ? t('common.update') : t('common.save')}
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <DialogTrigger asChild>
+          <Button onClick={handleOpenNewNote}>
+            <Plus className="h-4 w-4 mr-2" />
+            {t('appointment.notes.add')}
+          </Button>
+        </DialogTrigger>
       </div>
+
+      <AppointmentNoteDialog
+        isOpen={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        selectedNote={selectedNote}
+        noteText={noteText}
+        onNoteTextChange={setNoteText}
+        noteType={noteType}
+        onNoteTypeChange={setNoteType}
+        onSubmit={handleSubmit}
+        isLoading={isLoading}
+      />
 
       <div className="space-y-4">
         {filteredNotes.map((note) => (

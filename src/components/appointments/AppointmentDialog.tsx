@@ -15,7 +15,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useTranslation } from 'react-i18next';
-import { Appointment, CreateAppointmentNoteRequest, NoteType } from '@/types/appointment';
+import { GetAppointmentResponse, CreateAppointmentNoteRequest, NoteType } from '@/types/appointment';
 import { QueryClientResponse } from '@/types/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
@@ -41,7 +41,7 @@ interface AppointmentDialogProps {
   isOpen: boolean;
   onClose: () => void;
   selectedDate: Date | null;
-  appointment: Appointment | null;
+  appointment: GetAppointmentResponse | null;
 }
 
 // Helper function to format date to local ISO string without timezone offset

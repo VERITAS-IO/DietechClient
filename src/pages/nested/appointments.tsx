@@ -1,9 +1,9 @@
 import { AppointmentCalendar } from "@/components/appointments/AppointmentCalendar";
 
-const AppointmentsPage = () => {
+const AppointmentsCalendarPage = () => {
   return (
     <AppointmentCalendar />
   )
 }
 
-export default AppointmentsPage;
+export default AppointmentsCalendarPage;

@@ -5,7 +5,7 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { Button } from '@/components/ui/button';
 import { Calendar, Plus } from 'lucide-react';
-import { Appointment, AppointmentType } from '@/types/appointment';
+import { GetAppointmentResponse, AppointmentType } from '@/types/appointment';
 import { useAppointmentStore } from '@/stores/appointment-store';
 import { cn } from '@/lib/utils/utils';
 import { AppointmentDialog } from './AppointmentDialog';
@@ -21,7 +21,7 @@ export function AppointmentCalendar() {
   const { t } = useTranslation();
   const { appointments } = useAppointmentStore();
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+  const [selectedAppointment, setSelectedAppointment] = useState<GetAppointmentResponse | null>(null);
   const [isAppointmentDialogOpen, setIsAppointmentDialogOpen] = useState(false);
   const [isNotesDialogOpen, setIsNotesDialogOpen] = useState(false);
 
@@ -39,7 +39,7 @@ export function AppointmentCalendar() {
     }
   };
   
-  const getEventColor = (appointment: Appointment) => {
+  const getEventColor = (appointment: GetAppointmentResponse) => {
     switch (appointment.type) {
       case AppointmentType.Initial:
         return 'dark:bg-red-700 bg-[#FF5A5F]';

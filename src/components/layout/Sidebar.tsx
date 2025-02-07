@@ -47,6 +47,17 @@ const Sidebar = () => {
       ],
     },
     {
+      title: t('dashboard.menu.appointments'),
+      icon: <Calendar className="w-5 h-5" />,
+      href: '/dashboard/appointments',
+      subItems: [
+        { title: t('dashboard.menu.calendar'), href: '/dashboard/appointments/calendar' },
+        { title: t('dashboard.menu.schedule'), href: '/dashboard/appointments/schedule' },
+        { title: t('dashboard.menu.history'), href: '/dashboard/appointments/history' },
+        { title: t('dashboard.menu.notes'), href: '/dashboard/appointments/notes' },
+      ],
+    },
+    {
       title: t('dashboard.menu.dietPlans'),
       icon: <Utensils className="w-5 h-5" />,
       href: '/dashboard/diet-plans',
@@ -54,16 +65,6 @@ const Sidebar = () => {
         { title: t('dashboard.menu.createPlan'), href: '/dashboard/diet-plans/new' },
         { title: t('dashboard.menu.managePlans'), href: '/dashboard/diet-plans' },
         { title: t('dashboard.menu.templates'), href: '/dashboard/diet-plans/templates' },
-      ],
-    },
-    {
-      title: t('dashboard.menu.appointments'),
-      icon: <Calendar className="w-5 h-5" />,
-      href: '/dashboard/appointments',
-      subItems: [
-        { title: t('dashboard.menu.calendar'), href: '/dashboard/appointments' },
-        { title: t('dashboard.menu.schedule'), href: '/dashboard/appointments/schedule' },
-        { title: t('dashboard.menu.history'), href: '/dashboard/appointments/history' },
       ],
     },
     {
@@ -101,7 +102,7 @@ const Sidebar = () => {
   return (
     <aside className="w-64 min-h-screen border-r border-border bg-card">
       <div className="px-6 py-4 border-b border-border flex flex-row gap-2">
-      <Link to="/dashboard" className="font-semibold flex items-center gap-2">
+        <Link to="/dashboard" className="font-semibold flex items-center gap-2">
           <Salad className="h-6 w-6 text-primary" />
         </Link>
         <h2 className="text-xl font-bold text-foreground">{t('common.appName')}</h2>

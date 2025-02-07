@@ -6,7 +6,7 @@
   import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
   import { Separator } from '@/components/ui/separator';
   import { useAppointmentStore } from '@/stores/appointment-store';
-  import { AppointmentType, AppointmentStatus, Appointment } from '@/types/appointment';
+  import { AppointmentType, AppointmentStatus, GetAppointmentResponse } from '@/types/appointment';
   import { AppointmentNotes } from './AppointmentNotes';
 
   interface AppointmentDetailsProps {
@@ -16,7 +16,7 @@
   export function AppointmentDetails({ appointmentId }: AppointmentDetailsProps) {
     const { t } = useTranslation();
     const { getAppointment, isLoading } = useAppointmentStore();
-    const [appointment, setAppointment] = useState<Appointment | undefined>();
+    const [appointment, setAppointment] = useState<GetAppointmentResponse | undefined>();
 
     useEffect(() => {
       const loadAppointment = async () => {
