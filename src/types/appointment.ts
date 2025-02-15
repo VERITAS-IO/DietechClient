@@ -74,6 +74,7 @@ export interface GetAppointmentNoteResponse {
   appointmentId: number;
   note: string;
   noteType: NoteType;
+  createdAt: Date;
 }
 
 export interface QueryAppointmentNoteResponse {
@@ -89,7 +90,7 @@ export interface CreateAppointmentNoteRequest {
 }
 
 export interface UpdateAppointmentNoteRequest {
-  noteId: number;
+  id: number;
   note: string;
   noteType?: NoteType;
 }

@@ -74,12 +74,14 @@ const mockAppointmentNotes: GetAppointmentNoteResponse[] = [
     appointmentId: 1,
     note: "Client reported issues with current diet plan",
     noteType: NoteType.PreAppointment,
+    createdAt: new Date()
   },
   {
     id: 2,
     appointmentId: 1,
     note: "Discussed alternative meal options",
     noteType: NoteType.DuringAppointment,
+    createdAt: new Date()
   },
 ];
 
@@ -95,7 +97,9 @@ export const useAppointmentStore = create<AppointmentState>()(
       getAppointments: async (query) => {
         set({ isLoading: true, error: null });
         try {
-          const filtered = mockAppointments.filter(apt => {
+          // Use the stored appointments instead of mock data
+          const state = get();
+          const filtered = state.appointments.filter(apt => {
             if (query.clientId && apt.clientId !== query.clientId) return false;
             if (query.type && apt.type !== query.type) return false;
             if (query.status && apt.status !== query.status) return false;
@@ -104,13 +108,8 @@ export const useAppointmentStore = create<AppointmentState>()(
             return true;
           });
 
-          const parsedAppointments = filtered.map(apt => ({
-            ...apt,
-            start: createDateWithTimezone(apt.start),
-            end: createDateWithTimezone(apt.end)
-          }));
-
-          set({ appointments: parsedAppointments, isLoading: false });
+          // Don't overwrite the stored appointments, just update loading state
+          set({ isLoading: false });
         } catch (error) {
           set({ error: (error as Error).message, isLoading: false });
         }
@@ -141,7 +140,8 @@ export const useAppointmentStore = create<AppointmentState>()(
       createAppointment: async (request) => {
         set({ isLoading: true });
         try {
-          const tempAppointmentId = Date.now(); 
+          const state = get();
+          const tempAppointmentId = Math.max(...state.appointments.map(a => a.id), 0) + 1;
       
           const newAppointment: GetAppointmentResponse = {
             id: tempAppointmentId,
@@ -156,27 +156,28 @@ export const useAppointmentStore = create<AppointmentState>()(
             appointmentNotes: [] 
           };
       
+          const updates: Partial<AppointmentState> = {
+            appointments: [...state.appointments, newAppointment],
+            error: null
+          };
+      
           if (request.note) {
             const newNote: GetAppointmentNoteResponse = {
               id: tempAppointmentId, 
               appointmentId: tempAppointmentId, 
               note: request.note.note,
-              noteType: request.note.noteType
+              noteType: request.note.noteType,
+              createdAt: new Date()
             };
             
             newAppointment.appointmentNotes = [newNote];
-            
-            set(state => ({
-              appointments: [...state.appointments, newAppointment],
-              appointmentNotes: [...state.appointmentNotes, newNote],
-              error: null,
-            }));
-          } else {
-            set(state => ({
-              appointments: [...state.appointments, newAppointment],
-              error: null,
-            }));
+            updates.appointmentNotes = [...state.appointmentNotes, newNote];
           }
+      
+          set(updates);
+          
+          // Force a store update to ensure persistence
+          set(state => ({ ...state }));
         } catch (error) {
           set({ error: (error as Error).message });
         } finally {
@@ -251,6 +252,7 @@ export const useAppointmentStore = create<AppointmentState>()(
             appointmentId: request.appointmentId,
             note: request.note,
             noteType: request.noteType,
+            createdAt: new Date()
           };
 
           set(state => ({
@@ -269,7 +271,7 @@ export const useAppointmentStore = create<AppointmentState>()(
         try {
           set(state => {
             const updatedNotes = state.appointmentNotes.map(note => {
-              if (note.id === request.noteId) {
+              if (note.id === request.id) {
                 return {
                   ...note,
                   note: request.note,

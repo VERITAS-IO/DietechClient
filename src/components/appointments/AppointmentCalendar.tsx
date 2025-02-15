@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -19,11 +19,23 @@ import './calendar.css';
 
 export function AppointmentCalendar() {
   const { t } = useTranslation();
-  const { appointments } = useAppointmentStore();
+  const { appointments, getAppointments } = useAppointmentStore();
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedAppointment, setSelectedAppointment] = useState<GetAppointmentResponse | null>(null);
   const [isAppointmentDialogOpen, setIsAppointmentDialogOpen] = useState(false);
   const [isNotesDialogOpen, setIsNotesDialogOpen] = useState(false);
+
+  useEffect(() => {
+    // Fetch appointments for current month and next month
+    const now = new Date();
+    const startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endDate = new Date(now.getFullYear(), now.getMonth() + 2, 0);
+    
+    getAppointments({
+      startDate,
+      endDate
+    });
+  }, []);
 
   const handleDateSelect = (selectInfo: any) => {
     setSelectedDate(selectInfo.start);

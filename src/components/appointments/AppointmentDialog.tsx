@@ -166,6 +166,8 @@ export function AppointmentDialog({
         ...baseAppointmentData,
         status: AppointmentStatus.Scheduled
       };
+
+      console.log("createAppointmentRequest:", createData)
       createAppointment(createData);
     }
 
@@ -284,7 +286,10 @@ export function AppointmentDialog({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t('appointment.type')}</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value.toString()}>
+                  <Select 
+                    onValueChange={(value) => field.onChange(Number(value))} 
+                    value={field.value.toString()}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder={t('appointment.selectType')} />
