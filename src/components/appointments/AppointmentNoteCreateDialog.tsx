@@ -58,13 +58,13 @@ export function AppointmentNoteCreateDialog({
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-2">
-            <label>{t('appointment.select')}</label>
+            <label>{t('appointment.notes.select')}</label>
             <Select
               value={selectedAppointmentId ?? ''}
               onValueChange={onAppointmentChange}
             >
               <SelectTrigger>
-                <SelectValue placeholder={t('appointment.selectPlaceholder')} />
+                <SelectValue placeholder={t('appointment.notes.selectPlaceholder')} />
               </SelectTrigger>
               <SelectContent>
                 {appointments.map((appointment) => (
@@ -86,13 +86,13 @@ export function AppointmentNoteCreateDialog({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value={NoteType.PreAppointment.toString()}>
-                  {t('appointment.notes.types.pre')}
+                  {t(`appointment.notes.types.${NoteType.PreAppointment}`)}
                 </SelectItem>
                 <SelectItem value={NoteType.DuringAppointment.toString()}>
-                  {t('appointment.notes.types.during')}
+                  {t(`appointment.notes.types.${NoteType.DuringAppointment}`)}
                 </SelectItem>
                 <SelectItem value={NoteType.AfterAppointment.toString()}>
-                  {t('appointment.notes.types.after')}
+                  {t(`appointment.notes.types.${NoteType.AfterAppointment}`)}
                 </SelectItem>
               </SelectContent>
             </Select>

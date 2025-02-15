@@ -39,7 +39,7 @@
     };
 
     const getAppointmentStatusLabel = (status: AppointmentStatus) => {
-      return t(`appointment.statuses.${AppointmentStatus[status].toLowerCase()}`);
+      return t(`appointment.status.${status}`);
     };
 
     const getStatusColor = (status: AppointmentStatus) => {

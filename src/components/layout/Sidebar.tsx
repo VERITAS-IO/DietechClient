@@ -33,7 +33,6 @@ const Sidebar = () => {
       href: '/dashboard',
       subItems: [
         { title: t('dashboard.menu.overview'), href: '/dashboard' },
-        { title: t('dashboard.menu.schedule'), href: '/dashboard/schedule' },
       ],
     },
     {

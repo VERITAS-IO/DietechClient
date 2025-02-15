@@ -188,36 +188,15 @@
     "allTypes": "Tüm Türler",
     "selectType": "Randevu türü seçin",
     "selectStatus": "Durum seçin",
-    "validation": {
-      "clientNameRequired": "Danışan adı gereklidir",
-      "clientIdRequired": "Danışan ID gereklidir",
-      "startTimeRequired": "Başlangıç saati gereklidir",
-      "endTimeRequired": "Bitiş saati gereklidir"
-    },
-    "types": {
-      "initial": "İlk Görüşme",
-      "followUp": "Kontrol",
-      "assessment": "Değerlendirme",
-      "emergency": "Acil"
-    },
-    "statuses": {
-      "scheduled": "Planlandı",
-      "confirmed": "Onaylandı",
-      "cancelled": "İptal Edildi",
-      "completed": "Tamamlandı"
-    },
-    "notFound": "Randevu bulunamadı",
-    "newClient": "Yeni Danışan",
-    "searchClient": "Danışan ara...",
-    "searchExistingClient": "Mevcut danışan ara veya seç",
-    "enterClientName": "Yeni danışan adını girin",
-    "noClientsFound": "Danışan bulunamadı",
     "notes": {
-      "title": "Notlar",
+      "title": "Randevu Notları",
       "add": "Not Ekle",
-      "edit": "Not Düzenle",
-      "type": "Not Türü",
+      "edit": "Notu Düzenle",
+      "delete": "Notu Sil",
       "content": "Not İçeriği",
+      "type": "Not Türü",
+      "noNotes": "Not bulunamadı",
+      "appointmentNotFound": "Randevu bulunamadı",
       "createSuccess": "Not Eklendi",
       "createSuccessDesc": "Not başarıyla eklendi",
       "updateSuccess": "Not Güncellendi",
@@ -227,12 +206,49 @@
       "saveFailed": "Not kaydedilemedi",
       "deleteFailed": "Not silinemedi",
       "types": {
-        "pre": "Randevu Öncesi",
-        "during": "Randevu Sırası",
-        "after": "Randevu Sonrası",
-        "unknown": "Bilinmiyor"
+        "0": "Bilinmiyor",
+        "1": "Randevu Öncesi",
+        "2": "Randevu Sırasında",
+        "3": "Randevu Sonrası"
+      },
+      "select": "Randevu Seç",
+      "selectPlaceholder": "Randevu seçin...",
+      "filter": {
+        "all": "Tüm Randevular",
+        "type": "Türe Göre Filtrele",
+        "search": "Notlarda ara...",
+        "sortBy": "Sıralama",
+        "newest": "En Yeni Önce",
+        "oldest": "En Eski Önce"
       }
-    }
+    },
+    "types": {
+      "initial": "İlk Görüşme",
+      "followUp": "Kontrol",
+      "assessment": "Değerlendirme",
+      "emergency": "Acil"
+    },
+    "status": {
+      "0": "Bilinmiyor",
+      "1": "Planlandı",
+      "2": "Onaylandı",
+      "3": "İptal Edildi",
+      "4": "Tamamlandı"
+    },
+    "validation": {
+      "clientNameRequired": "Danışan adı gereklidir",
+      "clientIdRequired": "Danışan ID gereklidir",
+      "startTimeRequired": "Başlangıç saati gereklidir",
+      "endTimeRequired": "Bitiş saati gereklidir",
+      "noteRequired": "Not içeriği gereklidir",
+      "appointmentRequired": "Lütfen bir randevu seçin"
+    },
+    "notFound": "Randevu bulunamadı",
+    "newClient": "Yeni Danışan",
+    "searchClient": "Danışan ara...",
+    "searchExistingClient": "Mevcut danışan ara veya seç",
+    "enterClientName": "Yeni danışan adını girin",
+    "noClientsFound": "Danışan bulunamadı"
   },
   "calendar": {
     "next": "İleri",
@@ -270,7 +286,8 @@
       "settings": "Ayarlar",
       "profile": "Profil",
       "business": "İşletme",
-      "preferences": "Tercihler"
+      "preferences": "Tercihler",
+      "notes":"Notlar"
     },
     "stats": {
       "totalClients": "Toplam Danışan Sayısı",

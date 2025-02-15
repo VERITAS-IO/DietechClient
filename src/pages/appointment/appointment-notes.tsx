@@ -85,6 +85,8 @@ export default function AppointmentNotesPage() {
           note: noteText,
           noteType
         });
+
+        setIsCreateDialogOpen(false);
       }
 
       // Reset form
@@ -133,7 +135,7 @@ export default function AppointmentNotesPage() {
   return (
     <div className="space-y-6 p-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-semibold">{t('notes.title')}</h1>
+          <h1 className="text-2xl font-semibold">{t('appointment.notes.title')}</h1>
           <div className="flex gap-4 items-center">
             <Button 
               onClick={() => {
@@ -144,7 +146,7 @@ export default function AppointmentNotesPage() {
                 setIsCreateDialogOpen(true);
               }}
             >
-              {t('notes.addNote')}
+              {t('appointment.notes.add')}
             </Button>
           </div>
         </div>
@@ -152,7 +154,7 @@ export default function AppointmentNotesPage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <div className="flex-1">
             <Input
-              placeholder="Search notes..."
+              placeholder={t('appointment.notes.filter.search')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="max-w-sm"
@@ -160,10 +162,10 @@ export default function AppointmentNotesPage() {
           </div>
           <Select value={filterAppointment} onValueChange={setFilterAppointment}>
             <SelectTrigger className="w-[250px]">
-              <SelectValue placeholder="Filter by appointment" />
+              <SelectValue placeholder={t('appointment.notes.filter.type')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Appointments</SelectItem>
+              <SelectItem value="all">{t('appointment.notes.filter.all')}</SelectItem>
               {appointments.map((appointment) => (
                 <SelectItem key={appointment.id} value={appointment.id.toString()}>
                   {`${appointment.clientName} - ${new Date(appointment.start).toLocaleDateString()}`}
@@ -173,24 +175,28 @@ export default function AppointmentNotesPage() {
           </Select>
           <Select value={filterType} onValueChange={setFilterType}>
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter by type" />
+              <SelectValue placeholder={t('appointment.notes.filter.type')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              {Object.values(NoteType).map((type) => (
+              <SelectItem value="all">{t('appointment.allTypes')}</SelectItem>
+              {[
+                NoteType.PreAppointment,
+                NoteType.DuringAppointment,
+                NoteType.AfterAppointment
+              ].map((type) => (
                 <SelectItem key={type} value={type.toString()}>
-                  {t(`notes.types.${type}`)}
+                  {t(`appointment.notes.types.${type}`)}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
           <Select value={sortBy} onValueChange={setSortBy}>
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Sort by" />
+              <SelectValue placeholder={t('appointment.notes.filter.sortBy')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="newest">Newest First</SelectItem>
-              <SelectItem value="oldest">Oldest First</SelectItem>
+              <SelectItem value="newest">{t('appointment.notes.filter.newest')}</SelectItem>
+              <SelectItem value="oldest">{t('appointment.notes.filter.oldest')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -210,7 +216,7 @@ export default function AppointmentNotesPage() {
               {filteredNotes.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                    {t('notes.noNotes')}
+                    {t('appointment.notes.noNotes')}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -227,7 +233,7 @@ export default function AppointmentNotesPage() {
                             </span>
                           </div>
                         ) : (
-                          t('notes.appointmentNotFound')
+                          t('appointment.notes.appointmentNotFound')
                         )}
                       </TableCell>
                       <TableCell>
@@ -240,7 +246,7 @@ export default function AppointmentNotesPage() {
                               : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300"
                           }`}
                         >
-                          {t(`notes.types.${note.noteType}`)}
+                          {t(`appointment.notes.types.${note.noteType}`)}
                         </span>
                       </TableCell>
                       <TableCell className="font-medium">{note.note}</TableCell>
@@ -256,7 +262,7 @@ export default function AppointmentNotesPage() {
                               handleEditNote(note);
                             }}
                           >
-                            {t('common.edit')}
+                            {t('appointment.notes.edit')}
                           </Button>
                           <Button
                             variant="ghost"
@@ -264,7 +270,7 @@ export default function AppointmentNotesPage() {
                             className="hover:bg-destructive/10 text-destructive"
                             onClick={() => handleDeleteNote(note.id)}
                           >
-                            {t('common.delete')}
+                            {t('appointment.notes.delete')}
                           </Button>
                         </div>
                       </TableCell>

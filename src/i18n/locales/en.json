@@ -193,31 +193,15 @@
     "allTypes": "All Types",
     "selectType": "Select appointment type",
     "selectStatus": "Select status",
-    "validation": {
-      "clientNameRequired": "Client name is required",
-      "clientIdRequired": "Client ID is required",
-      "startTimeRequired": "Start time is required",
-      "endTimeRequired": "End time is required"
-    },
-    "types": {
-      "initial": "Initial Consultation",
-      "followUp": "Follow-up",
-      "assessment": "Assessment",
-      "emergency": "Emergency"
-    },
-    "statuses": {
-      "scheduled": "Scheduled",
-      "confirmed": "Confirmed",
-      "cancelled": "Cancelled",
-      "completed": "Completed"
-    },
-    "notFound": "Appointment not found",
     "notes": {
-      "title": "Notes",
+      "title": "Appointment Notes",
       "add": "Add Note",
       "edit": "Edit Note",
-      "type": "Note Type",
+      "delete": "Delete Note",
       "content": "Note Content",
+      "type": "Note Type",
+      "noNotes": "No notes found",
+      "appointmentNotFound": "Appointment not found",
       "createSuccess": "Note Added",
       "createSuccessDesc": "The note has been added successfully",
       "updateSuccess": "Note Updated",
@@ -227,12 +211,44 @@
       "saveFailed": "Failed to save note",
       "deleteFailed": "Failed to delete note",
       "types": {
-        "pre": "Pre-Appointment",
-        "during": "During Appointment",
-        "after": "After Appointment",
-        "unknown": "Unknown"
+        "0": "Unknown",
+        "1": "Pre-Appointment",
+        "2": "During Appointment",
+        "3": "After Appointment"
+      },
+      "select": "Select Appointment",
+      "selectPlaceholder": "Choose an appointment...",
+      "filter": {
+        "all": "All Appointments",
+        "type": "Filter by Type",
+        "search": "Search notes...",
+        "sortBy": "Sort by",
+        "newest": "Newest First",
+        "oldest": "Oldest First"
       }
-    }
+    },
+    "types": {
+      "initial": "Initial Consultation",
+      "followUp": "Follow-up",
+      "assessment": "Assessment",
+      "emergency": "Emergency"
+    },
+    "status": {
+      "0": "Unknown",
+      "1": "Scheduled",
+      "2": "Confirmed",
+      "3": "Cancelled",
+      "4": "Completed" 
+    },
+    "validation": {
+      "clientNameRequired": "Client name is required",
+      "clientIdRequired": "Client ID is required",
+      "startTimeRequired": "Start time is required",
+      "endTimeRequired": "End time is required",
+      "noteRequired": "Note content is required",
+      "appointmentRequired": "Please select an appointment"
+    },
+    "notFound": "Appointment not found"
   },
   "calendar": {
     "next": "Next",
@@ -270,7 +286,8 @@
       "settings": "Settings",
       "profile": "Profile",
       "business": "Business",
-      "preferences": "Preferences"
+      "preferences": "Preferences",
+      "notes":"Notes"
     },
     "stats": {
       "totalClients": "Total Clients",

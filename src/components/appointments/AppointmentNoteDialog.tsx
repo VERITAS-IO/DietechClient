@@ -68,13 +68,13 @@ export function AppointmentNoteDialog({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value={NoteType.PreAppointment.toString()}>
-                  {t('appointment.notes.types.pre')}
+                  {t(`appointment.notes.types.${NoteType.PreAppointment}`)}
                 </SelectItem>
                 <SelectItem value={NoteType.DuringAppointment.toString()}>
-                  {t('appointment.notes.types.during')}
+                  {t(`appointment.notes.types.${NoteType.DuringAppointment}`)}
                 </SelectItem>
                 <SelectItem value={NoteType.AfterAppointment.toString()}>
-                  {t('appointment.notes.types.after')}
+                  {t(`appointment.notes.types.${NoteType.AfterAppointment}`)}
                 </SelectItem>
               </SelectContent>
             </Select>
