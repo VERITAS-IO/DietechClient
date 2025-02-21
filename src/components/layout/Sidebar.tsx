@@ -57,13 +57,14 @@ const Sidebar = () => {
       ],
     },
     {
-      title: t('dashboard.menu.dietPlans'),
+      title: t('dashboard.menu.diet.index'),
       icon: <Utensils className="w-5 h-5" />,
-      href: '/dashboard/diet-plans',
+      href: '/dashboard/diets',
       subItems: [
-        { title: t('dashboard.menu.createPlan'), href: '/dashboard/diet-plans/new' },
-        { title: t('dashboard.menu.managePlans'), href: '/dashboard/diet-plans' },
-        { title: t('dashboard.menu.templates'), href: '/dashboard/diet-plans/templates' },
+        { title: t('dashboard.menu.diet.create'), href: '/dashboard/diets' },
+        { title: t('dashboard.menu.diet.manage'), href: '/dashboard/diet-plans' },
+        { title: t('dashboard.menu.diet.templates'), href: '/dashboard/diet-plans/templates' },
+        { title: t('dashboard.menu.diet.nutritions'), href: '/dashboard/diets/nutritions' },
       ],
     },
     {

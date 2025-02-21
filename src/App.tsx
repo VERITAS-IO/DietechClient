@@ -18,6 +18,7 @@ import { Navbar } from "./components/common/navbar";
 import AppointmentsCalendarPage from "./pages/nested/appointments";
 import { AppointmentNotes } from "./components/appointments/AppointmentNotes";
 import AppointmentNotesPage from "./pages/appointment/appointment-notes";
+import NutritionInfoListPage from "./pages/nested/nutrition-info";
 
 const queryClient = new QueryClient();
 
@@ -64,6 +65,10 @@ function App() {
                 <Route path="appointments">
                  <Route path="calendar" element={<AppointmentsCalendarPage />} />
                  <Route path="notes" element={<AppointmentNotesPage/>}  />
+                </Route>
+
+                <Route path="diets">
+                 <Route path="nutritions" element={<NutritionInfoListPage />} />
                 </Route>
 
                 <Route path="diet-plans/*" element={<Navigate to="/dashboard" replace />} />

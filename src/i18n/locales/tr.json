@@ -268,10 +268,14 @@
       "clientList": "Danışan Listesi",
       "addClient": "Danışan Ekle",
       "progress": "İlerleme",
-      "dietPlans": "Diyet Planları",
-      "createPlan": "Plan Oluştur",
-      "managePlans": "Planları Yönet",
-      "templates": "Şablonlar",
+      "diet":{
+        "index": "Diyetler",
+        "plans": "Diyet Planları",
+        "create": "Plan Oluştur",
+        "manage": "Planları Yönet",
+        "templates": "Şablonlar",
+        "nutritions": "Besinler"
+      },
       "appointments": "Randevular",
       "calendar": "Takvim",
       "history": "Geçmiş",
@@ -301,6 +305,25 @@
     "charts": {
       "overview": "Genel Bakış",
       "description": "Danışan Artışı ve Gelir Genel Bakışı"
+    },
+    "nutrition": {
+      "list": {
+        "title": "Besin Bilgileri",
+        "columns": {
+          "name": "İsim",
+          "servingSize": "Porsiyon Boyutu",
+          "unit": "Birim",
+          "category": "Kategori",
+          "calories": "Kalori",
+          "protein": "Protein",
+          "carbs": "Karbonhidrat",
+          "fat": "Yağ"
+        },
+        "loading": "Besin bilgileri yükleniyor...",
+        "error": "Besin bilgileri yüklenemedi. Lütfen daha sonra tekrar deneyin.",
+        "noData": "Besin bilgisi bulunamadı.",
+        "search": "İsme göre ara..."
+      }
     }
   }
 }

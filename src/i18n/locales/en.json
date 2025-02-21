@@ -268,10 +268,14 @@
       "clientList": "Client List",
       "addClient": "Add Client",
       "progress": "Progress",
-      "dietPlans": "Diet Plans",
-      "createPlan": "Create Plan",
-      "managePlans": "Manage Plans",
-      "templates": "Templates",
+      "diet":{
+        "index": "Diets",
+        "plans": "Diet Plans",
+        "create": "Create Plan",
+        "manage": "Manage Plan",
+        "templates": "Templates",
+        "nutritons": "Nutrition"
+      },
       "appointments": "Appointments",
       "calendar": "Calendar",
       "history": "History",
@@ -301,6 +305,25 @@
     "charts": {
       "overview": "Overview",
       "description": "Client Growth and Revenue Overview"
+    },
+    "nutrition": {
+      "list": {
+        "title": "Nutrition Information",
+        "columns": {
+          "name": "Name",
+          "servingSize": "Serving Size",
+          "unit": "Unit",
+          "category": "Category",
+          "calories": "Calories",
+          "protein": "Protein",
+          "carbs": "Carbohydrates",
+          "fat": "Fat"
+        },
+        "loading": "Loading nutrition information...",
+        "error": "Failed to load nutrition information. Please try again later.",
+        "noData": "No nutrition information found.",
+        "search": "Search by name..."
+      }
     }
   }
 }

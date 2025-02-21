@@ -1,4 +1,5 @@
 import { Gender } from "@/enums/gender";
+import { PagedRequest } from "./request-parameters";
 
 export interface CreateClientRequest {
   userRegistrationRequest: {
@@ -33,11 +34,6 @@ export interface CreateClientRequest {
     allergies: string;
     activelyUsedDrugs: string;
   };
-}
-
-export interface PagedRequest {
-  pageNumber: number;
-  pageSize: number;
 }
 
 export interface QueryClientRequest extends PagedRequest {
