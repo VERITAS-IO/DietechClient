@@ -200,6 +200,51 @@
       "tenantId": 1,
       "createdAt": "2024-02-05T10:00:00Z",
       "lastModifiedAt": "2024-02-05T10:00:00Z"
+    },
+    {
+      "name": "Serhat",
+      "servingSize": 100,
+      "servingUnit": 2,
+      "foodCategory": 2,
+      "caloriesPerServing": 123,
+      "protein": 12,
+      "carbohydrates": 323,
+      "totalFat": 23,
+      "fiber": 123,
+      "id": 1740517988569,
+      "tenantId": 1,
+      "createdAt": "2025-02-25T21:13:08.569Z",
+      "lastModifiedAt": "2025-02-25T21:13:08.569Z"
+    },
+    {
+      "name": "asdsdasda",
+      "servingSize": 100,
+      "servingUnit": 1,
+      "foodCategory": 1,
+      "caloriesPerServing": 123,
+      "protein": 123,
+      "carbohydrates": 123,
+      "totalFat": 123,
+      "fiber": 123,
+      "id": 1740518166278,
+      "tenantId": 1,
+      "createdAt": "2025-02-25T21:16:06.278Z",
+      "lastModifiedAt": "2025-02-25T21:16:06.278Z"
+    },
+    {
+      "name": "talip yemegi",
+      "servingSize": 100,
+      "servingUnit": 1,
+      "foodCategory": 2,
+      "caloriesPerServing": 333,
+      "protein": 333,
+      "carbohydrates": 333,
+      "totalFat": 33,
+      "fiber": 33,
+      "id": 1740518309495,
+      "tenantId": 1,
+      "createdAt": "2025-02-25T21:18:29.495Z",
+      "lastModifiedAt": "2025-02-25T21:18:29.495Z"
     }
   ],
   "clients": {
@@ -263,5 +308,101 @@
     "totalPages": 1,
     "hasPreviousPage": false,
     "hasNextPage": false
-  }
+  },
+  "diets": [
+    {
+      "id": 1,
+      "name": "asdasdasasdasdasdas",
+      "dietDescription": "asdasdasdasA heart-healthy eating plan combining the traditional cooking style of countries bordering the Mediterranean Sea.asdasdasdasdasdasdas",
+      "dietType": "MEDITERRANEAN",
+      "dietDuration": 303,
+      "totalCalories": 200023,
+      "startDate": "2024-02-01T00:00:00Z",
+      "endDate": "2024-03-01T00:00:00Z",
+      "isActive": true,
+      "tenantId": 1,
+      "nutritionInfoList": []
+    },
+    {
+      "id": 2,
+      "name": "1231adadasdas",
+      "dietDescription": "High-fat, low-carb diet designed for rapid weight loss.",
+      "dietType": "KETO",
+      "dietDuration": 602323,
+      "totalCalories": 18001,
+      "startDate": "2024-02-15T00:00:00Z",
+      "endDate": "2024-04-15T00:00:00Z",
+      "isActive": true,
+      "tenantId": 1,
+      "nutritionInfoList": []
+    }
+  ],
+  "meals": [
+    {
+      "id": 4,
+      "name": "Protein Snack",
+      "description": "Greek yogurt with berries and honey",
+      "mealType": 4,
+      "mealOrder": 4,
+      "startTime": "2024-03-08T15:00:00Z",
+      "endTime": "2024-03-08T15:15:00Z",
+      "dietId": 1,
+      "tenantId": 1,
+      "isActive": true,
+      "nutritionInfoList": []
+    },
+    {
+      "id": 5,
+      "name": "Pre-Workout Meal",
+      "description": "Banana with almond butter",
+      "mealType": 5,
+      "mealOrder": 5,
+      "startTime": "2024-03-08T16:30:00Z",
+      "endTime": "2024-03-08T16:45:00Z",
+      "dietId": 2,
+      "tenantId": 1,
+      "isActive": true,
+      "nutritionInfoList": []
+    },
+    {
+      "id": 3,
+      "name": "Keto Dinner",
+      "description": "Grilled salmon with asparagus and butter",
+      "mealType": 3,
+      "mealOrder": 3,
+      "startTime": "2024-03-08T18:00:00Z",
+      "endTime": "2024-03-08T18:45:00Z",
+      "dietId": 2,
+      "tenantId": 1,
+      "isActive": true,
+      "nutritionInfoList": []
+    },
+    {
+      "id": 1,
+      "name": "Breakfast Oatmeal",
+      "description": "Hearty oatmeal with fruits and nuts",
+      "mealType": 1,
+      "mealOrder": 1,
+      "startTime": "2024-03-08T07:00:00Z",
+      "endTime": "2024-03-08T07:30:00Z",
+      "dietId": 1,
+      "tenantId": 1,
+      "isActive": true,
+      "nutritionInfoList": []
+    },
+    {
+      "name": "asdasdasd",
+      "description": "asdasdasdasd",
+      "mealType": 2,
+      "mealOrder": 1,
+      "startTime": "2025-01-01T12:23:00",
+      "endTime": "2025-01-01T12:23:00",
+      "dietId": 1,
+      "tenantId": 1,
+      "nutritionInfoIds": [],
+      "id": 1741436365270,
+      "isActive": true,
+      "nutritionInfoList": []
+    }
+  ]
 }

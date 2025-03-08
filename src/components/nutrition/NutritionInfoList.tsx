@@ -12,6 +12,7 @@ import { useNutritionStore } from '@/stores/nutrition-store';
 import { NutritionInfoListItem, ServingUnit, FoodCategory } from '@/types/nutrition';
 import { NutritionInfoDetail as NutritionInfoDetailDialog } from './NutritionInfoDetail';
 import { NutritionInfoDelete } from './NutritionInfoDelete';
+import { NutritionInfoCreate } from './NutritionInfoCreate';
 import { DataTablePagination } from '@/components/common/DataTablePagination';
 import { NutritionInfoFilters } from "./NutritionInfoFilters";
 import { nutritionService } from '@/services/nutrition-service';
@@ -93,28 +94,31 @@ export const NutritionInfoList = () => {
 
     return (
         <div className="space-y-4">
-        <h2 className="text-2xl font-bold">{t('dashboard.nutrition.list.title')}</h2>
-        <NutritionInfoFilters />
-        
-        <div className="rounded-md border">
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>{t('dashboard.nutrition.list.columns.name')}</TableHead>
-                        <TableHead>{t('dashboard.nutrition.list.columns.servingSize')}</TableHead>
-                        <TableHead>{t('dashboard.nutrition.list.columns.unit')}</TableHead>
-                        <TableHead>{t('dashboard.nutrition.list.columns.category')}</TableHead>
-                        <TableHead>{t('dashboard.nutrition.list.columns.calories')}</TableHead>
-                        <TableHead>{t('dashboard.nutrition.list.columns.protein')}</TableHead>
-                        <TableHead>{t('dashboard.nutrition.list.columns.carbs')}</TableHead>
-                        <TableHead>{t('dashboard.nutrition.list.columns.fat')}</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {renderTableContent()}
-                </TableBody>
-            </Table>
-        </div>
+            <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold">{t('dashboard.nutrition.list.title')}</h2>
+                <NutritionInfoCreate />
+            </div>
+            <NutritionInfoFilters />
+            
+            <div className="rounded-md border">
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>{t('dashboard.nutrition.list.columns.name')}</TableHead>
+                            <TableHead>{t('dashboard.nutrition.list.columns.servingSize')}</TableHead>
+                            <TableHead>{t('dashboard.nutrition.list.columns.unit')}</TableHead>
+                            <TableHead>{t('dashboard.nutrition.list.columns.category')}</TableHead>
+                            <TableHead>{t('dashboard.nutrition.list.columns.calories')}</TableHead>
+                            <TableHead>{t('dashboard.nutrition.list.columns.protein')}</TableHead>
+                            <TableHead>{t('dashboard.nutrition.list.columns.carbs')}</TableHead>
+                            <TableHead>{t('dashboard.nutrition.list.columns.fat')}</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {renderTableContent()}
+                    </TableBody>
+                </Table>
+            </div>
 
             {data && data.totalCount > 0 && (
                 <DataTablePagination

@@ -9,7 +9,7 @@ import {
     NutritionInfoDetail
 } from '@/types/nutrition';
 
-const BASE_URL = '/nutrition-info';
+const BASE_URL = 'api/v1/nutrition-info';
 
 export const nutritionService = {
     async query(request: QueryNutritionInfoRequest): Promise<PagedDataResponse<NutritionInfoListItem>> {

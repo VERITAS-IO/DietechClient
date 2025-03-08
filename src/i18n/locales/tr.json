@@ -325,5 +325,38 @@
         "search": "İsme göre ara..."
       }
     }
+  },
+  "diet": {
+    "title": "Diyetler",
+    "create": "Diyet Oluştur",
+    "details": "Diyet Detayları",
+    "name": "Diyet Adı",
+    "description": "Açıklama",
+    "type": "Diyet Tipi",
+    "duration": "Süre",
+    "days": "gün",
+    "calories": "Toplam Kalori",
+    "startDate": "Başlangıç Tarihi",
+    "endDate": "Bitiş Tarihi",
+    "filterType": "Tipe Göre Filtrele",
+    "filterMinCalories": "Min Kalori",
+    "filterMaxCalories": "Max Kalori",
+    "deleteConfirmTitle": "Diyeti Sil",
+    "deleteConfirmMessage": "Bu diyeti silmek istediğinize emin misiniz? Bu işlem geri alınamaz.",
+    "createSuccess": "Diyet başarıyla oluşturuldu",
+    "createError": "Diyet oluşturulurken hata oluştu",
+    "updateSuccess": "Diyet başarıyla güncellendi",
+    "updateError": "Diyet güncellenirken hata oluştu",
+    "deleteSuccess": "Diyet başarıyla silindi",
+    "deleteError": "Diyet silinirken hata oluştu",
+    "types": {
+      "vegetarian": "Vejetaryen",
+      "vegan": "Vegan",
+      "keto": "Keto",
+      "paleo": "Paleo",
+      "mediterranean": "Akdeniz",
+      "low_carb": "Düşük Karbonhidrat",
+      "high_protein": "Yüksek Protein"
+    }
   }
 }

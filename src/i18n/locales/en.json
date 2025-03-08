@@ -176,8 +176,8 @@
     "noClientsFound": "No clients found",
     "startTime": "Start Time",
     "endTime": "End Time",
-    "type": "Type",
-    "status": "Status",
+    "appointmentType": "Type",
+    "appointmentStatus": "Status",
     "preparationInstructions": "Preparation Instructions",
     "search": "Search appointments...",
     "calendarView": "Calendar",
@@ -233,7 +233,7 @@
       "assessment": "Assessment",
       "emergency": "Emergency"
     },
-    "status": {
+    "statusValues": {
       "0": "Unknown",
       "1": "Scheduled",
       "2": "Confirmed",
@@ -274,7 +274,8 @@
         "create": "Create Plan",
         "manage": "Manage Plan",
         "templates": "Templates",
-        "nutritons": "Nutrition"
+        "nutritions": "Nutrition",
+        "meals": "Meals"
       },
       "appointments": "Appointments",
       "calendar": "Calendar",
@@ -324,6 +325,75 @@
         "noData": "No nutrition information found.",
         "search": "Search by name..."
       }
+    }
+  },
+  "diet": {
+    "title": "Diets",
+    "create": "Create Diet",
+    "details": "Diet Details",
+    "name": "Diet Name",
+    "description": "Description",
+    "type": "Diet Type",
+    "duration": "Duration",
+    "days": "days",
+    "calories": "Total Calories",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "filterType": "Filter by Type",
+    "filterMinCalories": "Min Calories",
+    "filterMaxCalories": "Max Calories",
+    "deleteConfirmTitle": "Delete Diet",
+    "deleteConfirmMessage": "Are you sure you want to delete this diet? This action cannot be undone.",
+    "createSuccess": "Diet created successfully",
+    "createError": "Failed to create diet",
+    "updateSuccess": "Diet updated successfully",
+    "updateError": "Failed to update diet",
+    "deleteSuccess": "Diet deleted successfully",
+    "deleteError": "Failed to delete diet",
+    "types": {
+      "vegetarian": "Vegetarian",
+      "vegan": "Vegan",
+      "keto": "Keto",
+      "paleo": "Paleo",
+      "mediterranean": "Mediterranean",
+      "low_carb": "Low Carb",
+      "high_protein": "High Protein"
+    }
+  },
+  "meal": {
+    "list": {
+      "title": "Meals"
+    },
+    "detail": {
+      "title": "Meal Details",
+      "description": "View meal details and nutritional information"
+    },
+    "delete": {
+      "title": "Delete Meal",
+      "description": "Are you sure you want to delete this meal? This action cannot be undone."
+    },
+    "name": "Name",
+    "description": "Description",
+    "type": "Type",
+    "time": "Time",
+    "dietId": "Diet",
+    "nutritionInfo": "Nutrition Information",
+    "noData": "No meals found",
+    "createSuccess": "Meal created successfully",
+    "createError": "Failed to create meal",
+    "updateSuccess": "Meal updated successfully",
+    "updateError": "Failed to update meal",
+    "deleteSuccess": "Meal deleted successfully",
+    "deleteError": "Failed to delete meal",
+    "notFound": "Meal not found",
+    "types": {
+      "breakfast": "Breakfast",
+      "lunch": "Lunch",
+      "dinner": "Dinner",
+      "snack": "Snack",
+      "preworkout": "Pre-Workout",
+      "postworkout": "Post-Workout",
+      "unknown": "Unknown"
     }
   }
 }
