@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMealStore } from '@/stores/meal-store';
+import { useDietStore } from '@/stores/diet-store';
 import { useCreateMeal } from '@/hooks/meal-hooks';
 import { MealType } from '@/types/meal';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -27,12 +28,24 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export default function MealCreateDialog() {
+interface MealCreateDialogProps {
+  forDietCreation?: boolean;
+  forDietUpdate?: boolean;
+}
+
+export default function MealCreateDialog({ forDietCreation = false, forDietUpdate = false }: MealCreateDialogProps) {
   const { t } = useTranslation();
   const { toast } = useToast();
-  // State is managed by the store, not local state
-  const createMealModalOpen = useMealStore((state) => state.createMealModalOpen);
-  const setCreateMealModalOpen = useMealStore((state) => state.setCreateMealModalOpen);
+  
+  const createMealModalOpen = forDietCreation || forDietUpdate
+    ? useDietStore((state) => state.isMealCreateModalOpen)
+    : useMealStore((state) => state.createMealModalOpen);
+    
+  const setCreateMealModalOpen = forDietCreation || forDietUpdate
+    ? useDietStore((state) => state.setMealCreateModalOpen)
+    : useMealStore((state) => state.setCreateMealModalOpen);
+    
+  const addTemporaryMeal = useDietStore((state) => state.addTemporaryMeal);
   const { mutate: createMeal, isPending } = useCreateMeal();
 
   const form = useForm<FormValues>({
@@ -48,34 +61,47 @@ export default function MealCreateDialog() {
   });
 
   const onSubmit = (data: FormValues) => {
-    // Convert form data to match the CreateMealRequest interface
-    createMeal({
+    const mealRequest = {
       name: data.name,
       description: data.description || '',
       mealType: parseInt(data.mealType),
       mealOrder: parseInt(data.mealOrder),
       startTime: data.time ? `2025-01-01T${data.time}:00` : new Date().toISOString(),
       endTime: data.time ? `2025-01-01T${data.time}:00` : new Date().toISOString(),
-      dietId: data.dietId || 1, // Default to first diet if not specified
-      tenantId: 1, // Default tenant ID
+      dietId: data.dietId || 1, 
+      tenantId: 1, 
       nutritionInfoIds: data.nutritionInfoIds || []
-    }, {
-      onSuccess: () => {
-        toast({
-          title: t('meal.createSuccess'),
-          variant: 'default'
-        });
-        setCreateMealModalOpen(false);
-        form.reset();
-      },
-      onError: (error) => {
-        toast({
-          title: t('meal.createError'),
-          description: error.message,
-          variant: 'destructive'
-        });
-      }
-    });
+    };
+    
+    if (forDietCreation || forDietUpdate) {
+      // Add meal to temporary meals for both diet creation and updates
+      addTemporaryMeal(mealRequest); 
+      toast({
+        title: t('meal.addedToDiet'),
+        description: t('meal.addedToDietDescription'),
+        variant: 'default'
+      });
+      setCreateMealModalOpen(false);
+      form.reset();
+    } else {
+      createMeal(mealRequest, {
+        onSuccess: () => {
+          toast({
+            title: t('meal.createSuccess'),
+            variant: 'default'
+          });
+          setCreateMealModalOpen(false);
+          form.reset();
+        },
+        onError: (error) => {
+          toast({
+            title: t('meal.createError'),
+            description: error.message,
+            variant: 'destructive'
+          });
+        }
+      });
+    }
   };
 
   return (

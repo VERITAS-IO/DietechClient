@@ -2,6 +2,10 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { QueryMealRequest } from '../types/meal';
 
+import { CreateMealRequest, MealListResponse } from '../types/meal';
+
+type MealCreatedCallback = (meal: MealListResponse | CreateMealRequest) => void;
+
 interface MealState {
     filters: QueryMealRequest;
     setFilters: (filters: Partial<QueryMealRequest>) => void;
@@ -18,6 +22,8 @@ interface MealState {
     setCreateModalOpen: (isOpen: boolean) => void;
     createMealModalOpen: boolean;
     setCreateMealModalOpen: (isOpen: boolean) => void;
+    onMealCreated: MealCreatedCallback | null;
+    setOnMealCreated: (callback: MealCreatedCallback | null) => void;
 }
 
 const defaultFilters: QueryMealRequest = {
@@ -55,6 +61,8 @@ export const useMealStore = create<MealState>()(
             setCreateModalOpen: (isOpen) => set({ isCreateModalOpen: isOpen }),
             createMealModalOpen: false,
             setCreateMealModalOpen: (isOpen) => set({ createMealModalOpen: isOpen }),
+            onMealCreated: null,
+            setOnMealCreated: (callback) => set({ onMealCreated: callback }),
         }),
         {
             name: 'meal-store',

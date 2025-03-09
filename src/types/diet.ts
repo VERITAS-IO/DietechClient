@@ -1,4 +1,4 @@
-import { CreateMealRequest } from "./meal";
+import { CreateMealRequest, MealListResponse } from "./meal";
 import { PagedRequest } from "./request-parameters";
 
 export enum DietType {
@@ -27,6 +27,9 @@ export interface UpdateDietRequest {
     dietType?: DietType;
     dietDuration?: number;
     totalCalories?: number;
+    startDate?: string;
+    endDate?: string;
+    isActive?: boolean;
     mealIdsToAdd?: number[];    
     mealIdsToRemove?: number[];
     newMealsToAdd?: CreateMealRequest[];
@@ -61,4 +64,5 @@ export interface PaginatedDietListResponse {
 
 export interface DietDetailResponse extends DietListResponse {
     dietName: string;
+    meals?:MealListResponse[]; 
 }

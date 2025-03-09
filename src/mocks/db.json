@@ -335,47 +335,122 @@
       "isActive": true,
       "tenantId": 1,
       "nutritionInfoList": []
+    },
+    {
+      "name": "sadasdasdas",
+      "dietDescription": "asdasdasdasdasdasdas",
+      "dietType": "VEGETARIAN",
+      "dietDuration": 7,
+      "totalCalories": 2000,
+      "tenantId": 1,
+      "nutritionInfoIds": [],
+      "startDate": "2025-03-09T00:00:00.000Z",
+      "endDate": "2025-03-16T00:00:00.000Z",
+      "isActive": true,
+      "meals": [
+        {
+          "name": "asdsdasd",
+          "description": "asdasdasdasd",
+          "mealType": 2,
+          "mealOrder": 1,
+          "startTime": "2025-01-01T14:42:00",
+          "endTime": "2025-01-01T14:42:00",
+          "dietId": 1,
+          "tenantId": 1,
+          "nutritionInfoIds": []
+        },
+        {
+          "name": "sadasdasd",
+          "description": "aasdasa",
+          "mealType": 1,
+          "mealOrder": 1,
+          "startTime": "2025-01-01T14:40:00",
+          "endTime": "2025-01-01T14:40:00",
+          "dietId": 1,
+          "tenantId": 1,
+          "nutritionInfoIds": []
+        }
+      ],
+      "id": 1741513302720,
+      "mealIdsToRemove": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "newMealsToAdd": [
+        {
+          "name": "asdasdasd",
+          "description": "asdasdasdas",
+          "mealType": 1,
+          "mealOrder": 1,
+          "startTime": "2025-01-01T14:11:00",
+          "endTime": "2025-01-01T14:11:00",
+          "dietId": 1,
+          "tenantId": 1,
+          "nutritionInfoIds": []
+        }
+      ]
     }
   ],
   "meals": [
     {
       "id": 4,
-      "name": "Protein Snack",
+      "name": "asdasdasdasProtein Snack",
       "description": "Greek yogurt with berries and honey",
       "mealType": 4,
       "mealOrder": 4,
-      "startTime": "2024-03-08T15:00:00Z",
-      "endTime": "2024-03-08T15:15:00Z",
+      "startTime": "2025-01-01T18:00:00",
+      "endTime": "2025-01-01T18:00:00",
       "dietId": 1,
       "tenantId": 1,
       "isActive": true,
-      "nutritionInfoList": []
+      "nutritionInfoList": [],
+      "nutritionInfoIdsToAdd": [],
+      "nutritionInfoIdsToRemove": [],
+      "newNutritionInfosToAdd": []
     },
     {
       "id": 5,
       "name": "Pre-Workout Meal",
-      "description": "Banana with almond butter",
+      "description": "Banana with almond butterasdasdasd",
       "mealType": 5,
-      "mealOrder": 5,
-      "startTime": "2024-03-08T16:30:00Z",
-      "endTime": "2024-03-08T16:45:00Z",
+      "mealOrder": 6,
+      "startTime": "2025-01-01T19:30:00",
+      "endTime": "2025-01-01T19:30:00",
       "dietId": 2,
       "tenantId": 1,
       "isActive": true,
-      "nutritionInfoList": []
+      "nutritionInfoList": [],
+      "nutritionInfoIdsToAdd": [],
+      "nutritionInfoIdsToRemove": [],
+      "newNutritionInfosToAdd": []
     },
     {
       "id": 3,
       "name": "Keto Dinner",
       "description": "Grilled salmon with asparagus and butter",
-      "mealType": 3,
+      "mealType": 4,
       "mealOrder": 3,
-      "startTime": "2024-03-08T18:00:00Z",
-      "endTime": "2024-03-08T18:45:00Z",
+      "startTime": "2025-01-01T21:00:00",
+      "endTime": "2025-01-01T21:00:00",
       "dietId": 2,
       "tenantId": 1,
       "isActive": true,
-      "nutritionInfoList": []
+      "nutritionInfoList": [],
+      "nutritionInfoIdsToAdd": [],
+      "nutritionInfoIdsToRemove": [],
+      "newNutritionInfosToAdd": []
     },
     {
       "id": 1,

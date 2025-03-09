@@ -52,7 +52,7 @@ export default function BaseDietDialog({
     setValue,
     defaultValues = {},
     isDisabled = false,
-    footerContent
+    footerContent,
 }: BaseDietDialogProps) {
     const { t } = useTranslation();
 
@@ -78,7 +78,7 @@ export default function BaseDietDialog({
                     <DialogTitle>{title}</DialogTitle>
                 </DialogHeader>
 
-                <form className="space-y-4">
+                <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <label>{t('diet.name')}</label>

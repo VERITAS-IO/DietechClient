@@ -350,6 +350,9 @@
     "updateError": "Failed to update diet",
     "deleteSuccess": "Diet deleted successfully",
     "deleteError": "Failed to delete diet",
+    "meals": "Meals",
+    "addMeal": "Add Meal",
+    "noMealsAdded": "No meals added to this diet yet",
     "types": {
       "vegetarian": "Vegetarian",
       "vegan": "Vegan",
@@ -386,6 +389,10 @@
     "deleteSuccess": "Meal deleted successfully",
     "deleteError": "Failed to delete meal",
     "notFound": "Meal not found",
+    "create": "Create Meal",
+    "addedToDiet": "Meal added to diet",
+    "addedToDietDescription": "The meal has been added to the diet successfully",
+    "selectType": "Select meal type",
     "types": {
       "breakfast": "Breakfast",
       "lunch": "Lunch",

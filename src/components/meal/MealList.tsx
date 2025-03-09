@@ -18,6 +18,7 @@ import { format } from 'date-fns';
 import MealDetailDialog from './MealDetailDialog';
 import MealFilter from './MealFilter';
 import MealCreateDialog from './MealCreateDialog';
+import MealUpdateDialog from './MealUpdateDialog';
 
 export default function MealList() {
     const { t } = useTranslation();
@@ -137,6 +138,7 @@ export default function MealList() {
 
             <MealDetailDialog />
             <MealCreateDialog />
+            <MealUpdateDialog />
         </div>
     );
 }

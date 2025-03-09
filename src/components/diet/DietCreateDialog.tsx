@@ -4,14 +4,20 @@ import { useCreateDiet } from '@/hooks/diet-hooks';
 import { useDietStore } from '@/stores/diet-store';
 import { DietType } from '@/types/diet';
 import { useForm } from 'react-hook-form';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Plus, Trash } from 'lucide-react';
 import BaseDietDialog from './BaseDietDialog';
+import MealCreateDialog from '../meal/MealCreateDialog';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function DietCreateDialog() {
     const { t } = useTranslation();
     const {
         isCreateModalOpen,
-        setCreateModalOpen
+        setCreateModalOpen,
+        temporaryMeals,
+        removeTemporaryMeal,
+        clearTemporaryMeals,
+        setMealCreateModalOpen
     } = useDietStore();
 
     const createMutation = useCreateDiet();
@@ -30,11 +36,11 @@ export default function DietCreateDialog() {
 
     const handleClose = () => {
         setCreateModalOpen(false);
+        clearTemporaryMeals();
         reset();
     };
 
     const onSubmit = (data: any) => {
-        // Create a new diet with required fields for CreateDietRequest
         const createData = {
             name: data.name,
             dietDescription: data.description,
@@ -45,7 +51,8 @@ export default function DietCreateDialog() {
             nutritionInfoIds: [], // Empty array for now, adjust as needed
             startDate: data.startDate ? new Date(data.startDate).toISOString() : new Date().toISOString(),
             endDate: data.endDate ? new Date(data.endDate).toISOString() : null,
-            isActive: !!data.isActive
+            isActive: !!data.isActive,
+            meals: temporaryMeals // Include the temporary meals in the diet creation request
         };
         
         createMutation.mutate(createData, {
@@ -55,39 +62,105 @@ export default function DietCreateDialog() {
         });
     };
 
+    // Render the list of meals that have been added to the diet
+    const renderMealsList = () => {
+        if (temporaryMeals.length === 0) {
+            return (
+                <div className="text-center py-4 text-muted-foreground">
+                    {t('diet.noMealsAdded')}
+                </div>
+            );
+        }
+
+        return (
+            <div className="space-y-2 max-h-60 overflow-y-auto">
+                {temporaryMeals.map((meal, index) => (
+                    <Card key={index} className="bg-muted/40">
+                        <CardHeader className="py-2 px-3">
+                            <div className="flex justify-between items-center">
+                                <CardTitle className="text-sm font-medium">{meal.name}</CardTitle>
+                                <Button 
+                                    variant="ghost" 
+                                    size="icon" 
+                                    className="h-6 w-6" 
+                                    onClick={() => removeTemporaryMeal(index)}
+                                >
+                                    <Trash className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="py-2 px-3">
+                            <div className="text-xs text-muted-foreground">
+                                <p>{meal.description}</p>
+                                <p className="mt-1">
+                                    {t('meal.type')}: {t(`meal.types.${meal.mealType}`)}
+                                </p>
+                            </div>
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
+        );
+    };
+
     const footerContent = (
         <>
-            <Button
-                type="button"
-                variant="outline"
-                onClick={handleClose}
-            >
-                {t('common.cancel')}
-            </Button>
-            <Button
-                onClick={handleSubmit(onSubmit)}
-                disabled={createMutation.isPending}
-            >
-                {createMutation.isPending ? (
-                    <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        {t('common.saving')}
-                    </>
-                ) : (
-                    t('common.create')
-                )}
-            </Button>
+            <div className="flex w-full justify-between">
+                <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setMealCreateModalOpen(true)}
+                    className="gap-1"
+                >
+                    <Plus className="h-4 w-4" />
+                    {t('diet.addMeal')}
+                </Button>
+                
+                <div className="flex gap-2">
+                    <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleClose}
+                    >
+                        {t('common.cancel')}
+                    </Button>
+                    <Button
+                        onClick={handleSubmit(onSubmit)}
+                        disabled={createMutation.isPending}
+                    >
+                        {createMutation.isPending ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                {t('common.saving')}
+                            </>
+                        ) : (
+                            t('common.create')
+                        )}
+                    </Button>
+                </div>
+            </div>
         </>
     );
 
     return (
-        <BaseDietDialog
-            isOpen={isCreateModalOpen}
-            onClose={handleClose}
-            title={t('diet.create')}
-            register={register}
-            setValue={setValue}
-            footerContent={footerContent}
-        />
+        <>
+            <BaseDietDialog
+                isOpen={isCreateModalOpen}
+                onClose={handleClose}
+                title={t('diet.create')}
+                register={register}
+                setValue={setValue}
+                footerContent={footerContent}
+            >
+                {/* Meals section */}
+                <div className="col-span-2 space-y-2">
+                    <h3 className="font-medium text-base">{t('diet.meals')}</h3>
+                    {renderMealsList()}
+                </div>
+            </BaseDietDialog>
+            
+            {/* Meal create dialog for adding meals to the diet */}
+            <MealCreateDialog forDietCreation={true} />
+        </>
     );
 }
