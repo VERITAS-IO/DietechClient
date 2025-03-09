@@ -15,7 +15,12 @@ import Dashboard from "@/pages/dashboard";
 import { useAuthStore } from "./stores/auth-store"; 
 import DashboardLayout from "./layouts/DashboadLayouts";
 import { Navbar } from "./components/common/navbar";
-import AppointmentsPage from "./pages/nested/appointments";
+import AppointmentsCalendarPage from "./pages/nested/appointments";
+import AppointmentNotesPage from "./pages/appointment/appointment-notes";
+import NutritionInfoListPage from "./pages/nested/nutrition-info";
+import DietListPage from "./pages/nested/diet-list";
+import NotFoundPage from "@/pages/not-found";
+import MealListPage from "./pages/nested/meal-list";
 
 const queryClient = new QueryClient();
 
@@ -60,7 +65,14 @@ function App() {
                 </Route>
 
                 <Route path="appointments">
-                 <Route index element={<AppointmentsPage />} />
+                 <Route path="calendar" element={<AppointmentsCalendarPage />} />
+                 <Route path="notes" element={<AppointmentNotesPage/>}  />
+                </Route>
+
+                <Route path="diets">
+                 <Route index element={<DietListPage/>} />
+                 <Route path="meals" element={<MealListPage />} />
+                 <Route path="nutritions" element={<NutritionInfoListPage />} />
                 </Route>
 
                 <Route path="diet-plans/*" element={<Navigate to="/dashboard" replace />} />
@@ -68,7 +80,7 @@ function App() {
                 <Route path="resources/*" element={<Navigate to="/dashboard" replace />} />
                 <Route path="settings/*" element={<Navigate to="/dashboard" replace />} />
               </Route>
-              <Route path="*" element={<Navigate to="/" replace />} />
+              <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </div>
         </Router>

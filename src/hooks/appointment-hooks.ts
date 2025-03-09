@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { appointmentService } from '@/services/appointment-service';
-import { Appointment } from '@/types/appointment';
+import { UpdateAppointmentRequest } from '@/types/appointment';
 
 export function useAppointments() {
   const queryClient = useQueryClient();
@@ -18,7 +18,7 @@ export function useAppointments() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Appointment> }) =>
+    mutationFn: ({ id, data }: { id: string; data: Partial<UpdateAppointmentRequest> }) =>
       appointmentService.updateAppointment(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments'] });

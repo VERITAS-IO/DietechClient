@@ -1,0 +1,106 @@
+import { CreateClientRequest } from '@/types/client';
+
+export const fakeClients: CreateClientRequest[] = [
+  {
+    userRegistrationRequest: {
+      firstName: "John",
+      lastName: "Doe",
+      email: "john.doe@example.com",
+      phoneNumber: "+1234567890",
+      roles: ["Client"],
+    },
+    createPersonaInfoRequest: {
+      gender: "Male",
+      dateOfBirth: "1990-01-15",
+      firstName: "John",
+      lastName: "Doe",
+      email: "john.doe@example.com",
+      phoneNumber: "+1234567890",
+    },
+    createLifeStyleInfoRequest: {
+      physicalActivity: "Moderate",
+      sleepHours: 7,
+      stressLevel: "Moderate",
+      smoking: "None",
+      alcohol: "Occasional",
+    },
+    createHealthInfoRequest: {
+      bloodPressure: "Normal",
+      bloodType: "A_Postive",
+      bloodSugarLevel: 95,
+      weight: 75,
+      height: 180,
+      chronicConditions: "None",
+      allergies: "Pollen",
+      activelyUsedDrugs: "None",
+    },
+  },
+  {
+    userRegistrationRequest: {
+      firstName: "Jane",
+      lastName: "Smith",
+      email: "jane.smith@example.com",
+      phoneNumber: "+1987654321",
+      roles: ["Client"],
+    },
+    createPersonaInfoRequest: {
+      gender: "Female",
+      dateOfBirth: "1995-03-20",
+      firstName: "Jane",
+      lastName: "Smith",
+      email: "jane.smith@example.com",
+      phoneNumber: "+1987654321",
+    },
+    createLifeStyleInfoRequest: {
+      physicalActivity: "Active",
+      sleepHours: 8,
+      stressLevel: "Low",
+      smoking: "None",
+      alcohol: "None",
+    },
+    createHealthInfoRequest: {
+      bloodPressure: "Normal",
+      bloodType: "O_Negative",
+      bloodSugarLevel: 90,
+      weight: 62,
+      height: 165,
+      chronicConditions: "None",
+      allergies: "None",
+      activelyUsedDrugs: "None",
+    },
+  },
+  {
+    userRegistrationRequest: {
+      firstName: "Michael",
+      lastName: "Johnson",
+      email: "michael.johnson@example.com",
+      phoneNumber: "+1122334455",
+      roles: ["Client"],
+    },
+    createPersonaInfoRequest: {
+      gender: "Male",
+      dateOfBirth: "1988-07-10",
+      firstName: "Michael",
+      lastName: "Johnson",
+      email: "michael.johnson@example.com",
+      phoneNumber: "+1122334455",
+    },
+    createLifeStyleInfoRequest: {
+      physicalActivity: "VeryActive",
+      sleepHours: 6,
+      stressLevel: "High",
+      smoking: "Occasional",
+      alcohol: "Regular",
+    },
+    createHealthInfoRequest: {
+      bloodPressure: "HighStageOne",
+      bloodType: "B_Positive",
+      bloodSugarLevel: 100,
+      weight: 85,
+      height: 190,
+      chronicConditions: "Asthma",
+      allergies: "Dust, Pet dander",
+      activelyUsedDrugs: "Inhaler",
+    },
+  }
+];

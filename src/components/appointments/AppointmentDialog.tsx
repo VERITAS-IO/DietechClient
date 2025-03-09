@@ -1,20 +1,36 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { useTranslation } from 'react-i18next';
+import { GetAppointmentResponse, CreateAppointmentNoteRequest, NoteType } from '@/types/appointment';
+import { QueryClientResponse } from '@/types/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Appointment, AppointmentType } from '@/types/appointment';
+import { AppointmentType, AppointmentStatus, CreateAppointmentRequest, UpdateAppointmentRequest } from '@/types/appointment';
 import { useAppointmentStore } from '@/stores/appointment-store';
+import { useClientStore } from '@/stores/client-store';
+import { Check } from "lucide-react";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from '@/lib/utils/utils';
 
 const appointmentSchema = z.object({
   clientName: z.string().min(1, 'Client name is required'),
-  clientId: z.string().min(1, 'Client ID is required'),
-  type: z.enum(['initial', 'followUp', 'assessment', 'emergency']),
+  isNewClient: z.boolean().default(false),
+  type: z.nativeEnum(AppointmentType),
   start: z.string().min(1, 'Start time is required'),
   end: z.string().min(1, 'End time is required'),
   notes: z.string().optional(),
@@ -25,8 +41,22 @@ interface AppointmentDialogProps {
   isOpen: boolean;
   onClose: () => void;
   selectedDate: Date | null;
-  appointment: Appointment | null;
+  appointment: GetAppointmentResponse | null;
 }
+
+// Helper function to format date to local ISO string without timezone offset
+const formatLocalISOString = (date: Date): string => {
+  const offset = date.getTimezoneOffset();
+  const adjustedDate = new Date(date.getTime() - (offset * 60 * 1000));
+  return adjustedDate.toISOString().slice(0, 16);
+};
+
+// Helper function to parse local datetime string to UTC Date
+const parseLocalDateTime = (dateTimeString: string): Date => {
+  const date = new Date(dateTimeString);
+  const offset = date.getTimezoneOffset();
+  return new Date(date.getTime() + (offset * 60 * 1000));
+};
 
 export function AppointmentDialog({
   isOpen,
@@ -34,60 +64,111 @@ export function AppointmentDialog({
   selectedDate,
   appointment,
 }: AppointmentDialogProps) {
-  const { addAppointment, updateAppointment, deleteAppointment } = useAppointmentStore();
+  const { t } = useTranslation();
+  const { createAppointment, updateAppointment, deleteAppointment, appointments } = useAppointmentStore();
+  const { searchClients } = useClientStore();
+  const [open, setOpen] = useState(false);
+  const [selectedClient, setSelectedClient] = useState<QueryClientResponse | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (inputRef.current) {
+      document.documentElement.style.setProperty('--trigger-width', `${inputRef.current.offsetWidth}px`);
+    }
+  }, [isOpen]);
 
   const form = useForm<z.infer<typeof appointmentSchema>>({
     resolver: zodResolver(appointmentSchema),
     defaultValues: {
-      clientName: '',
-      clientId: '',
-      type: 'initial',
-      start: '',
-      end: '',
-      notes: '',
-      preparationInstructions: '',
+      clientName: appointment?.clientName ?? '',
+      isNewClient: false,
+      type: appointment?.type ?? AppointmentType.Initial,
+      start: appointment?.start 
+        ? formatLocalISOString(new Date(appointment.start))
+        : selectedDate 
+          ? formatLocalISOString(selectedDate)
+          : formatLocalISOString(new Date()),
+      end: appointment?.end 
+        ? formatLocalISOString(new Date(appointment.end))
+        : selectedDate 
+          ? formatLocalISOString(new Date(selectedDate.getTime() + 3600000))
+          : formatLocalISOString(new Date(new Date().getTime() + 3600000)),
+      notes: appointment?.appointmentNotes?.map(note => note.note).join('\n') ?? '',
+      preparationInstructions: appointment?.preparationInstructions ?? '',
     },
   });
+
+  useEffect(() => {
+    setSelectedClient(null);
+  }, []);
+
+  const filteredClients = searchClients(searchQuery);
+
+  const handleClientSelect = (client: QueryClientResponse) => {
+    setSelectedClient(client);
+    form.setValue('clientName', client.fullName);
+    setOpen(false);
+  };
 
   useEffect(() => {
     if (appointment) {
       form.reset({
         clientName: appointment.clientName,
-        clientId: appointment.clientId,
+        isNewClient: false,
         type: appointment.type,
-        start: appointment.start.toISOString().slice(0, 16),
-        end: appointment.end.toISOString().slice(0, 16),
-        notes: appointment.notes || '',
+        start: formatLocalISOString(new Date(appointment.start)),
+        end: formatLocalISOString(new Date(appointment.end)),
+        notes: appointment.appointmentNotes?.map(note => note.note).join('\n') || '',
         preparationInstructions: appointment.preparationInstructions || '',
       });
     } else if (selectedDate) {
       const endDate = new Date(selectedDate);
       endDate.setHours(endDate.getHours() + 1);
       form.reset({
-        start: selectedDate.toISOString().slice(0, 16),
-        end: endDate.toISOString().slice(0, 16),
+        clientName: '',
+        isNewClient: false,
+        type: AppointmentType.Initial,
+        start: formatLocalISOString(selectedDate),
+        end: formatLocalISOString(endDate),
+        notes: '',
+        preparationInstructions: '',
       });
     }
-  }, [appointment, selectedDate]);
+  }, [appointment, selectedDate, form]);
 
   const onSubmit = (values: z.infer<typeof appointmentSchema>) => {
-    const appointmentData = {
-      id: appointment?.id || crypto.randomUUID(),
+    const note: CreateAppointmentNoteRequest = {
+      note: values.notes ?? '',
+      noteType: NoteType.PreAppointment
+    };
+
+    const baseAppointmentData = {
       title: `${values.clientName} - ${values.type}`,
-      start: new Date(values.start),
-      end: new Date(values.end),
-      clientId: values.clientId,
+      start: parseLocalDateTime(values.start),
+      end: parseLocalDateTime(values.end),
+      clientId: selectedClient ? selectedClient.id : undefined,
       clientName: values.clientName,
-      type: values.type as AppointmentType,
-      status: appointment?.status || 'scheduled',
-      notes: values.notes,
+      type: values.type,
       preparationInstructions: values.preparationInstructions,
+      note: note
     };
 
     if (appointment) {
-      updateAppointment(appointment.id, appointmentData);
+      const updateData: UpdateAppointmentRequest = {
+        ...baseAppointmentData,
+        status: appointment.status,
+        appointmentId: appointment.id
+      };
+      updateAppointment(appointment.id, updateData);
     } else {
-      addAppointment(appointmentData);
+      const createData: CreateAppointmentRequest = {
+        ...baseAppointmentData,
+        status: AppointmentStatus.Scheduled
+      };
+
+      console.log("createAppointmentRequest:", createData)
+      createAppointment(createData);
     }
 
     onClose();
@@ -105,34 +186,94 @@ export function AppointmentDialog({
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>
-            {appointment ? 'Edit Appointment' : 'New Appointment'}
+            {appointment ? t('appointment.edit') : t('appointment.create')}
           </DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <style dangerouslySetInnerHTML={{
+              __html: `
+                .w-\\[--trigger-width\\] {
+                  width: var(--trigger-width) !important;
+                }
+              `
+            }} />
             <FormField
               control={form.control}
-              name="clientName"
+              name="isNewClient"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Client Name</FormLabel>
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                   <FormControl>
-                    <Input {...field} />
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={(checked) => {
+                        field.onChange(checked);
+                        if (checked) {
+                          setSelectedClient(null);
+                          form.setValue('clientName', '');
+                        }
+                      }}
+                    />
                   </FormControl>
-                  <FormMessage />
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>{t('appointment.newClient')}</FormLabel>
+                  </div>
                 </FormItem>
               )}
             />
 
             <FormField
               control={form.control}
-              name="clientId"
+              name="clientName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Client ID</FormLabel>
+                  <FormLabel>{t('appointment.clientName')}</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    {form.watch('isNewClient') ? (
+                      <Input 
+                        {...field} 
+                        placeholder={t('appointment.enterClientName')}
+                      />
+                    ) : (
+                      <Popover open={open} onOpenChange={setOpen}>
+                        <PopoverTrigger asChild>
+                          <Input 
+                            {...field}
+                            ref={inputRef}
+                            placeholder={t('appointment.searchExistingClient')}
+                          />
+                        </PopoverTrigger>
+                        <PopoverContent align="start" className="p-0" style={{ width: 'var(--radix-popover-trigger-width)' }}>
+                          <Command className="w-full">
+                            <CommandInput
+                              placeholder={t('appointment.searchClient')}
+                              value={searchQuery}
+                              onValueChange={setSearchQuery}
+                            />
+                            <CommandEmpty>
+                              <p className="p-2">{t('appointment.noClientsFound')}</p>
+                            </CommandEmpty>
+                            <CommandGroup>
+                              {filteredClients.map((client) => (
+                                <CommandItem
+                                  key={client.id}
+                                  onSelect={() => handleClientSelect(client)}
+                                >
+                                  <div className="flex items-center">
+                                    <Check className={cn(
+                                      "mr-2 h-4 w-4",
+                                      selectedClient?.id === client.id ? "opacity-100" : "opacity-0"
+                                    )} />
+                                    <span>{client.fullName}</span>
+                                  </div>
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                    )}
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -144,18 +285,21 @@ export function AppointmentDialog({
               name="type"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Appointment Type</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormLabel>{t('appointment.type')}</FormLabel>
+                  <Select 
+                    onValueChange={(value) => field.onChange(Number(value))} 
+                    value={field.value.toString()}
+                  >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select appointment type" />
+                        <SelectValue placeholder={t('appointment.selectType')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="initial">Initial Consultation</SelectItem>
-                      <SelectItem value="followUp">Follow-up</SelectItem>
-                      <SelectItem value="assessment">Assessment</SelectItem>
-                      <SelectItem value="emergency">Emergency</SelectItem>
+                      <SelectItem value={AppointmentType.Initial.toString()}>{t('appointment.types.initial')}</SelectItem>
+                      <SelectItem value={AppointmentType.FollowUp.toString()}>{t('appointment.types.followUp')}</SelectItem>
+                      <SelectItem value={AppointmentType.Assessment.toString()}>{t('appointment.types.assessment')}</SelectItem>
+                      <SelectItem value={AppointmentType.Emergency.toString()}>{t('appointment.types.emergency')}</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -169,7 +313,7 @@ export function AppointmentDialog({
                 name="start"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Start Time</FormLabel>
+                    <FormLabel>{t('appointment.startTime')}</FormLabel>
                     <FormControl>
                       <Input type="datetime-local" {...field} />
                     </FormControl>
@@ -183,7 +327,7 @@ export function AppointmentDialog({
                 name="end"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>End Time</FormLabel>
+                    <FormLabel>{t('appointment.endTime')}</FormLabel>
                     <FormControl>
                       <Input type="datetime-local" {...field} />
                     </FormControl>
@@ -193,26 +337,28 @@ export function AppointmentDialog({
               />
             </div>
 
-            <FormField
-              control={form.control}
-              name="notes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Notes</FormLabel>
-                  <FormControl>
-                    <Textarea {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {!appointment && (
+              <FormField
+                control={form.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('appointment.notes.add')}</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
             <FormField
               control={form.control}
               name="preparationInstructions"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Preparation Instructions</FormLabel>
+                  <FormLabel>{t('appointment.preparationInstructions')}</FormLabel>
                   <FormControl>
                     <Textarea {...field} />
                   </FormControl>
@@ -221,29 +367,15 @@ export function AppointmentDialog({
               )}
             />
 
-            <div className="flex justify-end gap-2">
+            <div className="flex justify-between">
+              <Button type="submit">
+                {appointment ? t('common.save') : t('common.create')}
+              </Button>
               {appointment && (
-                <Button
-                  type="button"
-                  variant="destructive"
-                  onClick={handleDelete}
-                >
-                  Delete
+                <Button type="button" variant="destructive" onClick={handleDelete}>
+                  {t('common.delete')}
                 </Button>
               )}
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onClose}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                className="bg-[#FF5A5F] hover:bg-[#FF5A5F]/90"
-              >
-                {appointment ? 'Update' : 'Create'}
-              </Button>
             </div>
           </form>
         </Form>

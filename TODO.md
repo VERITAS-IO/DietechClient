@@ -1,3 +1,7 @@
+TO CONTINUE:
+- WHEN WE TRY TO DELETE A MEAL, THE DELETE MEAL DIALOG IS NOT BEING OPEN, BECAUSE MEAL IDS ARE NOT COMING FROM BACKEND
+
+
 #SECURITY
 
 ##LOCAL STORAGE
@@ -9,17 +13,23 @@
 #REQUEST RESPONSE CYCLE
 ## 1.Problem details response body does not return after token refresh middleawre executed, it goes to the exception middleware but response does not have body, only response code.
 ## 2.Confirm email page sends two request, therefore a concurrency error occurs.
+## 3.RepositoryBase methods in should get a TenantId as a parameter, and this should be get from token claims.
 
 ## DEVELOPMENT FLOW:
-1.Aside development.
+1.Aside development [DONE]
 2.Changing main page when user  is authenticated
-3.Connect pages to backend with real data.
+3.Connect pages to backend with real data.[DONE]
 4.CREATE A DIET CREATION PAGE.
 5.api & db should be deployed.
 
+    ##DIETS:
+    1.meal (ogun) will be added to diets.(IT WILL CHANGE MOSTLY.)
+
+    ##PAGINATION:
+    1. Create a pagination logic on the frontend according to metadata object, (it will get from headers)
 
     ### APPOINTMENTS
-    1.AppointmentNotes should be a seperate table.
+    1.AppointmentNotes should be a seperate table. [DONE]
 
     ### TENANTS
     1.How to add users to tenants
@@ -32,3 +42,5 @@
 ## HTTP 
 
 -RETURN 412 - PRECONDITION FAILED IN THE SERVICES WITH PRECONDITIONS.
+
+
