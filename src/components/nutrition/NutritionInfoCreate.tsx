@@ -27,7 +27,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { useNutritionStore } from '@/stores/nutrition-store';
-import { ServingUnit, FoodCategory, CreateNutritionInfoRequest } from '@/types/nutrition';
+import { ServingUnit, FoodCategory, CreateNutritionInfoRequest, NutritionInfoDetail } from '@/types/nutrition';
 import { nutritionService } from '@/services/nutrition-service';
 import { useQueryClient } from '@tanstack/react-query';
 import { t } from 'i18next';
@@ -46,11 +46,24 @@ const formSchema = z.object({
 
 interface Props {
     className?: string;
+    isOpen?: boolean;
+    onOpenChange?: (open: boolean) => void;
+    onNutritionCreated?: (nutritionInfo: NutritionInfoDetail | CreateNutritionInfoRequest, id?: number) => void;
 }
 
-export const NutritionInfoCreate = ({ className }: Props) => {
+export const NutritionInfoCreate = ({ 
+    className, 
+    isOpen: controlledOpen, 
+    onOpenChange: setControlledOpen,
+    onNutritionCreated 
+}: Props) => {
     const [open, setOpen] = useState(false);
     const queryClient = useQueryClient();
+    
+    // Determine if we're in controlled or uncontrolled mode
+    const isControlled = controlledOpen !== undefined && setControlledOpen !== undefined;
+    const isDialogOpen = isControlled ? controlledOpen : open;
+    const setIsDialogOpen = isControlled ? setControlledOpen : setOpen;
     
     const form = useForm<CreateNutritionInfoRequest>({
         resolver: zodResolver(formSchema),
@@ -79,9 +92,27 @@ export const NutritionInfoCreate = ({ className }: Props) => {
             };
             
             console.log('Submitting request:', request);
-            await nutritionService.create(request);
+            const response = await nutritionService.create(request);
+            
+            // If we have a callback for when nutrition is created, call it
+            if (onNutritionCreated) {
+                if (response && response.id) {
+                    // If we have an ID, try to get the full nutrition info
+                    try {
+                        const nutritionInfo = await nutritionService.getById(response.id);
+                        onNutritionCreated(nutritionInfo, response.id);
+                    } catch (error) {
+                        // If we can't get the full info, just pass the request and ID
+                        onNutritionCreated(request, response.id);
+                    }
+                } else {
+                    // If we don't have an ID, just pass the request
+                    onNutritionCreated(request);
+                }
+            }
+            
             queryClient.invalidateQueries({ queryKey: ['nutrition-info', 'list'] });
-            setOpen(false);
+            setIsDialogOpen(false);
             form.reset();
         } catch (error) {
             console.error('Failed to create nutrition info:', error);
@@ -89,18 +120,45 @@ export const NutritionInfoCreate = ({ className }: Props) => {
     };
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-                <Button variant="default" className={className}>
-                    {t('nutrition.create')}
-                </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+        <Dialog 
+            open={isDialogOpen} 
+            onOpenChange={(open) => {
+                // Prevent event propagation to parent dialogs
+                setTimeout(() => {
+                    setIsDialogOpen(open);
+                }, 0);
+            }}
+        >
+            {!isControlled && (
+                <DialogTrigger asChild>
+                    <Button variant="default" className={className}>
+                        {t('nutrition.create')}
+                    </Button>
+                </DialogTrigger>
+            )}
+            <DialogContent 
+                className="sm:max-w-[425px]"
+                onPointerDownOutside={(e) => {
+                    // Prevent clicks outside from closing parent dialogs
+                    e.preventDefault();
+                }}
+                onEscapeKeyDown={(e) => {
+                    // Prevent Escape key from closing parent dialogs
+                    e.stopPropagation();
+                }}
+            >
                 <DialogHeader>
                     <DialogTitle>{t('nutrition.createTitle')}</DialogTitle>
                 </DialogHeader>
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <form 
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            form.handleSubmit(onSubmit)(e);
+                        }} 
+                        className="space-y-4"
+                    >
                         <FormField
                             control={form.control}
                             name="name"
@@ -281,7 +339,7 @@ export const NutritionInfoCreate = ({ className }: Props) => {
                             <Button
                                 type="button"
                                 variant="outline"
-                                onClick={() => setOpen(false)}
+                                onClick={() => setIsDialogOpen(false)}
                             >
                                 {t('common.cancel')}
                             </Button>

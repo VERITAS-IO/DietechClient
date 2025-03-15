@@ -20,8 +20,10 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import MealDeleteDialog from '../meal/MealDeleteDialog';
+import DietMealRemoveDialog from './DietMealRemoveDialog';
 import { useMealStore } from '@/stores/meal-store';
+import { CreateMealRequest, MealListResponse } from '@/types/meal';
+import DietDelete from './DietDelete';
 
 interface DietFormValues {
     name: string;
@@ -48,45 +50,64 @@ export default function DietDetailDialog() {
         setDeleteModalOpen,
         temporaryMeals,
         clearTemporaryMeals,
-        setMealCreateModalOpen
+        setMealCreateModalOpen,
+        isDeleteModalOpen
     } = useDietStore();
 
-    const {setDeleteModalOpen: setDeleteModalOpenMeal, isDeleteModalOpen: isDeleteModalOpenMeal} = useMealStore();
+    const {setDeleteModalOpen: setDeleteModalOpenMeal} = useMealStore();
 
-
-    React.useEffect(() => {
-    console.log("isDeleteModalOpenMeal", isDeleteModalOpenMeal)
-    }, [isDeleteModalOpenMeal])
-    
-    const [mealToDeleteId, setMealToDeleteId] = React.useState<number | null>(null);
+    const [mealToRemove, setMealToRemove] = React.useState<{ id: number; name: string } | null>(null);
+    const [isRemoveDialogOpen, setIsRemoveDialogOpen] = React.useState(false);
     
     const handleRemoveMeal = (mealId: number) => {
-        alert("handleRemoveMeal is triggered, mealId:"+mealId)
-        if (mealId) {
-            setMealToDeleteId(mealId);
-            setDeleteModalOpenMeal(true);
+        // Handle temporary meals (with negative IDs)
+        if (mealId < 0) {
+            // Convert negative ID back to index
+            const index = Math.abs(mealId) - 1;
+            if (index >= 0 && index < temporaryMeals.length) {
+                // Remove the temporary meal by index
+                const removedMeal = temporaryMeals[index];
+                useDietStore.getState().removeTemporaryMeal(index);
+                
+                toast(t('meal.removedFromDiet'), {
+                    description: t('meal.temporaryMealRemoved', { name: removedMeal.name }),
+                });
+            }
+            return;
         }
-    };
-    
-    const confirmMealRemoval = () => {
-        if (mealToDeleteId) {
-            // Add meal to remove list
-            addMealToRemove(mealToDeleteId);
-            // Show toast notification for meal removal
-            toast(t('meal.removedFromDiet'), {
-                description: t('meal.removedFromDietDescription'),
+        
+        // Validate that we have a valid meal ID for existing meals
+        if (!mealId || mealId <= 0) {
+            toast.error(t('meal.error'), {
+                description: t('meal.invalidId'),
             });
-            // Reset state
-            setMealToDeleteId(null);
-            setDeleteModalOpenMeal(false);
+            return;
         }
+        
+        // Find the meal in the diet
+        const meal = diet?.meals?.find(m => m.id === mealId);
+        if (!meal) {
+            toast.error(t('meal.error'), {
+                description: t('meal.notFoundInDiet'),
+            });
+            return;
+        }
+        
+        // Set the meal to remove and open the confirmation dialog
+        setMealToRemove({ id: mealId, name: meal.name });
+        setIsRemoveDialogOpen(true);
     };
     
-    const cancelMealRemoval = () => {
-        setMealToDeleteId(null);
-        setDeleteModalOpenMeal(false);
+    const confirmMealRemoval = (mealId: number) => {
+        // Add meal to remove list
+        addMealToRemove(mealId);
+        
+        // Show toast notification for meal removal
+        toast(t('meal.removedFromDiet'), {
+            description: t('meal.removedFromDietDescription'),
+        });
     };
-
+    
     const handleAddMeal = () => {
         // Open meal creation modal for adding to the diet
         setMealCreateModalOpen(true);
@@ -254,6 +275,27 @@ export default function DietDetailDialog() {
         </>
     );
 
+    // Add this function to convert temporary meals to MealListResponse format
+    const convertTemporaryMealsToListResponse = (temporaryMeals: CreateMealRequest[]): MealListResponse[] => {
+        return temporaryMeals.map((meal, index) => ({
+            id: -(index + 1), // Use negative IDs to distinguish temporary meals
+            name: meal.name,
+            description: meal.description,
+            mealType: meal.mealType,
+            mealOrder: meal.mealOrder,
+            startTime: meal.startTime,
+            endTime: meal.endTime,
+            dietId: meal.dietId,
+            tenantId: meal.tenantId,
+            isActive: true,
+            nutritionInfoList: []
+        }));
+    };
+
+    React.useEffect(() => {
+        // Monitor temporary meals changes
+    }, [temporaryMeals]);
+
     return (
         <>
             <BaseDietDialog
@@ -268,9 +310,9 @@ export default function DietDetailDialog() {
                 footerContent={footerContent}
             >
                 {diet?.meals && (
-                    <div className="mt-6">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-lg font-medium">{t('meal.list')}</h3>
+                    <div className="mt-4">
+                        <div className="flex justify-between items-center mb-2">
+                            <h3 className="text-lg font-medium">{t('meal.list.title')}</h3>
                             {isEditMode && (
                                 <Button 
                                     onClick={handleAddMeal}
@@ -282,7 +324,12 @@ export default function DietDetailDialog() {
                             )}
                         </div>
                         <DietMealList
-                            meals={diet.meals.filter(meal => !mealsToRemove.includes(meal.id))}
+                            meals={[
+                                ...(diet.meals || []).filter(meal => 
+                                    meal.id && !mealsToRemove.includes(meal.id)
+                                ),
+                                ...(isEditMode ? convertTemporaryMealsToListResponse(temporaryMeals) : [])
+                            ]}
                             isEditMode={isEditMode}
                             onRemoveMeal={handleRemoveMeal}
                         />
@@ -290,9 +337,24 @@ export default function DietDetailDialog() {
                 )}
             </BaseDietDialog>
             
-            <MealDeleteDialog/>
+            <DietMealRemoveDialog
+                isOpen={isRemoveDialogOpen}
+                onOpenChange={setIsRemoveDialogOpen}
+                mealId={mealToRemove?.id || null}
+                mealName={mealToRemove?.name}
+                onConfirm={confirmMealRemoval}
+            />
             
             <MealCreateDialog forDietUpdate={true} />
+            
+            <DietDelete 
+                isOpen={isDeleteModalOpen}
+                onClose={() => setDeleteModalOpen(false)}
+                onDeleted={() => {
+                    setDetailModalOpen(false);
+                    setDeleteModalOpen(false);
+                }}
+            />
         </>
     );
 }

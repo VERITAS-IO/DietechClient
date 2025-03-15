@@ -21,7 +21,7 @@ export default function DietMealList({ meals, isEditMode = false, onRemoveMeal }
 
   if (!meals || meals.length === 0) {
     return (
-      <Card className="mt-6">
+      <Card className="mt-4 mb-4">
         <CardContent className="text-center py-6 text-muted-foreground">
           {t('diet.noMealsAdded')}
         </CardContent>
@@ -30,63 +30,74 @@ export default function DietMealList({ meals, isEditMode = false, onRemoveMeal }
   }
 
   const handleRowClick = (meal: MealListResponse) => {
-    setSelectedMealId(meal.id);
-    setDetailModalOpen(true);
+    // Only open detail modal for existing meals (positive IDs)
+    if (meal.id && meal.id > 0) {
+      setSelectedMealId(meal.id);
+      setDetailModalOpen(true);
+    }
+    // For temporary meals, do nothing as they don't have details yet
   };
 
   const handleRemove = (e: React.MouseEvent, mealId: number) => {
-    alert("handle remove triggered:"+mealId);
     e.stopPropagation(); // Prevent row click event
     e.preventDefault(); // Prevent form submission
-    if (onRemoveMeal && mealId) {
+    
+    // For temporary meals (negative IDs) or valid existing meals
+    if (onRemoveMeal && (mealId < 0 || mealId > 0)) {
       onRemoveMeal(mealId);
     }
   };
 
   return (
-    <Card className="mt-6">
-      <CardHeader>
-        <CardTitle>{t('meal.list')}</CardTitle>
+    <Card className="mt-4 mb-4 border shadow-sm">
+      <CardHeader className="py-3 px-4">
+        <CardTitle className="text-base">{t('meal.list.title')}</CardTitle>
       </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>{t('meal.name')}</TableHead>
-              <TableHead>{t('meal.type')}</TableHead>
-              <TableHead>{t('meal.time')}</TableHead>
-              {isEditMode && <TableHead className="w-[100px]"></TableHead>}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {meals.map((meal, index) => (
-              <TableRow 
-                key={meal.id ? `meal-${meal.id}` : `temp-meal-${index}`} // Use meal.id if available, otherwise use index
-                className="cursor-pointer hover:bg-muted/50 transition-colors"
-                onClick={() => handleRowClick(meal)}
-              >
-                <TableCell className="font-medium">{meal.name}</TableCell>
-                <TableCell>{t(`meal.types.${meal.mealType.toString()}`)}</TableCell>
-                <TableCell>
-                  {meal.startTime ? format(new Date(meal.startTime), 'HH:mm') : '-'}
-                </TableCell>
-                {isEditMode && (
-                  <TableCell className="text-right">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      type="button" // Explicitly set type to button to prevent form submission
-                      onClick={(e) => handleRemove(e, meal.id || 0)}
-                      className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-                    >
-                      <Trash2 className="h-4 w-4" />  
-                    </Button>
-                  </TableCell>
-                )}
+      <CardContent className="p-0">
+        <div className="max-h-[300px] overflow-auto">
+          <Table>
+            <TableHeader className="sticky top-0 bg-background z-10">
+              <TableRow>
+                <TableHead className="w-[40%]">{t('meal.name')}</TableHead>
+                <TableHead className="w-[30%]">{t('meal.type')}</TableHead>
+                <TableHead className="w-[20%]">{t('meal.time')}</TableHead>
+                {isEditMode && <TableHead className="w-[10%]"></TableHead>}
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {meals.map((meal, index) => (
+                <TableRow 
+                  key={meal.id ? `meal-${meal.id}` : `temp-meal-${index}`}
+                  className={`cursor-pointer hover:bg-muted/50 transition-colors ${meal.id < 0 ? 'border-l-4 border-l-primary' : ''}`}
+                  onClick={() => handleRowClick(meal)}
+                >
+                  <TableCell className="font-medium">
+                    {meal.name}
+                    {meal.id < 0 && <span className="ml-2 text-xs text-primary">{t('common.new')}</span>}
+                  </TableCell>
+                  <TableCell>{t(`meal.types.${meal.mealType.toString()}`)}</TableCell>
+                  <TableCell>
+                    {meal.startTime ? format(new Date(meal.startTime), 'HH:mm') : '-'}
+                  </TableCell>
+                  {isEditMode && (
+                    <TableCell className="text-right">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        type="button"
+                        onClick={(e) => handleRemove(e, meal.id || 0)}
+                        className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                        disabled={!meal.id} // Disable the button if there's no meal ID
+                      >
+                        <Trash2 className="h-4 w-4" />  
+                      </Button>
+                    </TableCell>
+                  )}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   );

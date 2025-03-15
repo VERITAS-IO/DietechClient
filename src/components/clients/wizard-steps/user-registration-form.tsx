@@ -6,27 +6,31 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { useEffect } from "react";
 import { useClientStore } from "@/stores/client-store";
-
-const formSchema = z.object({
-  userRegistrationRequest: z.object({
-    firstName: z.string().min(2, "First name must be at least 2 characters").max(50, "First name must be less than 50 characters"),
-    lastName: z.string().min(2, "Last name must be at least 2 characters").max(50, "Last name must be less than 50 characters"),
-    email: z.string().email("Please enter a valid email address"),
-    phoneNumber: z.string().min(10, "Phone number must be at least 10 digits").max(15, "Phone number must be less than 15 digits"),
-    roles: z.array(z.string()).default(['Client']),
-  }),
-});
+import { useTranslation } from "react-i18next";
 
 interface UserRegistrationFormProps {
-  data?: z.infer<typeof formSchema>['userRegistrationRequest'];
-  onSubmit: (data: z.infer<typeof formSchema>) => void;
+  data?: any;
+  onSubmit: (data: any) => void;
   isSubmitting?: boolean;
 }
 
 export function UserRegistrationForm({ data, onSubmit, isSubmitting = false }: UserRegistrationFormProps) {
+  const { t } = useTranslation();
   const { formData } = useClientStore();
   
-  const form = useForm({
+  const formSchema = z.object({
+    userRegistrationRequest: z.object({
+      firstName: z.string().min(2, t('auth.register.form.validation.firstName')).max(50, t('validation.maxLength', { max: 50 })),
+      lastName: z.string().min(2, t('auth.register.form.validation.lastName')).max(50, t('validation.maxLength', { max: 50 })),
+      email: z.string().email(t('validation.email')),
+      phoneNumber: z.string().min(10, t('validation.minLength', { min: 10 })).max(15, t('validation.maxLength', { max: 15 })),
+      roles: z.array(z.string()).default(['Client']),
+    }),
+  });
+
+  type FormValues = z.infer<typeof formSchema>;
+  
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       userRegistrationRequest: {
@@ -48,51 +52,42 @@ export function UserRegistrationForm({ data, onSubmit, isSubmitting = false }: U
       phoneNumber: data?.phoneNumber || formData.userRegistrationRequest.phoneNumber,
       roles: data?.roles || formData.userRegistrationRequest.roles,
     };
-    
+
     form.reset({
       userRegistrationRequest: newData,
     });
-  }, [data, formData.userRegistrationRequest, form]);
+  }, [data, form, formData.userRegistrationRequest]);
+
+  const handleSubmit = (values: FormValues) => {
+    onSubmit(values);
+  };
 
   return (
     <Form {...form}>
-      <form 
-        onSubmit={form.handleSubmit(onSubmit)} 
-        className="space-y-6"
-      >
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={form.control}
             name="userRegistrationRequest.firstName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>First Name</FormLabel>
+                <FormLabel>{t('auth.register.form.firstName.label')}</FormLabel>
                 <FormControl>
-                  <Input 
-                    {...field} 
-                    placeholder="Enter first name"
-                    disabled={isSubmitting}
-                    autoComplete="given-name"
-                  />
+                  <Input placeholder={t('auth.register.form.firstName.placeholder')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="userRegistrationRequest.lastName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Last Name</FormLabel>
+                <FormLabel>{t('auth.register.form.lastName.label')}</FormLabel>
                 <FormControl>
-                  <Input 
-                    {...field} 
-                    placeholder="Enter last name"
-                    disabled={isSubmitting}
-                    autoComplete="family-name"
-                  />
+                  <Input placeholder={t('auth.register.form.lastName.placeholder')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -105,15 +100,9 @@ export function UserRegistrationForm({ data, onSubmit, isSubmitting = false }: U
           name="userRegistrationRequest.email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>{t('auth.register.form.email.label')}</FormLabel>
               <FormControl>
-                <Input 
-                  type="email" 
-                  {...field} 
-                  placeholder="Enter email address"
-                  disabled={isSubmitting}
-                  autoComplete="email"
-                />
+                <Input placeholder={t('auth.register.form.email.placeholder')} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -125,28 +114,20 @@ export function UserRegistrationForm({ data, onSubmit, isSubmitting = false }: U
           name="userRegistrationRequest.phoneNumber"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Phone Number</FormLabel>
+              <FormLabel>{t('auth.register.form.phoneNumber.label')}</FormLabel>
               <FormControl>
-                <Input 
-                  {...field} 
-                  placeholder="Enter phone number"
-                  disabled={isSubmitting}
-                  autoComplete="tel"
-                  type="tel"
-                />
+                <Input placeholder={t('auth.register.form.phoneNumber.placeholder')} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <Button 
-          type="submit" 
-          className="w-full"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? "Creating..." : "Next"}
-        </Button>
+        <div className="flex justify-end">
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? t('common.saving') : t('client.wizard.next')}
+          </Button>
+        </div>
       </form>
     </Form>
   );

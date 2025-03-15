@@ -12,6 +12,7 @@ import {
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Loader2 } from 'lucide-react';
+import { useEffect } from 'react';
 
 export default function MealDeleteDialog() {
     const { t } = useTranslation();
@@ -21,10 +22,28 @@ export default function MealDeleteDialog() {
 
     const deleteMealMutation = useDeleteMeal();
 
+    // Add debugging to track when the dialog opens and what meal ID is selected
+    useEffect(() => {
+        if (isDeleteModalOpen) {
+            console.log("MealDeleteDialog opened with selectedMealId:", selectedMealId);
+        }
+    }, [isDeleteModalOpen, selectedMealId]);
+
     const handleDelete = async () => {
-        if (selectedMealId) {
-            await deleteMealMutation.mutateAsync(selectedMealId);
+        console.log("Attempting to delete meal with ID:", selectedMealId);
+        
+        if (!selectedMealId) {
+            console.error("Cannot delete meal: No meal ID selected");
             setDeleteModalOpen(false);
+            return;
+        }
+        
+        try {
+            await deleteMealMutation.mutateAsync(selectedMealId);
+            console.log("Successfully deleted meal with ID:", selectedMealId);
+            setDeleteModalOpen(false);
+        } catch (error) {
+            console.error("Error deleting meal:", error);
         }
     };
 
@@ -35,6 +54,7 @@ export default function MealDeleteDialog() {
                     <AlertDialogTitle>{t('meal.delete.title')}</AlertDialogTitle>
                     <AlertDialogDescription>
                         {t('meal.delete.description')}
+                        {selectedMealId ? ` (ID: ${selectedMealId})` : ''}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -43,7 +63,7 @@ export default function MealDeleteDialog() {
                     </AlertDialogCancel>
                     <AlertDialogAction 
                         onClick={handleDelete}
-                        disabled={deleteMealMutation.isPending}
+                        disabled={deleteMealMutation.isPending || !selectedMealId}
                         className="bg-destructive hover:bg-destructive/90"
                     >
                         {deleteMealMutation.isPending ? (

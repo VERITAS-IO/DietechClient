@@ -5,6 +5,7 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
+    DialogFooter
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,6 +16,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { DietType } from '@/types/diet';
 import { Loader2 } from 'lucide-react';
 import { UseFormRegister, UseFormSetValue } from 'react-hook-form';
@@ -73,109 +75,113 @@ export default function BaseDietDialog({
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-2xl">
-                <DialogHeader>
+            <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col p-0 overflow-hidden">
+                <DialogHeader className="px-6 pt-6 pb-2">
                     <DialogTitle>{title}</DialogTitle>
                 </DialogHeader>
 
-                <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <label>{t('diet.name')}</label>
-                            <Input
-                                {...register('name', { required: true })}
-                                disabled={isDisabled}
-                                placeholder={t('diet.namePlaceholder')}
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <label>{t('diet.type')}</label>
-                            <Select
-                                disabled={isDisabled}
-                                onValueChange={(value) => setValue('type', value)}
-                                defaultValue={defaultValues.type || DietType.VEGETARIAN}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {Object.values(DietType).map((type) => (
-                                        <SelectItem key={type} value={type}>
-                                            {t(`diet.types.${type.toLowerCase()}`)}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        <div className="space-y-2">
-                            <label>{t('diet.duration')}</label>
-                            <Input
-                                type="number"
-                                {...register('duration', { required: true, min: 1 })}
-                                disabled={isDisabled}
-                                placeholder="7"
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <label>{t('diet.calories')}</label>
-                            <Input
-                                type="number"
-                                {...register('calories', { required: true, min: 0 })}
-                                disabled={isDisabled}
-                                placeholder="2000"
-                            />
-                        </div>
-                        
-                        <div className="space-y-2">
-                            <label>{t('diet.startDate')}</label>
-                            <Input
-                                type="date"
-                                {...register('startDate')}
-                                disabled={isDisabled}
-                            />
-                        </div>
-                        
-                        <div className="space-y-2">
-                            <label>{t('diet.endDate')}</label>
-                            <Input
-                                type="date"
-                                {...register('endDate')}
-                                disabled={isDisabled}
-                            />
-                        </div>
-                        
-                        <div className="space-y-2 flex items-center">
-                            <label className="flex items-center space-x-2">
-                                <input
-                                    type="checkbox"
-                                    {...register('isActive')}
+                <div className="flex-1 overflow-auto px-6 py-2" style={{ maxHeight: 'calc(90vh - 10rem)' }}>
+                    <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <label>{t('diet.name')}</label>
+                                <Input
+                                    {...register('name', { required: true })}
                                     disabled={isDisabled}
-                                    className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary dark:border-gray-600 dark:bg-gray-700"
+                                    placeholder={t('diet.namePlaceholder')}
                                 />
-                                <span>{t('diet.isActive')}</span>
-                            </label>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label>{t('diet.type')}</label>
+                                <Select
+                                    disabled={isDisabled}
+                                    onValueChange={(value) => setValue('type', value)}
+                                    defaultValue={defaultValues.type || DietType.VEGETARIAN}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {Object.values(DietType).map((type) => (
+                                            <SelectItem key={type} value={type}>
+                                                {t(`diet.types.${type.toLowerCase()}`)}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label>{t('diet.duration')}</label>
+                                <Input
+                                    type="number"
+                                    {...register('duration', { required: true, min: 1 })}
+                                    disabled={isDisabled}
+                                    placeholder="7"
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <label>{t('diet.calories')}</label>
+                                <Input
+                                    type="number"
+                                    {...register('calories', { required: true, min: 0 })}
+                                    disabled={isDisabled}
+                                    placeholder="2000"
+                                />
+                            </div>
+                            
+                            <div className="space-y-2">
+                                <label>{t('diet.startDate')}</label>
+                                <Input
+                                    type="date"
+                                    {...register('startDate')}
+                                    disabled={isDisabled}
+                                />
+                            </div>
+                            
+                            <div className="space-y-2">
+                                <label>{t('diet.endDate')}</label>
+                                <Input
+                                    type="date"
+                                    {...register('endDate')}
+                                    disabled={isDisabled}
+                                />
+                            </div>
+                            
+                            <div className="space-y-2 flex items-center">
+                                <label className="flex items-center space-x-2">
+                                    <input
+                                        type="checkbox"
+                                        {...register('isActive')}
+                                        disabled={isDisabled}
+                                        className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary dark:border-gray-600 dark:bg-gray-700"
+                                    />
+                                    <span>{t('diet.isActive')}</span>
+                                </label>
+                            </div>
+
+                            <div className="col-span-2 space-y-2">
+                                <label>{t('diet.description')}</label>
+                                <Textarea
+                                    {...register('description', { required: true })}
+                                    disabled={isDisabled}
+                                    className="min-h-[100px]"
+                                    placeholder={t('diet.descriptionPlaceholder')}
+                                />
+                            </div>
                         </div>
 
-                        <div className="col-span-2 space-y-2">
-                            <label>{t('diet.description')}</label>
-                            <Textarea
-                                {...register('description', { required: true })}
-                                disabled={isDisabled}
-                                className="min-h-[100px]"
-                                placeholder={t('diet.descriptionPlaceholder')}
-                            />
-                        </div>
-                    </div>
+                        {children}
+                    </form>
+                </div>
 
-                    {children}
-
-                    <div className="flex justify-end space-x-2">
+                <DialogFooter className="px-6 py-4 border-t">
+                    <div className="flex justify-end space-x-2 w-full">
                         {footerContent}
                     </div>
-                </form>
+                </DialogFooter>
             </DialogContent>
         </Dialog>
     );

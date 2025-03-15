@@ -11,7 +11,34 @@
     "viewDemo": "Demo Görüntüle",
     "save": "Kaydet",
     "delete": "Sil",
-    "edit": "Düzenle"
+    "edit": "Düzenle",
+    "cancel": "İptal",
+    "done": "Tamam",
+    "create": "Oluştur",
+    "saving": "Kaydediliyor...",
+    "success": "Başarılı",
+    "error": "Hata",
+    "new": "Yeni",
+    "remove": "Kaldır",
+    "removing": "Kaldırılıyor...",
+    "all": "Tümü",
+    "resetFilters": "Filtreleri Sıfırla",
+    "logout": "Çıkış Yap"
+  },
+  "validation": {
+    "required": "Bu alan zorunludur",
+    "min": "En az {{min}} olmalıdır",
+    "max": "En fazla {{max}} olmalıdır",
+    "minLength": "En az {{min}} karakter olmalıdır",
+    "maxLength": "En fazla {{max}} karakter olmalıdır",
+    "email": "Geçersiz e-posta adresi",
+    "url": "Geçersiz URL",
+    "pattern": "Geçersiz format",
+    "numeric": "Sayı olmalıdır",
+    "integer": "Tam sayı olmalıdır",
+    "positive": "Pozitif sayı olmalıdır",
+    "negative": "Negatif sayı olmalıdır",
+    "date": "Geçersiz tarih formatı"
   },
   "landing": {
     "hero": {
@@ -49,11 +76,11 @@
       "subtitle": "Hesabınıza erişmek için bilgilerinizi girin",
       "forgotPassword": "Şifrenizi mi unuttunuz?",
       "noAccount": "Hesabınız yok mu?",
-      "signUp": "Kayıt ol",
+      "signUp": "Kaydolun",
       "form": {
         "email": {
           "label": "E-posta",
-          "placeholder": "siz@ornek.com"
+          "placeholder": "ornek@email.com"
         },
         "password": {
           "label": "Şifre",
@@ -79,7 +106,7 @@
       "title": "Hesap oluştur",
       "subtitle": "Başlamak için bilgilerinizi girin",
       "haveAccount": "Zaten hesabınız var mı?",
-      "signIn": "Giriş yap",
+      "signIn": "Giriş yapın",
       "form": {
         "firstName": {
           "label": "Ad",
@@ -95,7 +122,7 @@
         },
         "email": {
           "label": "E-posta",
-          "placeholder": "siz@ornek.com"
+          "placeholder": "ornek@email.com"
         },
         "phoneNumber": {
           "label": "Telefon Numarası (İsteğe bağlı)",
@@ -106,8 +133,8 @@
           "placeholder": "Şifre oluşturun"
         },
         "confirmPassword": {
-          "label": "Şifre Tekrar",
-          "placeholder": "Şifrenizi tekrar girin",
+          "label": "Şifreyi Onayla",
+          "placeholder": "Şifrenizi onaylayın",
           "matching": "✓ Şifreler eşleşiyor",
           "notMatching": "✗ Şifreler eşleşmiyor"
         },
@@ -120,7 +147,7 @@
           "lastName": "Soyad en az 2 karakter olmalıdır",
           "userName": {
             "min": "Kullanıcı adı en az 3 karakter olmalıdır",
-            "pattern": "Kullanıcı adı sadece harf, rakam, alt çizgi ve tire içerebilir"
+            "pattern": "Kullanıcı adı sadece harf, rakam, alt çizgi ve kısa çizgi içerebilir"
           },
           "email": "Geçersiz e-posta adresi",
           "password": {
@@ -147,14 +174,14 @@
     "resetPassword": {
       "title": "Şifre Sıfırlama",
       "subtitle": "Yeni şifrenizi girin",
-      "backToLogin": "Girişe Dön",
+      "backToLogin": "Giriş Sayfasına Dön",
       "newPassword": "Yeni Şifre",
-      "confirmPassword": "Şifre Tekrar",
+      "confirmPassword": "Şifreyi Onayla",
       "resetButton": "Şifreyi Sıfırla",
       "success": {
-        "title": "Şifre Başarıyla Sıfırlandı",
+        "title": "Şifre Sıfırlama Başarılı",
         "description": "Şifreniz başarıyla sıfırlandı. Artık yeni şifrenizle giriş yapabilirsiniz.",
-        "loginButton": "Girişe Git"
+        "loginButton": "Giriş Sayfasına Git"
       },
       "validation": {
         "passwordRequirements": "Şifre en az bir büyük harf, bir küçük harf, bir rakam ve bir özel karakter içermelidir",
@@ -164,89 +191,14 @@
     }
   },
   "appointment": {
-    "title": "Randevular",
-    "calendarView": "Takvim",
-    "tableView": "Liste",
-    "create": "Yeni Randevu",
+    "title": "Randevu",
+    "create": "Randevu Oluştur",
     "edit": "Randevu Düzenle",
-    "update": "Randevu Güncelle",
     "delete": "Randevu Sil",
-    "cancel": "İptal",
     "clientName": "Danışan Adı",
-    "clientId": "Danışan ID",
-    "date": "Tarih",
-    "time": "Saat",
-    "startTime": "Başlangıç Saati",
-    "endTime": "Bitiş Saati",
-    "type": "Tür",
-    "status": "Durum",
-    "preparationInstructions": "Hazırlık Talimatları",
-    "search": "Randevularda ara...",
-    "filterByStatus": "Duruma Göre Filtrele",
-    "filterByType": "Türe Göre Filtrele",
-    "allStatuses": "Tüm Durumlar",
-    "allTypes": "Tüm Türler",
-    "selectType": "Randevu türü seçin",
-    "selectStatus": "Durum seçin",
-    "notes": {
-      "title": "Randevu Notları",
-      "add": "Not Ekle",
-      "edit": "Notu Düzenle",
-      "delete": "Notu Sil",
-      "content": "Not İçeriği",
-      "type": "Not Türü",
-      "noNotes": "Not bulunamadı",
-      "appointmentNotFound": "Randevu bulunamadı",
-      "createSuccess": "Not Eklendi",
-      "createSuccessDesc": "Not başarıyla eklendi",
-      "updateSuccess": "Not Güncellendi",
-      "updateSuccessDesc": "Not başarıyla güncellendi",
-      "deleteSuccess": "Not Silindi",
-      "deleteSuccessDesc": "Not başarıyla silindi",
-      "saveFailed": "Not kaydedilemedi",
-      "deleteFailed": "Not silinemedi",
-      "types": {
-        "0": "Bilinmiyor",
-        "1": "Randevu Öncesi",
-        "2": "Randevu Sırasında",
-        "3": "Randevu Sonrası"
-      },
-      "select": "Randevu Seç",
-      "selectPlaceholder": "Randevu seçin...",
-      "filter": {
-        "all": "Tüm Randevular",
-        "type": "Türe Göre Filtrele",
-        "search": "Notlarda ara...",
-        "sortBy": "Sıralama",
-        "newest": "En Yeni Önce",
-        "oldest": "En Eski Önce"
-      }
-    },
-    "types": {
-      "initial": "İlk Görüşme",
-      "followUp": "Kontrol",
-      "assessment": "Değerlendirme",
-      "emergency": "Acil"
-    },
-    "status": {
-      "0": "Bilinmiyor",
-      "1": "Planlandı",
-      "2": "Onaylandı",
-      "3": "İptal Edildi",
-      "4": "Tamamlandı"
-    },
-    "validation": {
-      "clientNameRequired": "Danışan adı gereklidir",
-      "clientIdRequired": "Danışan ID gereklidir",
-      "startTimeRequired": "Başlangıç saati gereklidir",
-      "endTimeRequired": "Bitiş saati gereklidir",
-      "noteRequired": "Not içeriği gereklidir",
-      "appointmentRequired": "Lütfen bir randevu seçin"
-    },
-    "notFound": "Randevu bulunamadı",
     "newClient": "Yeni Danışan",
     "searchClient": "Danışan ara...",
-    "searchExistingClient": "Mevcut danışan ara veya seç",
+    "searchExistingClient": "Mevcut bir danışan ara veya seç",
     "enterClientName": "Yeni danışan adını girin",
     "noClientsFound": "Danışan bulunamadı"
   },
@@ -274,7 +226,8 @@
         "create": "Plan Oluştur",
         "manage": "Planları Yönet",
         "templates": "Şablonlar",
-        "nutritions": "Besinler"
+        "nutritions": "Besinler",
+        "meals": "Öğünler"
       },
       "appointments": "Randevular",
       "calendar": "Takvim",
@@ -293,6 +246,7 @@
       "preferences": "Tercihler",
       "notes":"Notlar"
     },
+    "greeting": "Hoş geldin, {{name}}!",
     "stats": {
       "totalClients": "Toplam Danışan Sayısı",
       "appointments": "Randevular",
@@ -330,6 +284,7 @@
     "title": "Diyetler",
     "create": "Diyet Oluştur",
     "details": "Diyet Detayları",
+    "edit": "Diyeti Düzenle",
     "name": "Diyet Adı",
     "description": "Açıklama",
     "type": "Diyet Tipi",
@@ -338,6 +293,7 @@
     "calories": "Toplam Kalori",
     "startDate": "Başlangıç Tarihi",
     "endDate": "Bitiş Tarihi",
+    "isActive": "Aktif",
     "filterType": "Tipe Göre Filtrele",
     "filterMinCalories": "Min Kalori",
     "filterMaxCalories": "Max Kalori",
@@ -345,10 +301,17 @@
     "deleteConfirmMessage": "Bu diyeti silmek istediğinize emin misiniz? Bu işlem geri alınamaz.",
     "createSuccess": "Diyet başarıyla oluşturuldu",
     "createError": "Diyet oluşturulurken hata oluştu",
+    "updated": "Diyet güncellendi",
+    "updatedDescription": "Diyet başarıyla güncellendi",
     "updateSuccess": "Diyet başarıyla güncellendi",
     "updateError": "Diyet güncellenirken hata oluştu",
     "deleteSuccess": "Diyet başarıyla silindi",
     "deleteError": "Diyet silinirken hata oluştu",
+    "meals": "Öğünler",
+    "addMeal": "Öğün Ekle",
+    "noMealsAdded": "Bu diyete henüz öğün eklenmedi",
+    "namePlaceholder": "Diyet adını girin",
+    "descriptionPlaceholder": "Diyet açıklamasını girin",
     "types": {
       "vegetarian": "Vejetaryen",
       "vegan": "Vegan",
@@ -358,5 +321,142 @@
       "low_carb": "Düşük Karbonhidrat",
       "high_protein": "Yüksek Protein"
     }
+  },
+  "meal": {
+    "list": {
+      "title": "Öğünler"
+    },
+    "detail": {
+      "title": "Öğün Detayları",
+      "description": "Öğün detaylarını ve besin değerlerini görüntüleyin"
+    },
+    "delete": {
+      "title": "Öğünü Sil",
+      "description": "Bu öğünü silmek istediğinizden emin misiniz? Bu işlem geri alınamaz."
+    },
+    "name": "İsim",
+    "description": "Açıklama",
+    "type": "Tür",
+    "time": "Zaman",
+    "order": "Sıra",
+    "dietId": "Diyet",
+    "nutritionInfo": "Besin Değerleri",
+    "noData": "Öğün bulunamadı",
+    "createSuccess": "Öğün başarıyla oluşturuldu",
+    "createError": "Öğün oluşturulamadı",
+    "update": "Öğünü Güncelle",
+    "updateSuccess": "Öğün başarıyla güncellendi",
+    "updateError": "Öğün güncellenirken hata oluştu",
+    "deleteSuccess": "Öğün başarıyla silindi",
+    "deleteError": "Öğün silinirken hata oluştu",
+    "notFound": "Öğün bulunamadı",
+    "create": "Öğün Oluştur",
+    "add": "Öğün Ekle",
+    "addToDiet": "Diyete Ekle",
+    "addedToDiet": "Öğün diyete eklendi",
+    "addedToDietDescription": "Öğün başarıyla diyete eklendi",
+    "selectType": "Öğün türü seçin",
+    "filterType": "Türe Göre Filtrele",
+    "removeFromDiet": "Diyetten Çıkar",
+    "removeFromDietConfirmation": "{{name}} öğününü bu diyetten çıkarmak istediğinize emin misiniz?",
+    "temporaryMealRemoved": "{{name}} çıkarıldı",
+    "removedFromDiet": "Öğün çıkarıldı",
+    "removedFromDietDescription": "Öğün diyetten çıkarıldı",
+    "error": "Öğün Hatası",
+    "invalidId": "Geçersiz öğün ID",
+    "notFoundInDiet": "Öğün diyette bulunamadı",
+    "defaultName": "bu öğün",
+    "types": {
+      "breakfast": "Kahvaltı",
+      "lunch": "Öğle Yemeği",
+      "dinner": "Akşam Yemeği",
+      "snack": "Atıştırmalık",
+      "preworkout": "Antrenman Öncesi",
+      "postworkout": "Antrenman Sonrası",
+      "unknown": "Bilinmiyor"
+    }
+  },
+  "nutrition": {
+    "title": "Besin Bilgisi",
+    "create": "Besin Ekle",
+    "createTitle": "Yeni Besin Bilgisi Ekle",
+    "name": "İsim",
+    "servingSize": "Porsiyon Boyutu",
+    "servingUnit": "Porsiyon Birimi",
+    "foodCategory": "Yiyecek Kategorisi",
+    "calories": "Kalori",
+    "protein": "Protein",
+    "carbs": "Karbonhidrat",
+    "fat": "Yağ",
+    "fiber": "Lif",
+    "search": "Besin ara...",
+    "addNew": "Yeni Ekle",
+    "add": "Ekle",
+    "added": "Eklendi",
+    "selected": "Seçilen Besinler",
+    "newItems": "Yeni Besin Öğeleri",
+    "mealDescription": "Bu öğüne besin bilgisi eklemek için arama yapın. Mevcut öğeleri ekleyebilir veya yenilerini oluşturabilirsiniz.",
+    "servingUnits": {
+      "unknown": "Bilinmiyor",
+      "grams": "Gram",
+      "milliliters": "Mililitre",
+      "pieces": "Adet",
+      "cups": "Bardak",
+      "tablespoons": "Yemek Kaşığı"
+    },
+    "foodCategories": {
+      "unknown": "Bilinmiyor",
+      "dairy": "Süt Ürünleri",
+      "proteins": "Proteinler",
+      "grains": "Tahıllar",
+      "vegetables": "Sebzeler",
+      "fruits": "Meyveler"
+    }
+  },
+  "client": {
+    "title": "Danışanlar",
+    "create": "Danışan Oluştur",
+    "createNew": "Yeni Danışan Oluştur",
+    "addNew": "Yeni Danışan Ekle",
+    "details": "Danışan Detayları",
+    "edit": "Danışanı Düzenle",
+    "delete": "Danışanı Sil",
+    "name": "İsim",
+    "fullName": "Ad Soyad",
+    "email": "E-posta",
+    "phone": "Telefon",
+    "address": "Adres",
+    "dateOfBirth": "Doğum Tarihi",
+    "gender": "Cinsiyet",
+    "height": "Boy",
+    "weight": "Kilo",
+    "bmi": "VKİ",
+    "notes": "Notlar",
+    "search": "İsim, e-posta veya telefon ile ara...",
+    "sort": "Sıralama",
+    "sortOptions": {
+      "nameAsc": "İsim (A-Z)",
+      "nameDesc": "İsim (Z-A)",
+      "recent": "En Yeni",
+      "oldest": "En Eski"
+    },
+    "noClients": "Danışan bulunamadı",
+    "createSuccess": "Danışan başarıyla oluşturuldu",
+    "createError": "Danışan oluşturulurken hata oluştu",
+    "updateSuccess": "Danışan başarıyla güncellendi",
+    "updateError": "Danışan güncellenirken hata oluştu",
+    "deleteSuccess": "Danışan başarıyla silindi",
+    "deleteError": "Danışan silinirken hata oluştu",
+    "stats": {
+      "totalClients": "Toplam Danışan Sayısı"
+    },
+    "wizard": {
+      "step": "Adım {{current}}/{{total}}: {{title}}",
+      "completed": "tamamlandı",
+      "next": "İleri",
+      "back": "Geri"
+    },
+    "lifestyle": "Yaşam Tarzı",
+    "health": "Sağlık"
   }
 }

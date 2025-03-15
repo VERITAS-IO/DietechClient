@@ -272,10 +272,29 @@ server.get('/api/v1/diets/:id', (req, res) => {
 server.post('/api/v1/diets', (req, res) => {
   try {
     const db = router.db;
-    const newDiet = { ...req.body, id: Date.now() };
+    const newDiet = { 
+      ...req.body, 
+      id: Date.now(),
+      isActive: true,
+      startDate: req.body.startDate || new Date().toISOString(),
+      endDate: req.body.endDate || new Date(Date.now() + req.body.dietDuration * 24 * 60 * 60 * 1000).toISOString(),
+      nutritionInfoList: []
+    };
+    
+    // Ensure all meals have IDs
+    if (newDiet.meals && Array.isArray(newDiet.meals)) {
+      newDiet.meals = newDiet.meals.map(meal => ({
+        ...meal,
+        id: Date.now() + Math.floor(Math.random() * 1000), // Generate unique ID
+        isActive: true,
+        tenantId: meal.tenantId || 1,
+        nutritionInfoList: []
+      }));
+    }
+    
     db.get('diets').push(newDiet).write();
     
-    res.status(201).jsonp(newDiet);
+    res.status(201).jsonp({ id: newDiet.id, name: newDiet.name });
   } catch (error) {
     console.error('Error in POST /api/v1/diets:', error);
     res.status(500).jsonp(createErrorResponse(500, 'Internal server error'));
@@ -295,18 +314,63 @@ server.put('/api/v1/diets/:id', (req, res) => {
       return res.status(404).jsonp(createErrorResponse(404, 'Diet not found'));
     }
     
+    // Handle removing meals from diet
+    if (req.body.mealIdsToRemove && Array.isArray(req.body.mealIdsToRemove) && req.body.mealIdsToRemove.length > 0) {
+      console.log(`Removing meals from diet ${id}:`, req.body.mealIdsToRemove);
+      
+      // Make sure diet.meals exists
+      if (!diet.meals) {
+        diet.meals = [];
+      }
+      
+      // Filter out meals to remove
+      diet.meals = diet.meals.filter(meal => !req.body.mealIdsToRemove.includes(meal.id));
+      
+      // Also remove these meals from the standalone meals collection if they exist there
+      req.body.mealIdsToRemove.forEach(mealId => {
+        const exists = db.get('meals').find({ id: mealId }).value();
+        if (exists) {
+          db.get('meals').remove({ id: mealId }).write();
+        }
+      });
+    }
+    
+    // Handle adding new meals with proper IDs
+    if (req.body.newMealsToAdd && Array.isArray(req.body.newMealsToAdd)) {
+      const newMealsWithIds = req.body.newMealsToAdd.map(meal => ({
+        ...meal,
+        id: Date.now() + Math.floor(Math.random() * 1000), // Generate unique ID
+        isActive: true,
+        tenantId: meal.tenantId || 1,
+        nutritionInfoList: []
+      }));
+      
+      // Add to standalone meals collection
+      db.get('meals').push(...newMealsWithIds).write();
+      
+      // Update the diet's meals array if it exists
+      if (!diet.meals) {
+        diet.meals = [];
+      }
+      diet.meals.push(...newMealsWithIds);
+    }
+    
     const updatedDiet = {
       ...diet,
       ...req.body,
       id // Ensure ID cannot be changed
     };
     
+    // Remove temporary properties that shouldn't be stored
+    delete updatedDiet.mealIdsToRemove;
+    delete updatedDiet.newMealsToAdd;
+    
     db.get('diets')
       .find({ id })
       .assign(updatedDiet)
       .write();
     
-    res.status(200).jsonp(updatedDiet);
+    res.status(200).send();
   } catch (error) {
     console.error('Error in PUT /api/v1/diets/:id:', error);
     res.status(500).jsonp(createErrorResponse(500, 'Internal server error'));
@@ -429,7 +493,7 @@ server.post('/api/v1/meals', (req, res) => {
       ...req.body, 
       id: Date.now(),
       isActive: true,
-      tenantId: 1,
+      tenantId: req.body.tenantId || 1,
       nutritionInfoList: []
     };
     
@@ -486,9 +550,25 @@ server.delete('/api/v1/meals/:id', (req, res) => {
       return res.status(404).jsonp(createErrorResponse(404, 'Meal not found'));
     }
     
+    // Remove from standalone meals array
     db.get('meals')
       .remove({ id })
       .write();
+    
+    // Also remove from any diet that contains this meal
+    const diets = db.get('diets').value();
+    for (const diet of diets) {
+      if (diet.meals && Array.isArray(diet.meals)) {
+        const mealIndex = diet.meals.findIndex(meal => meal.id === id);
+        if (mealIndex !== -1) {
+          diet.meals.splice(mealIndex, 1);
+          db.get('diets')
+            .find({ id: diet.id })
+            .assign({ meals: diet.meals })
+            .write();
+        }
+      }
+    }
     
     res.status(204).send();
   } catch (error) {

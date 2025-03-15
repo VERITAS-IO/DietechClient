@@ -7,6 +7,7 @@ import { LifeStyleForm } from "./wizard-steps/life-style-form";
 import { HealthInfoForm } from "./wizard-steps/health-info-form";
 import { useCreateClient } from "@/hooks/client-hooks";
 import { useClientStore } from "@/stores/client-store";
+import { useTranslation } from "react-i18next";
 
 interface CreateClientWizardProps {
   onComplete: () => void;
@@ -14,14 +15,8 @@ interface CreateClientWizardProps {
 
 type StepKey = 'userRegistrationRequest' | 'createPersonaInfoRequest' | 'createLifeStyleInfoRequest' | 'createHealthInfoRequest';
 
-const STEPS = [
-  { title: "Account", key: "userRegistrationRequest" as StepKey, component: UserRegistrationForm },
-  { title: "Personal", key: "createPersonaInfoRequest" as StepKey, component: PersonalInfoForm },
-  { title: "Lifestyle", key: "createLifeStyleInfoRequest" as StepKey, component: LifeStyleForm },
-  { title: "Health", key: "createHealthInfoRequest" as StepKey, component: HealthInfoForm },
-];
-
 export function CreateClientWizard({ onComplete }: CreateClientWizardProps) {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const createClientMutation = useCreateClient();
   
@@ -33,6 +28,13 @@ export function CreateClientWizard({ onComplete }: CreateClientWizardProps) {
     resetForm
   } = useClientStore();
 
+  const STEPS = [
+    { title: t('auth.register.form.firstName.label'), key: "userRegistrationRequest" as StepKey, component: UserRegistrationForm },
+    { title: t('client.details'), key: "createPersonaInfoRequest" as StepKey, component: PersonalInfoForm },
+    { title: t('client.lifestyle'), key: "createLifeStyleInfoRequest" as StepKey, component: LifeStyleForm },
+    { title: t('client.health'), key: "createHealthInfoRequest" as StepKey, component: HealthInfoForm },
+  ];
+  
   const progress = ((currentStep + 1) / STEPS.length) * 100;
   const currentStepData = STEPS[currentStep];
   const isLastStep = currentStep === STEPS.length - 1;
@@ -49,16 +51,16 @@ export function CreateClientWizard({ onComplete }: CreateClientWizardProps) {
         await createClientMutation.mutateAsync(formData, {
           onSuccess: () => {
             toast({
-              title: "Success",
-              description: "Client created successfully",
+              title: t('common.success'),
+              description: t('client.createSuccess'),
             });
             resetForm();
             onComplete();
           },
           onError: (error: Error) => {
             toast({
-              title: "Error",
-              description: error.message || "Failed to create client. Please try again.",
+              title: t('common.error'),
+              description: error.message || t('client.createError'),
               variant: "destructive",
             });
           },
@@ -67,8 +69,8 @@ export function CreateClientWizard({ onComplete }: CreateClientWizardProps) {
     } catch (error) {
       console.error("Error handling step submission:", error);
       toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
+        title: t('common.error'),
+        description: t('client.createError'),
         variant: "destructive",
       });
     }
@@ -85,18 +87,42 @@ export function CreateClientWizard({ onComplete }: CreateClientWizardProps) {
       <div className="space-y-2">
         <div className="flex justify-between text-sm mb-2">
           <span>
-            Step {currentStep + 1} of {STEPS.length}: {currentStepData.title}
+            {t('client.wizard.step', { current: currentStep + 1, total: STEPS.length, title: currentStepData.title })}
           </span>
-          <span>{Math.round(progress)}% completed</span>
+          <span>{Math.round(progress)}% {t('client.wizard.completed')}</span>
         </div>
         <Progress value={progress} className="h-2" />
       </div>
 
-      <StepComponent
-        data={formData[currentStepData.key]}
-        onSubmit={handleStepSubmit}
-        isSubmitting={createClientMutation.isPending}
-      />
+      {currentStepData.key === "userRegistrationRequest" && (
+        <UserRegistrationForm
+          data={formData.userRegistrationRequest}
+          onSubmit={handleStepSubmit}
+          isSubmitting={createClientMutation.isPending}
+        />
+      )}
+      
+      {currentStepData.key === "createPersonaInfoRequest" && (
+        <PersonalInfoForm
+          data={formData.createPersonaInfoRequest}
+          onSubmit={handleStepSubmit}
+          isSubmitting={createClientMutation.isPending}
+        />
+      )}
+      
+      {currentStepData.key === "createLifeStyleInfoRequest" && (
+        <LifeStyleForm
+          data={formData.createLifeStyleInfoRequest}
+          onSubmit={handleStepSubmit}
+        />
+      )}
+      
+      {currentStepData.key === "createHealthInfoRequest" && (
+        <HealthInfoForm
+          data={formData.createHealthInfoRequest}
+          onSubmit={handleStepSubmit}
+        />
+      )}
 
       <div className="flex justify-between">
         <Button
@@ -105,13 +131,13 @@ export function CreateClientWizard({ onComplete }: CreateClientWizardProps) {
           onClick={handleBack}
           disabled={currentStep === 0 || createClientMutation.isPending}
         >
-          Back
+          {t('client.wizard.back')}
         </Button>
       </div>
 
       {createClientMutation.isError && (
         <div className="text-sm text-destructive mt-2">
-          {createClientMutation.error.message || "An error occurred while creating the client"}
+          {createClientMutation.error.message || t('client.createError')}
         </div>
       )}
     </div>

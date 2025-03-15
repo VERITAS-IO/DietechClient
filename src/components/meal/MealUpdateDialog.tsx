@@ -16,18 +16,19 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { useEffect } from 'react';
 import { format } from 'date-fns';
+import { t } from 'i18next';
 
 const formSchema = z.object({
-  name: z.string().min(1, { message: 'Name is required' }),
+  name: z.string().min(1, { message: t('validation.required') }),
   description: z.string().optional(),
-  mealType: z.string().min(1, { message: 'Meal type is required' }),
-  mealOrder: z.string().min(1, { message: 'Meal order is required' }).default('1'),
+  mealType: z.string().min(1, { message: t('validation.required') }),
+  mealOrder: z.string().min(1, { message: t('validation.required') }).default('1'),
   time: z.string().optional(),
   dietId: z.number().optional(),
   nutritionInfoIds: z.array(z.number()).optional(),
   newNutritionInfos: z.array(
     z.object({
-      name: z.string().min(1, { message: 'Nutrition info name is required' }),
+      name: z.string().min(1, { message: t('validation.required') }),
       description: z.string().optional(),
       caloriesPerServing: z.number().min(0).optional(),
       proteinPerServing: z.number().min(0).optional(),

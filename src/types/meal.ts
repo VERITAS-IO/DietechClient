@@ -33,20 +33,18 @@ export enum MealOrder {
     Custom = 99
 }
 
-/**
- * Interface for creating a new meal
- */
+
 export interface CreateMealRequest {
     name: string;
     description: string;
     mealType: MealType;
     mealOrder: MealOrder;
-    startTime: string; // ISO date string
-    endTime: string; // ISO date string
+    startTime: string; 
+    endTime: string; 
     dietId: number;
     tenantId: number;
     nutritionInfoIds?: number[];
-    newNutritionInfoRequests?: any[]; // Replace with actual type when available
+    newNutritionInfoRequests?: any[]; 
 }
 
 /**
