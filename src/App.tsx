@@ -21,6 +21,7 @@ import NutritionInfoListPage from "./pages/nested/nutrition-info";
 import DietListPage from "./pages/nested/diet-list";
 import NotFoundPage from "@/pages/not-found";
 import MealListPage from "./pages/nested/meal-list";
+import { FinancialPage } from "./pages/nested/financial";
 
 const queryClient = new QueryClient();
 
@@ -76,7 +77,11 @@ function App() {
                 </Route>
 
                 <Route path="diet-plans/*" element={<Navigate to="/dashboard" replace />} />
-                <Route path="analytics/*" element={<Navigate to="/dashboard" replace />} />
+                
+                <Route path="analytics">
+                  <Route index element={<FinancialPage />} />
+                </Route>
+
                 <Route path="resources/*" element={<Navigate to="/dashboard" replace />} />
                 <Route path="settings/*" element={<Navigate to="/dashboard" replace />} />
               </Route>
