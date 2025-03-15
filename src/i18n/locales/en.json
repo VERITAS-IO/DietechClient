@@ -526,6 +526,20 @@
       "back": "Back"
     },
     "lifestyle": "Lifestyle",
-    "health": "Health"
+    "health": "Health",
+    "management": "Manage and monitor your client base",
+    "status": "Status",
+    "lastVisit": "Last Visit",
+    "nextAppointment": "Next Appointment",
+    "viewDetails": "View Details"
+  },
+  "pagination": {
+    "showing": "Showing {{start}} to {{end}} of {{total}} entries",
+    "rowsPerPage": "Rows per page:",
+    "of": "of",
+    "next": "Next",
+    "previous": "Previous",
+    "first": "First",
+    "last": "Last"
   }
 }

@@ -35,6 +35,13 @@ export default function MealList() {
         setDetailModalOpen(true);
     };
 
+    const handlePageSizeChange = (newPageSize: number) => {
+        setFilters({ 
+            pageSize: newPageSize,
+            pageNumber: 1 // Reset to first page when changing page size
+        });
+    };
+
     const getMealTypeName = (mealType: number): string => {
         const mealTypeKeys = Object.keys(MealType)
             .filter(key => !isNaN(Number(key)))
@@ -110,7 +117,7 @@ export default function MealList() {
             
             <MealFilter />
             
-            <div className="rounded-md border">
+            <div className="table-container">
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -133,6 +140,10 @@ export default function MealList() {
                     pageSize={filters.pageSize}
                     totalItems={data.totalCount}
                     onPageChange={(page) => setFilters({ pageNumber: page })}
+                    onPageSizeChange={handlePageSizeChange}
+                    pageSizeOptions={[5, 10, 25, 50]}
+                    showPageSizeSelector={true}
+                    className="mt-4"
                 />
             )}
 

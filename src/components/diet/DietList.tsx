@@ -31,6 +31,13 @@ export default function DietList(){
         setDetailModalOpen(true);
     };
 
+    const handlePageSizeChange = (newPageSize: number) => {
+        setFilters({ 
+            pageSize: newPageSize,
+            pageNumber: 1 // Reset to first page when changing page size
+        });
+    };
+
     const renderTableContent = () => {
         if (isLoading) {
             return (
@@ -87,7 +94,7 @@ export default function DietList(){
         <div className="space-y-4">
             <h2 className="text-2xl font-bold">{t('diet.list.title')}</h2>
             
-            <div className="rounded-md border">
+            <div className="table-container">
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -110,6 +117,10 @@ export default function DietList(){
                     pageSize={filters.pageSize}
                     totalItems={data.totalCount}
                     onPageChange={(page) => setFilters({ pageNumber: page })}
+                    onPageSizeChange={handlePageSizeChange}
+                    pageSizeOptions={[5, 10, 25, 50]}
+                    showPageSizeSelector={true}
+                    className="mt-4"
                 />
             )}
 

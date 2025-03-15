@@ -26,6 +26,20 @@ const Sidebar = () => {
   const location = useLocation();
   const [activeMenu, setActiveMenu] = React.useState<string | null>(null);
 
+  // Set active menu based on current path
+  React.useEffect(() => {
+    const currentPath = location.pathname;
+    const activeItem = navigation.find(item => 
+      currentPath === item.href || 
+      currentPath.startsWith(`${item.href}/`) ||
+      (item.subItems?.some(subItem => currentPath === subItem.href))
+    );
+    
+    if (activeItem) {
+      setActiveMenu(activeItem.title);
+    }
+  }, [location.pathname]);
+
   const navigation: NavItem[] = [
     {
       title: t('dashboard.menu.dashboard'),
@@ -99,6 +113,19 @@ const Sidebar = () => {
     },
   ];
 
+  // Helper function to check if a menu item is active
+  const isMenuActive = (item: NavItem) => {
+    const currentPath = location.pathname;
+    return currentPath === item.href || 
+           currentPath.startsWith(`${item.href}/`) ||
+           (item.subItems?.some(subItem => currentPath === subItem.href));
+  };
+
+  // Helper function to check if a submenu item is active
+  const isSubmenuActive = (href: string) => {
+    return location.pathname === href;
+  };
+
   return (
     <aside className="w-64 min-h-screen border-r border-border bg-card">
       <div className="px-6 py-4 border-b border-border flex flex-row gap-2">
@@ -114,7 +141,7 @@ const Sidebar = () => {
               onClick={() => setActiveMenu(activeMenu === item.title ? null : item.title)}
               className={cn(
                 "w-full flex items-center justify-between px-6 py-3 text-muted-foreground hover:bg-accent hover:text-accent-foreground",
-                location.pathname.startsWith(item.href) && "bg-accent text-accent-foreground",
+                isMenuActive(item) && "bg-accent text-accent-foreground",
               )}
             >
               <div className="flex items-center">
@@ -137,7 +164,7 @@ const Sidebar = () => {
                     className={({ isActive }) =>
                       cn(
                         "block pl-14 pr-6 py-2 text-sm text-muted-foreground hover:text-accent-foreground hover:bg-accent",
-                        isActive && "bg-accent text-accent-foreground"
+                        isSubmenuActive(subItem.href) && "bg-accent text-accent-foreground"
                       )
                     }
                   >

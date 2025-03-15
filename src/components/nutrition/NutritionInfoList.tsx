@@ -17,9 +17,10 @@ import { DataTablePagination } from '@/components/common/DataTablePagination';
 import { NutritionInfoFilters } from "./NutritionInfoFilters";
 import { nutritionService } from '@/services/nutrition-service';
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 export const NutritionInfoList = () => {
+    const { t } = useTranslation();
     const filters = useNutritionStore((state) => state.filters);
     const setFilters = useNutritionStore((state) => state.setFilters);
     const setSelectedNutritionInfo = useNutritionStore((state) => state.setSelectedNutritionInfo);
@@ -35,6 +36,13 @@ export const NutritionInfoList = () => {
         } catch (error) {
             console.error('Failed to fetch nutrition info details:', error);
         }
+    };
+
+    const handlePageSizeChange = (newPageSize: number) => {
+        setFilters({ 
+            pageSize: newPageSize,
+            pageNumber: 1 // Reset to first page when changing page size
+        });
     };
 
     const renderTableContent = () => {
@@ -100,7 +108,7 @@ export const NutritionInfoList = () => {
             </div>
             <NutritionInfoFilters />
             
-            <div className="rounded-md border">
+            <div className="table-container">
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -126,6 +134,10 @@ export const NutritionInfoList = () => {
                     pageSize={filters.pageSize}
                     totalItems={data.totalCount}
                     onPageChange={(page) => setFilters({ pageNumber: page })}
+                    onPageSizeChange={handlePageSizeChange}
+                    pageSizeOptions={[5, 10, 25, 50]}
+                    showPageSizeSelector={true}
+                    className="mt-4"
                 />
             )}
 

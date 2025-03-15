@@ -457,6 +457,20 @@
       "back": "Geri"
     },
     "lifestyle": "Yaşam Tarzı",
-    "health": "Sağlık"
+    "health": "Sağlık",
+    "management": "Danışan tabanınızı yönetin ve izleyin",
+    "status": "Durum",
+    "lastVisit": "Son Ziyaret",
+    "nextAppointment": "Sonraki Randevu",
+    "viewDetails": "Detayları Görüntüle"
+  },
+  "pagination": {
+    "showing": "Toplam {{total}} kayıttan {{start}} - {{end}} arası gösteriliyor",
+    "rowsPerPage": "Sayfa başına satır:",
+    "of": "/",
+    "next": "Sonraki",
+    "previous": "Önceki",
+    "first": "İlk",
+    "last": "Son"
   }
 }

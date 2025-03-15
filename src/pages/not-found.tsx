@@ -1,13 +1,20 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/theme-provider";
+import { cn } from "@/lib/utils/utils";
 
 const NotFoundPage = () => {
   const { theme } = useTheme();
   
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center" data-theme={theme}>
-      <div className="max-w-md w-full space-y-8">
+    <div 
+      className={cn(
+        "min-h-screen flex flex-col items-center justify-center p-4 text-center relative",
+        theme === "light" ? "light-404-bg" : "dark-404-bg"
+      )} 
+      data-theme={theme}
+    >
+      <div className="max-w-md w-full space-y-8 relative z-10">
         <div className="space-y-4">
           <h1 className="text-9xl font-extrabold text-primary">404</h1>
           <h2 className="text-3xl font-bold text-foreground">Page Not Found</h2>

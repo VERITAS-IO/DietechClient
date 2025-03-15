@@ -7,6 +7,8 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import { DataTablePagination } from '@/components/common/DataTablePagination';
 
 interface DietMealListProps {
   meals?: MealListResponse[];
@@ -18,10 +20,12 @@ export default function DietMealList({ meals, isEditMode = false, onRemoveMeal }
   const { t } = useTranslation();
   const setSelectedMealId = useMealStore((state) => state.setSelectedMealId);
   const setDetailModalOpen = useMealStore((state) => state.setDetailModalOpen);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5); // Number of meals per page
 
   if (!meals || meals.length === 0) {
     return (
-      <Card className="mt-4 mb-4">
+      <Card className="mt-4 mb-4 card">
         <CardContent className="text-center py-6 text-muted-foreground">
           {t('diet.noMealsAdded')}
         </CardContent>
@@ -48,8 +52,20 @@ export default function DietMealList({ meals, isEditMode = false, onRemoveMeal }
     }
   };
 
+  // Calculate pagination
+  const totalItems = meals.length;
+  const paginatedMeals = meals.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setCurrentPage(1); // Reset to first page when changing page size
+  };
+
   return (
-    <Card className="mt-4 mb-4 border shadow-sm">
+    <Card className="mt-4 mb-4 card">
       <CardHeader className="py-3 px-4">
         <CardTitle className="text-base">{t('meal.list.title')}</CardTitle>
       </CardHeader>
@@ -65,7 +81,7 @@ export default function DietMealList({ meals, isEditMode = false, onRemoveMeal }
               </TableRow>
             </TableHeader>
             <TableBody>
-              {meals.map((meal, index) => (
+              {paginatedMeals.map((meal, index) => (
                 <TableRow 
                   key={meal.id ? `meal-${meal.id}` : `temp-meal-${index}`}
                   className={`cursor-pointer hover:bg-muted/50 transition-colors ${meal.id < 0 ? 'border-l-4 border-l-primary' : ''}`}
@@ -98,6 +114,20 @@ export default function DietMealList({ meals, isEditMode = false, onRemoveMeal }
             </TableBody>
           </Table>
         </div>
+        
+        {totalItems > pageSize && (
+          <div className="p-4 border-t">
+            <DataTablePagination
+              currentPage={currentPage}
+              pageSize={pageSize}
+              totalItems={totalItems}
+              onPageChange={setCurrentPage}
+              onPageSizeChange={handlePageSizeChange}
+              pageSizeOptions={[5, 10, 25, 50]}
+              showPageSizeSelector={true}
+            />
+          </div>
+        )}
       </CardContent>
     </Card>
   );
