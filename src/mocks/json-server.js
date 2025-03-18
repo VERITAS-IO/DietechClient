@@ -577,6 +577,205 @@ server.delete('/api/v1/meals/:id', (req, res) => {
   }
 });
 
+// Add financial endpoints
+server.get('/api/v1/financial/summary', (req, res) => {
+  const { db } = req.app;
+  const financialSummary = db.get('financialSummary').value();
+  res.json(financialSummary);
+});
+
+server.get('/api/v1/financial/transactions', (req, res) => {
+  const { db } = req.app;
+  const financialTransactions = db.get('financialTransactions').value();
+  res.json(financialTransactions);
+});
+
+server.get('/api/v1/financial/accounts', (req, res) => {
+  const { db } = req.app;
+  const financialAccounts = db.get('financialAccounts').value();
+  res.json(financialAccounts);
+});
+
+// Add financial API endpoints for use with financial-service.ts
+server.get('/api/v1/financials', (req, res) => {
+  try {
+    const db = router.db;
+    const { 
+      page = 1, 
+      pageSize = 10, 
+      type,
+      status,
+      startDate,
+      endDate,
+      description,
+      clientId
+    } = req.query;
+    
+    let financials = db.get('financials').value() || [];
+    
+    // Apply filters
+    if (type) {
+      financials = financials.filter(item => item.type === type);
+    }
+    if (status) {
+      financials = financials.filter(item => item.status === status);
+    }
+    if (startDate) {
+      financials = financials.filter(item => new Date(item.date) >= new Date(startDate));
+    }
+    if (endDate) {
+      financials = financials.filter(item => new Date(item.date) <= new Date(endDate));
+    }
+    if (description) {
+      financials = financials.filter(item => 
+        item.description.toLowerCase().includes(description.toLowerCase())
+      );
+    }
+    if (clientId) {
+      financials = financials.filter(item => item.clientId === clientId);
+    }
+    
+    // Apply pagination
+    const start = (parseInt(page) - 1) * parseInt(pageSize);
+    const paginatedItems = financials.slice(start, start + parseInt(pageSize));
+    
+    const response = {
+      items: paginatedItems,
+      totalCount: financials.length,
+      pageNumber: parseInt(page),
+      pageSize: parseInt(pageSize)
+    };
+    
+    res.jsonp(response);
+  } catch (error) {
+    console.error('Error in GET /api/v1/financials:', error);
+    res.status(500).jsonp(createErrorResponse(500, 'Internal server error'));
+  }
+});
+
+server.get('/api/v1/financials/:id', (req, res) => {
+  try {
+    const db = router.db;
+    const financial = db.get('financials')
+      .find({ id: req.params.id })
+      .value();
+    
+    if (!financial) {
+      return res.status(404).jsonp(createErrorResponse(404, 'Financial record not found'));
+    }
+    
+    res.jsonp(financial);
+  } catch (error) {
+    console.error('Error in GET /api/v1/financials/:id:', error);
+    res.status(500).jsonp(createErrorResponse(500, 'Internal server error'));
+  }
+});
+
+server.post('/api/v1/financials', (req, res) => {
+  try {
+    const db = router.db;
+    const newFinancial = {
+      ...req.body,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    // If clientId is provided, try to get the client name
+    if (newFinancial.clientId) {
+      const client = db.get('clients')
+        .find({ id: newFinancial.clientId })
+        .value();
+      
+      if (client) {
+        newFinancial.clientName = `${client.firstName} ${client.lastName}`;
+      }
+      // We have clientId, so no need for subject
+      newFinancial.subject = undefined;
+    }
+    
+    db.get('financials').push(newFinancial).write();
+    
+    res.status(201).jsonp(newFinancial);
+  } catch (error) {
+    console.error('Error in POST /api/v1/financials:', error);
+    res.status(500).jsonp(createErrorResponse(500, 'Internal server error'));
+  }
+});
+
+server.patch('/api/v1/financials/:id', (req, res) => {
+  try {
+    const db = router.db;
+    const id = req.params.id;
+    const financial = db.get('financials')
+      .find({ id })
+      .value();
+    
+    if (!financial) {
+      return res.status(404).jsonp(createErrorResponse(404, 'Financial record not found'));
+    }
+    
+    const updatedFinancial = {
+      ...financial,
+      ...req.body,
+      id, // Ensure ID cannot be changed
+      updatedAt: new Date().toISOString()
+    };
+    
+    // If clientId is changed, update clientName and clear subject
+    if (req.body.clientId && req.body.clientId !== financial.clientId) {
+      const client = db.get('clients')
+        .find({ id: req.body.clientId })
+        .value();
+      
+      if (client) {
+        updatedFinancial.clientName = `${client.firstName} ${client.lastName}`;
+        updatedFinancial.subject = undefined; // Clear subject if we have clientId
+      } else {
+        updatedFinancial.clientName = undefined;
+      }
+    }
+    
+    // If clientId is removed, clear clientName
+    if (req.body.clientId === null || req.body.clientId === undefined) {
+      updatedFinancial.clientName = undefined;
+    }
+    
+    db.get('financials')
+      .find({ id })
+      .assign(updatedFinancial)
+      .write();
+    
+    res.status(200).jsonp(updatedFinancial);
+  } catch (error) {
+    console.error('Error in PATCH /api/v1/financials/:id:', error);
+    res.status(500).jsonp(createErrorResponse(500, 'Internal server error'));
+  }
+});
+
+server.delete('/api/v1/financials/:id', (req, res) => {
+  try {
+    const db = router.db;
+    const id = req.params.id;
+    const exists = db.get('financials')
+      .find({ id })
+      .value();
+    
+    if (!exists) {
+      return res.status(404).jsonp(createErrorResponse(404, 'Financial record not found'));
+    }
+    
+    db.get('financials')
+      .remove({ id })
+      .write();
+    
+    res.status(204).send();
+  } catch (error) {
+    console.error('Error in DELETE /api/v1/financials/:id:', error);
+    res.status(500).jsonp(createErrorResponse(500, 'Internal server error'));
+  }
+});
+
 // Start server
 const port = 5001;
 server.listen(port, () => {

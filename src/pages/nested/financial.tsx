@@ -8,17 +8,20 @@ import { FinancialList } from '../../components/financial/FinancialList';
 import { FinancialDialog } from '../../components/financial/FinancialDialog';
 import { Financial } from '@/types/financial';
 import { useGetFinancials } from '@/hooks/useFinancials';
+import { useFinancialStore } from '@/stores/financial-store';
 
 export const FinancialPage: React.FC = () => {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState('overview');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [financials, setFinancials] = useState<Financial[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Use financial store for tab state
+  const activeTab = useFinancialStore(state => state.activeTab);
+  const setActiveTab = useFinancialStore(state => state.setActiveTab);
 
-  // Fetch all financials for the overview
   const { data, isLoading: isLoadingFinancials, refetch } = useGetFinancials({
-    page: 1,
+    pageNumber: 1,
     pageSize: 1000, // Get all for the overview charts
   });
 
@@ -30,7 +33,7 @@ export const FinancialPage: React.FC = () => {
   }, [data, isLoadingFinancials]);
 
   const handleTabChange = (value: string) => {
-    setActiveTab(value);
+    setActiveTab(value as 'overview' | 'transactions');
   };
 
   const handleDialogOpenChange = (open: boolean) => {
@@ -69,7 +72,7 @@ export const FinancialPage: React.FC = () => {
         </TabsContent>
         
         <TabsContent value="transactions" className="mt-6">
-          <FinancialList onAddClick={() => setIsDialogOpen(true)} />
+          <FinancialList />
         </TabsContent>
       </Tabs>
 

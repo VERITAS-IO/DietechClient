@@ -31,6 +31,7 @@ export interface Financial {
   description: string;
   clientId?: string;
   clientName?: string;
+  subject?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -45,6 +46,7 @@ export interface CreateFinancialRequest {
   date: string;
   description: string;
   clientId?: string;
+  subject?: string;
 }
 
 /**
@@ -58,13 +60,14 @@ export interface UpdateFinancialRequest {
   date?: string;
   description?: string;
   clientId?: string;
+  subject?: string;
 }
 
 /**
  * Interface for querying financial transactions
  */
 export interface QueryFinancialsRequest {
-  page?: number;
+  pageNumber?: number;
   pageSize?: number;
   type?: FinancialType;
   status?: FinancialStatus;
@@ -79,8 +82,8 @@ export interface QueryFinancialsRequest {
  */
 export interface QueryFinancialsResponse {
   items: Financial[];
-  totalItems: number;
-  page: number;
+  totalCount: number;
+  pageNumber: number;
   pageSize: number;
 }
 

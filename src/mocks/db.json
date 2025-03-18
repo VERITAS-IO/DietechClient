@@ -644,6 +644,21 @@
       ],
       "id": 1741997794762,
       "nutritionInfoList": []
+    },
+    {
+      "name": "weqweqweqweqweq",
+      "dietDescription": "qweqweqweqweqw",
+      "dietType": "VEGETARIAN",
+      "dietDuration": 7,
+      "totalCalories": 2000,
+      "tenantId": 1,
+      "nutritionInfoIds": [],
+      "startDate": "2025-03-18T00:00:00.000Z",
+      "endDate": "2025-03-25T00:00:00.000Z",
+      "isActive": true,
+      "meals": [],
+      "id": 1742329783344,
+      "nutritionInfoList": []
     }
   ],
   "meals": [
@@ -856,6 +871,142 @@
       "id": 1741996041910,
       "isActive": true,
       "nutritionInfoList": []
+    }
+  ],
+  "financials": [
+    {
+      "type": "EXPENSE",
+      "status": "COMPLETED",
+      "amount": 250,
+      "date": "2025-02-01",
+      "description": "subat 1",
+      "id": "1742328417268",
+      "createdAt": "2025-03-18T20:06:57.268Z",
+      "updatedAt": "2025-03-18T20:06:57.268Z"
+    },
+    {
+      "type": "CONSULTATION",
+      "status": "COMPLETED",
+      "amount": 300,
+      "date": "2025-02-01",
+      "description": "subat 1",
+      "id": "1742328447605",
+      "createdAt": "2025-03-18T20:07:27.605Z",
+      "updatedAt": "2025-03-18T20:07:50.244Z"
+    },
+    {
+      "type": "CONSULTATION",
+      "status": "COMPLETED",
+      "amount": 300,
+      "date": "2025-02-01",
+      "description": "subat 1",
+      "id": "1742328492486",
+      "createdAt": "2025-03-18T20:08:12.486Z",
+      "updatedAt": "2025-03-18T20:09:10.147Z"
+    },
+    {
+      "type": "INCOME",
+      "status": "COMPLETED",
+      "amount": 1232,
+      "date": "2025-03-18",
+      "description": "sadasdasdas",
+      "clientId": "1",
+      "id": "1742330489642",
+      "createdAt": "2025-03-18T20:41:29.642Z",
+      "updatedAt": "2025-03-18T20:41:29.642Z"
+    },
+    {
+      "type": "INCOME",
+      "status": "PENDING",
+      "amount": 123,
+      "date": "2025-03-18",
+      "description": "asdasdasdasd",
+      "subject": "konu ahmet mehmet",
+      "id": "1742330690612",
+      "createdAt": "2025-03-18T20:44:50.612Z",
+      "updatedAt": "2025-03-18T20:44:50.612Z"
+    }
+  ],
+  "financialSummary": {
+    "totalIncome": 1700,
+    "totalExpense": 425,
+    "netIncome": 1275,
+    "pendingAmount": 150,
+    "completedAmount": 1550,
+    "monthlyData": [
+      {
+        "month": "January",
+        "income": 1500,
+        "expense": 300
+      },
+      {
+        "month": "February",
+        "income": 1800,
+        "expense": 450
+      },
+      {
+        "month": "March",
+        "income": 1700,
+        "expense": 425
+      }
+    ]
+  },
+  "financialAccounts": [
+    {
+      "id": "1",
+      "name": "Business Checking",
+      "type": "CHECKING",
+      "balance": 15750.25,
+      "currency": "USD"
+    },
+    {
+      "id": "2",
+      "name": "Business Savings",
+      "type": "SAVINGS",
+      "balance": 32400.75,
+      "currency": "USD"
+    }
+  ],
+  "financialTransactions": [
+    {
+      "id": "1",
+      "accountId": "1",
+      "type": "DEPOSIT",
+      "amount": 1200,
+      "date": "2024-03-15T10:00:00Z",
+      "description": "Monthly consultation fee deposit"
+    },
+    {
+      "id": "2",
+      "accountId": "1",
+      "type": "WITHDRAWAL",
+      "amount": 350,
+      "date": "2024-03-16T14:30:00Z",
+      "description": "Office supplies purchase"
+    },
+    {
+      "id": "3",
+      "accountId": "1",
+      "type": "DEPOSIT",
+      "amount": 500,
+      "date": "2024-03-19T15:45:00Z",
+      "description": "Group session payment deposit"
+    },
+    {
+      "id": "4",
+      "accountId": "1",
+      "type": "WITHDRAWAL",
+      "amount": 75,
+      "date": "2024-03-20T13:20:00Z",
+      "description": "Software subscription payment"
+    },
+    {
+      "id": "5",
+      "accountId": "2",
+      "type": "TRANSFER",
+      "amount": 1000,
+      "date": "2024-03-22T09:30:00Z",
+      "description": "Transfer from checking to savings"
     }
   ]
 }

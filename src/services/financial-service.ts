@@ -3,7 +3,6 @@ import {
   CreateFinancialRequest,
   Financial,
   QueryFinancialsRequest,
-  QueryFinancialsResponse,
   UpdateFinancialRequest
 } from '@/types/financial';
 

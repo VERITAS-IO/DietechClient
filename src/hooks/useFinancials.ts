@@ -1,79 +1,61 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import { useToast } from './use-toast';
 import { 
   Financial, 
   CreateFinancialRequest, 
   UpdateFinancialRequest, 
-  QueryFinancialsRequest,
-  QueryFinancialsResponse
+  QueryFinancialsRequest
 } from '@/types/financial';
-import { api } from '@/lib/api';
+import { financialService } from '@/services/financial-service';
 
 // Query key factory
-const financialKeys = {
+const FINANCIAL_KEYS = {
   all: ['financials'] as const,
-  lists: () => [...financialKeys.all, 'list'] as const,
-  list: (filters: QueryFinancialsRequest) => [...financialKeys.lists(), filters] as const,
-  details: () => [...financialKeys.all, 'detail'] as const,
-  detail: (id: string) => [...financialKeys.details(), id] as const,
+  lists: () => [...FINANCIAL_KEYS.all, 'list'] as const,
+  list: (filters: QueryFinancialsRequest) => [...FINANCIAL_KEYS.lists(), filters] as const,
+  details: () => [...FINANCIAL_KEYS.all, 'detail'] as const,
+  detail: (id: number) => [...FINANCIAL_KEYS.details(), id] as const,
 };
 
 // Get financials with pagination and filters
-export const useGetFinancials = (params: QueryFinancialsRequest) => {
-  const { t } = useTranslation();
-  
-  return useQuery<QueryFinancialsResponse, Error>({
-    queryKey: financialKeys.list(params),
-    queryFn: async (): Promise<QueryFinancialsResponse> => {
-      try {
-        const response = await api.get('/financials', { params });
-        return response.data;
-      } catch (error) {
-        toast.error(t('common.error.fetch'));
-        throw error;
-      }
-    },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+export const useGetFinancials = (request: QueryFinancialsRequest) => {
+  return useQuery({
+    queryKey: FINANCIAL_KEYS.list(request),
+    queryFn: () => financialService.queryFinancials(request),
   });
 };
 
 // Get a single financial by ID
-export const useGetFinancial = (id: string) => {
-  const { t } = useTranslation();
-  
-  return useQuery<Financial, Error>({
-    queryKey: financialKeys.detail(id),
-    queryFn: async (): Promise<Financial> => {
-      try {
-        const response = await api.get(`/financials/${id}`);
-        return response.data;
-      } catch (error) {
-        toast.error(t('common.error.fetch'));
-        throw error;
-      }
-    },
+export const useGetFinancial = (id: number) => {
+  return useQuery({
+    queryKey: FINANCIAL_KEYS.detail(id),
+    queryFn: () => financialService.getFinancial(id),
     enabled: !!id,
-    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 
 // Create a new financial
 export const useCreateFinancial = () => {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   const { t } = useTranslation();
   
   return useMutation({
-    mutationFn: async (data: CreateFinancialRequest): Promise<Financial> => {
-      const response = await api.post('/financials', data);
-      return response.data;
-    },
+    mutationFn: (request: CreateFinancialRequest) => financialService.createFinancial(request),
     onSuccess: () => {
-      toast.success(t('financial.createSuccess'));
-      queryClient.invalidateQueries({ queryKey: financialKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: FINANCIAL_KEYS.lists() });
+      toast({
+        title: t('common.success'),
+        description: t('financial.createSuccess'),
+      });
     },
     onError: () => {
-      toast.error(t('financial.createError'));
+      toast({
+        title: t('common.error'),
+        description: t('financial.createError'),
+        variant: 'destructive',
+      });
     }
   });
 };
@@ -81,20 +63,26 @@ export const useCreateFinancial = () => {
 // Update an existing financial
 export const useUpdateFinancial = () => {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   const { t } = useTranslation();
   
   return useMutation({
-    mutationFn: async (data: UpdateFinancialRequest): Promise<Financial> => {
-      const response = await api.put(`/financials/${data.id}`, data);
-      return response.data;
-    },
-    onSuccess: (data) => {
-      toast.success(t('financial.updateSuccess'));
-      queryClient.invalidateQueries({ queryKey: financialKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: financialKeys.detail(data.id) });
+    mutationFn: ({ id, request }: { id: number; request: UpdateFinancialRequest }) => 
+      financialService.updateFinancial(id, request),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: FINANCIAL_KEYS.lists() });
+      queryClient.invalidateQueries({ queryKey: FINANCIAL_KEYS.detail(id) });
+      toast({
+        title: t('common.success'),
+        description: t('financial.updateSuccess'),
+      });
     },
     onError: () => {
-      toast.error(t('financial.updateError'));
+      toast({
+        title: t('common.error'),
+        description: t('financial.updateError'),
+        variant: 'destructive',
+      });
     }
   });
 };
@@ -102,19 +90,24 @@ export const useUpdateFinancial = () => {
 // Delete a financial
 export const useDeleteFinancial = () => {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   const { t } = useTranslation();
   
   return useMutation({
-    mutationFn: async (id: string): Promise<void> => {
-      await api.delete(`/financials/${id}`);
-    },
-    onSuccess: (_, id) => {
-      toast.success(t('financial.deleteSuccess'));
-      queryClient.invalidateQueries({ queryKey: financialKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: financialKeys.detail(id) });
+    mutationFn: (id: number) => financialService.deleteFinancial(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: FINANCIAL_KEYS.lists() });
+      toast({
+        title: t('common.success'),
+        description: t('financial.deleteSuccess'),
+      });
     },
     onError: () => {
-      toast.error(t('financial.deleteError'));
+      toast({
+        title: t('common.error'),
+        description: t('financial.deleteError'),
+        variant: 'destructive',
+      });
     }
   });
 }; 

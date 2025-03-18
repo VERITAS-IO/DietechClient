@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { format } from 'date-fns';
+import { Search, X } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -26,6 +27,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Financial, FinancialType, FinancialStatus, CreateFinancialRequest, UpdateFinancialRequest } from '@/types/financial';
 import { useCreateFinancial, useUpdateFinancial } from '@/hooks/useFinancials';
 import { DatePicker } from '../ui/date-picker';
+import { useClientStore } from '@/stores/client-store';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 interface FinancialDialogProps {
   open: boolean;
@@ -42,6 +47,8 @@ const formSchema = z.object({
   date: z.date({ required_error: 'Date is required' }),
   description: z.string().min(1, { message: 'Description is required' }).max(500, { message: 'Description is too long' }),
   clientId: z.string().optional(),
+  subject: z.string().optional(),
+  isClient: z.boolean().default(false),
 });
 
 // Form values type
@@ -54,9 +61,14 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
   onSuccess,
 }) => {
   const { t } = useTranslation();
-  const createFinancial = useCreateFinancial();
-  const updateFinancial = useUpdateFinancial();
+  const createFinancialMutation = useCreateFinancial();
+  const updateFinancialMutation = useUpdateFinancial();
   const isEditing = !!financial;
+  const [prevStatus, setPrevStatus] = useState<FinancialStatus | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [commandOpen, setCommandOpen] = useState(false);
+  const { searchClients } = useClientStore();
+  const [searchResults, setSearchResults] = useState<Array<{id: number, fullName: string}>>([]);
 
   // Initialize form
   const form = useForm<FormValues>({
@@ -68,8 +80,17 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
       date: new Date(),
       description: '',
       clientId: undefined,
+      subject: undefined,
+      isClient: false,
     },
   });
+
+  // Track status changes
+  useEffect(() => {
+    if (financial) {
+      setPrevStatus(financial.status as FinancialStatus);
+    }
+  }, [financial]);
 
   // Reset form when financial changes
   useEffect(() => {
@@ -81,6 +102,8 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
         date: new Date(financial.date),
         description: financial.description,
         clientId: financial.clientId,
+        subject: financial.subject,
+        isClient: !!financial.clientId,
       });
     } else {
       form.reset({
@@ -90,36 +113,103 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
         date: new Date(),
         description: '',
         clientId: undefined,
+        subject: undefined,
+        isClient: false,
       });
     }
   }, [financial, form]);
 
+  // Handle client search
+  useEffect(() => {
+    if (searchQuery.trim().length >= 2) {
+      const results = searchClients(searchQuery);
+      setSearchResults(results);
+    } else {
+      setSearchResults([]);
+    }
+  }, [searchQuery, searchClients]);
+
+  // Handle isClient checkbox change
+  const handleIsClientChange = (checked: boolean) => {
+    form.setValue('isClient', checked);
+    if (!checked) {
+      // If not a client, clear clientId
+      form.setValue('clientId', undefined);
+    } else {
+      // If a client, clear subject
+      form.setValue('subject', undefined);
+    }
+  };
+
+  // Handle client selection
+  const handleClientSelect = (clientId: string) => {
+    form.setValue('clientId', clientId);
+    setCommandOpen(false);
+    
+    // Find the selected client to display name
+    const selectedClient = searchResults.find(client => client.id.toString() === clientId);
+    if (selectedClient) {
+      setSearchQuery(selectedClient.fullName);
+    }
+  };
+
+  // Handle status change
+  const handleStatusChange = (newStatus: string) => {
+    // If changing from PENDING to COMPLETED, update the date to today
+    if (
+      prevStatus === FinancialStatus.Pending && 
+      newStatus === FinancialStatus.Completed &&
+      // Only for income-related transactions
+      (form.getValues('type') === FinancialType.Income ||
+       form.getValues('type') === FinancialType.Consultation ||
+       form.getValues('type') === FinancialType.Appointment ||
+       form.getValues('type') === FinancialType.Other)
+    ) {
+      form.setValue('date', new Date());
+    }
+    form.setValue('status', newStatus);
+  };
+
   // Handle form submission
   const onSubmit = async (values: FormValues) => {
     try {
+      const { isClient, ...formData } = values;
+      
+      // Prepare request data based on whether it's for a client or not
+      const requestData = {
+        ...formData,
+        clientId: isClient ? formData.clientId : undefined,
+        subject: !isClient ? formData.subject : undefined,
+      };
+      
       if (isEditing && financial) {
         // Update existing financial
-        const updateData: UpdateFinancialRequest = {
-          id: financial.id,
-          type: values.type as FinancialType,
-          status: values.status as FinancialStatus,
-          amount: values.amount,
-          date: format(values.date, 'yyyy-MM-dd'),
-          description: values.description,
-          clientId: values.clientId,
+        const updateData = {
+          id: parseInt(financial.id),
+          request: {
+            id: financial.id,
+            type: requestData.type as FinancialType,
+            status: requestData.status as FinancialStatus,
+            amount: requestData.amount,
+            date: format(requestData.date, 'yyyy-MM-dd'),
+            description: requestData.description,
+            clientId: requestData.clientId,
+            subject: requestData.subject,
+          }
         };
-        await updateFinancial.mutateAsync(updateData);
+        await updateFinancialMutation.mutateAsync(updateData);
       } else {
         // Create new financial
         const createData: CreateFinancialRequest = {
-          type: values.type as FinancialType,
-          status: values.status as FinancialStatus,
-          amount: values.amount,
-          date: format(values.date, 'yyyy-MM-dd'),
-          description: values.description,
-          clientId: values.clientId,
+          type: requestData.type as FinancialType,
+          status: requestData.status as FinancialStatus,
+          amount: requestData.amount,
+          date: format(requestData.date, 'yyyy-MM-dd'),
+          description: requestData.description,
+          clientId: requestData.clientId,
+          subject: requestData.subject,
         };
-        await createFinancial.mutateAsync(createData);
+        await createFinancialMutation.mutateAsync(createData);
       }
       
       onSuccess?.();
@@ -146,7 +236,7 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
               name="type"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('financial.type')}</FormLabel>
+                  <FormLabel>{t('financial.form.type')}</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
@@ -154,13 +244,13 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder={t('financial.type')} />
+                        <SelectValue placeholder={t('financial.form.type')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
                       {Object.values(FinancialType).map((type) => (
                         <SelectItem key={type} value={type}>
-                          {t(`financial.${type.toLowerCase()}`)}
+                          {t(`financial.type.${type.toLowerCase()}`)}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -176,21 +266,21 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
               name="status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('financial.status')}</FormLabel>
+                  <FormLabel>{t('financial.form.status')}</FormLabel>
                   <Select
-                    onValueChange={field.onChange}
+                    onValueChange={handleStatusChange}
                     defaultValue={field.value}
                     value={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder={t('financial.status')} />
+                        <SelectValue placeholder={t('financial.form.status')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
                       {Object.values(FinancialStatus).map((status) => (
                         <SelectItem key={status} value={status}>
-                          {t(`financial.${status.toLowerCase()}`)}
+                          {t(`financial.status.${status.toLowerCase()}`)}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -200,20 +290,132 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
               )}
             />
 
+            {/* Subject is a client checkbox */}
+            <FormField
+              control={form.control}
+              name="isClient"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={(checked) => {
+                        field.onChange(checked);
+                        handleIsClientChange(!!checked);
+                      }}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>
+                      {t('financial.form.isClientSubject')}
+                    </FormLabel>
+                  </div>
+                </FormItem>
+              )}
+            />
+
+            {/* Client Search or Subject Input */}
+            {form.watch('isClient') ? (
+              <FormField
+                control={form.control}
+                name="clientId"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>{t('financial.form.client')}</FormLabel>
+                    <Popover open={commandOpen} onOpenChange={setCommandOpen}>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <div className="relative">
+                            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Input
+                              placeholder={t('client.search')}
+                              className="pl-8"
+                              value={searchQuery}
+                              onChange={(e) => setSearchQuery(e.target.value)}
+                              onClick={() => setCommandOpen(true)}
+                            />
+                            {searchQuery && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="absolute right-0 top-0 h-full px-3"
+                                onClick={() => {
+                                  setSearchQuery('');
+                                  form.setValue('clientId', undefined);
+                                }}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="p-0" align="start">
+                        <Command>
+                          <CommandInput 
+                            placeholder={t('client.search')} 
+                            value={searchQuery}
+                            onValueChange={setSearchQuery}
+                          />
+                          <CommandEmpty>{t('client.noClients')}</CommandEmpty>
+                          <CommandGroup>
+                            {searchResults.map((client) => (
+                              <CommandItem
+                                key={client.id}
+                                onSelect={() => handleClientSelect(client.id.toString())}
+                                className="cursor-pointer"
+                              >
+                                {client.fullName}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            ) : (
+              <FormField
+                control={form.control}
+                name="subject"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('financial.form.subject')}</FormLabel>
+                    <FormControl>
+                      <Input 
+                        {...field}
+                        placeholder={t('financial.form.subjectPlaceholder')}
+                        value={field.value || ''}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
             {/* Amount */}
             <FormField
               control={form.control}
               name="amount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('financial.amount')}</FormLabel>
+                  <FormLabel>{t('financial.form.amount')}</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
                       step="0.01"
                       placeholder="0.00"
                       {...field}
-                      onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                      value={field.value === 0 ? '' : field.value}
+                      onChange={(e) => {
+                        // Remove any leading zeros and convert to number
+                        const value = e.target.value.replace(/^0+/, '') || '0';
+                        field.onChange(parseFloat(value) || 0);
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
@@ -227,7 +429,7 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
               name="date"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>{t('financial.date')}</FormLabel>
+                  <FormLabel>{t('financial.form.date')}</FormLabel>
                   <DatePicker
                     value={field.value}
                     onChange={field.onChange}
@@ -243,10 +445,10 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('financial.description')}</FormLabel>
+                  <FormLabel>{t('financial.form.description')}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder={t('financial.description')}
+                      placeholder={t('financial.form.description')}
                       className="resize-none"
                       {...field}
                     />
@@ -266,12 +468,12 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
               </Button>
               <Button
                 type="submit"
-                disabled={createFinancial.isPending || updateFinancial.isPending}
+                disabled={createFinancialMutation.isPending || updateFinancialMutation.isPending}
               >
-                {createFinancial.isPending || updateFinancial.isPending
+                {createFinancialMutation.isPending || updateFinancialMutation.isPending
                   ? t('common.saving')
                   : isEditing
-                  ? t('common.update')
+                  ? t('financial.editTransaction')
                   : t('common.save')}
               </Button>
             </DialogFooter>

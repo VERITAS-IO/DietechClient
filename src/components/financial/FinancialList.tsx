@@ -33,6 +33,8 @@ import {
 import { useGetFinancials, useDeleteFinancial } from '@/hooks/useFinancials';
 import { FinancialDialog } from './FinancialDialog';
 import { formatCurrency } from '@/lib/utils/format';
+import { useFinancialStore } from '@/stores/financial-store';
+import FinancialDeleteDialog from './FinancialDeleteDialog';
 
 interface FinancialListProps {
   onAddClick?: () => void;
@@ -40,73 +42,43 @@ interface FinancialListProps {
 
 export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
   const { t } = useTranslation();
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
   const [showFilters, setShowFilters] = useState(false);
-  const [selectedFinancial, setSelectedFinancial] = useState<Financial | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
-  // Filter state
-  const [filters, setFilters] = useState<QueryFinancialsRequest>({
-    page: currentPage,
-    pageSize: pageSize,
-    description: '',
-    type: undefined,
-    status: undefined,
-    startDate: undefined,
-    endDate: undefined,
-  });
+  // Use financial store for state management
+  const {
+    filters,
+    setFilters,
+    resetFilters,
+    selectedFinancial,
+    setSelectedFinancial,
+    isDeleteModalOpen,
+    setDeleteModalOpen
+  } = useFinancialStore();
 
   // Fetch financials with current filters
   const { data, isLoading, refetch } = useGetFinancials(filters);
-  const deleteFinancial = useDeleteFinancial();
-
-  // Update filters when pagination changes
-  useEffect(() => {
-    setFilters(prev => ({
-      ...prev,
-      page: currentPage,
-      pageSize: pageSize,
-    }));
-  }, [currentPage, pageSize]);
+  const deleteFinancialMutation = useDeleteFinancial();
 
   // Handle page change
   const handlePageChange = (page: number) => {
-    setCurrentPage(page);
+    setFilters({ pageNumber: page });
   };
 
   // Handle page size change
   const handlePageSizeChange = (size: number) => {
-    setPageSize(size);
-    setCurrentPage(1); // Reset to first page when changing page size
+    setFilters({ pageSize: size, pageNumber: 1 });
   };
 
   // Handle filter changes
   const handleFilterChange = (key: keyof QueryFinancialsRequest, value: any) => {
-    setFilters(prev => ({
-      ...prev,
-      [key]: value,
-    }));
+    setFilters({ [key]: value });
   };
 
   // Apply filters
   const applyFilters = () => {
-    setCurrentPage(1); // Reset to first page when applying filters
+    setFilters({ pageNumber: 1 }); // Reset to first page when applying filters
     refetch();
-  };
-
-  // Reset filters
-  const resetFilters = () => {
-    setFilters({
-      page: 1,
-      pageSize: pageSize,
-      description: '',
-      type: undefined,
-      status: undefined,
-      startDate: undefined,
-      endDate: undefined,
-    });
-    setCurrentPage(1);
   };
 
   // Handle edit click
@@ -116,10 +88,9 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
   };
 
   // Handle delete click
-  const handleDeleteClick = async (id: string) => {
-    if (window.confirm(t('common.confirmDelete'))) {
-      await deleteFinancial.mutateAsync(id);
-    }
+  const handleDeleteClick = (financial: Financial) => {
+    setSelectedFinancial(financial);
+    setDeleteModalOpen(true);
   };
 
   // Handle dialog close
@@ -173,12 +144,36 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
 
   // Get text for status
   const getStatusText = (status: FinancialStatus) => {
-    return t(`financial.${status.toLowerCase()}`);
+    switch (status) {
+      case FinancialStatus.Pending:
+        return t('financial.status.pending');
+      case FinancialStatus.Completed:
+        return t('financial.status.completed');
+      case FinancialStatus.Cancelled:
+        return t('financial.cancelled');
+      case FinancialStatus.Refunded:
+        return t('financial.refunded');
+      default:
+        return t('financial.unknown');
+    }
   };
 
   // Get text for type
   const getTypeText = (type: FinancialType) => {
-    return t(`financial.${type.toLowerCase()}`);
+    switch (type) {
+      case FinancialType.Income:
+        return t('financial.type.income');
+      case FinancialType.Expense:
+        return t('financial.type.expense');
+      case FinancialType.Consultation:
+        return t('financial.consultation');
+      case FinancialType.Appointment:
+        return t('financial.appointment');
+      case FinancialType.Other:
+        return t('financial.other');
+      default:
+        return t('financial.unknown');
+    }
   };
 
   return (
@@ -204,10 +199,6 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
             </Button>
           )}
         </div>
-        <Button onClick={onAddClick || (() => setIsDialogOpen(true))}>
-          <PlusIcon className="h-4 w-4 mr-2" />
-          {t('financial.addTransaction')}
-        </Button>
       </div>
 
       {/* Filters */}
@@ -242,8 +233,8 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
                   value={filters.type}
                   onValueChange={(value) => handleFilterChange('type', value)}
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder={t('financial.type')} />
+                  <SelectTrigger className="w-full bg-background">
+                    <SelectValue placeholder={t('financial.form.type')} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="">
@@ -267,8 +258,8 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
                   value={filters.status}
                   onValueChange={(value) => handleFilterChange('status', value)}
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder={t('financial.status')} />
+                  <SelectTrigger className="w-full bg-background">
+                    <SelectValue placeholder={t('financial.form.status')} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="">
@@ -323,8 +314,8 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
             <TableRow>
               <TableHead>{t('financial.date')}</TableHead>
               <TableHead>{t('financial.description')}</TableHead>
-              <TableHead>{t('financial.type')}</TableHead>
-              <TableHead>{t('financial.status')}</TableHead>
+              <TableHead>{t('financial.form.type')}</TableHead>
+              <TableHead>{t('financial.form.status')}</TableHead>
               <TableHead className="text-right">{t('financial.amount')}</TableHead>
               <TableHead className="text-right">{t('common.actions')}</TableHead>
             </TableRow>
@@ -375,7 +366,7 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => handleDeleteClick(financial.id)}
+                        onClick={() => handleDeleteClick(financial)}
                       >
                         <TrashIcon className="h-4 w-4" />
                         <span className="sr-only">{t('financial.deleteTransaction')}</span>
@@ -396,11 +387,11 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
       </div>
 
       {/* Pagination */}
-      {data && data.totalItems > 0 && (
+      {data && data.totalCount > 0 && (
         <DataTablePagination
-          currentPage={currentPage}
-          pageSize={pageSize}
-          totalItems={data.totalItems}
+          currentPage={filters.pageNumber || 1}
+          pageSize={filters.pageSize || 10}
+          totalItems={data.totalCount}
           onPageChange={handlePageChange}
           onPageSizeChange={handlePageSizeChange}
           pageSizeOptions={[5, 10, 25, 50]}
@@ -415,6 +406,9 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
         financial={selectedFinancial}
         onSuccess={handleTransactionSuccess}
       />
+      
+      {/* Delete Dialog */}
+      <FinancialDeleteDialog />
     </div>
   );
 }; 
