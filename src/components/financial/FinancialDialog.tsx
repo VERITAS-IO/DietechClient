@@ -74,8 +74,8 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      type: '',
-      status: '',
+      type: FinancialType.Income,
+      status: FinancialStatus.Pending,
       amount: 0,
       date: new Date(),
       description: '',
@@ -92,20 +92,34 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
     }
   }, [financial]);
 
-  // Reset form when financial changes
+  // Reset form when dialog opens/closes or financial changes
   useEffect(() => {
-    if (financial) {
-      form.reset({
-        type: financial.type,
-        status: financial.status,
-        amount: financial.amount,
-        date: new Date(financial.date),
-        description: financial.description,
-        clientId: financial.clientId,
-        subject: financial.subject,
-        isClient: !!financial.clientId,
-      });
+    if (open) {
+      if (financial) {
+        form.reset({
+          type: financial.type,
+          status: financial.status,
+          amount: financial.amount,
+          date: new Date(financial.date),
+          description: financial.description,
+          clientId: financial.clientId,
+          subject: financial.subject,
+          isClient: !!financial.clientId,
+        });
+      } else {
+        form.reset({
+          type: FinancialType.Income,
+          status: FinancialStatus.Pending,
+          amount: 0,
+          date: new Date(),
+          description: '',
+          clientId: undefined,
+          subject: undefined,
+          isClient: false,
+        });
+      }
     } else {
+      // Reset form when dialog closes
       form.reset({
         type: FinancialType.Income,
         status: FinancialStatus.Pending,
@@ -116,8 +130,10 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
         subject: undefined,
         isClient: false,
       });
+      setSearchQuery('');
+      setSearchResults([]);
     }
-  }, [financial, form]);
+  }, [open, financial, form]);
 
   // Handle client search
   useEffect(() => {
@@ -220,7 +236,24 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={(newOpen) => {
+      if (!newOpen) {
+        // Reset form when dialog is closed
+        form.reset({
+          type: FinancialType.Income,
+          status: FinancialStatus.Pending,
+          amount: 0,
+          date: new Date(),
+          description: '',
+          clientId: undefined,
+          subject: undefined,
+          isClient: false,
+        });
+        setSearchQuery('');
+        setSearchResults([]);
+      }
+      onOpenChange(newOpen);
+    }}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>

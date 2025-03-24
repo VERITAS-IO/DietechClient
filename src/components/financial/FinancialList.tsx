@@ -35,6 +35,21 @@ import { FinancialDialog } from './FinancialDialog';
 import { formatCurrency } from '@/lib/utils/format';
 import { useFinancialStore } from '@/stores/financial-store';
 import FinancialDeleteDialog from './FinancialDeleteDialog';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+
+// Form schema for filters
+const filterSchema = z.object({
+  type: z.string().optional(),
+  status: z.string().optional(),
+  startDate: z.date().optional(),
+  endDate: z.date().optional(),
+  description: z.string().optional(),
+});
+
+type FilterValues = z.infer<typeof filterSchema>;
 
 interface FinancialListProps {
   onAddClick?: () => void;
@@ -71,13 +86,26 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
   };
 
   // Handle filter changes
-  const handleFilterChange = (key: keyof QueryFinancialsRequest, value: any) => {
-    setFilters({ [key]: value });
+  const handleFilterChange = (field: keyof FilterValues, value: any) => {
+    const newFilters = { ...filters };
+    
+    // Remove the field from filters if 'all' is selected or value is empty
+    if (value === 'all' || !value) {
+      delete newFilters[field];
+    } else {
+      newFilters[field] = value;
+    }
+    
+    // Update filters and reset to first page
+    setFilters({ 
+      ...newFilters, 
+      pageNumber: 1,
+      pageSize: filters.pageSize || 10 
+    });
   };
 
   // Apply filters
   const applyFilters = () => {
-    setFilters({ pageNumber: 1 }); // Reset to first page when applying filters
     refetch();
   };
 
@@ -150,9 +178,9 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
       case FinancialStatus.Completed:
         return t('financial.status.completed');
       case FinancialStatus.Cancelled:
-        return t('financial.cancelled');
+        return t('financial.status.cancelled');
       case FinancialStatus.Refunded:
-        return t('financial.refunded');
+        return t('financial.status.refunded');
       default:
         return t('financial.unknown');
     }
@@ -166,15 +194,67 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
       case FinancialType.Expense:
         return t('financial.type.expense');
       case FinancialType.Consultation:
-        return t('financial.consultation');
+        return t('financial.type.consultation');
       case FinancialType.Appointment:
-        return t('financial.appointment');
+        return t('financial.type.appointment');
       case FinancialType.Other:
-        return t('financial.other');
+        return t('financial.type.other');
       default:
         return t('financial.unknown');
     }
   };
+
+  // Initialize form with current filters
+  const form = useForm<FilterValues>({
+    resolver: zodResolver(filterSchema),
+    defaultValues: {
+      type: filters.type || undefined,
+      status: filters.status || undefined,
+      startDate: filters.startDate ? new Date(filters.startDate) : undefined,
+      endDate: filters.endDate ? new Date(filters.endDate) : undefined,
+      description: filters.description || undefined,
+    },
+  });
+
+  // Update form when filters change
+  useEffect(() => {
+    form.reset({
+      type: filters.type || undefined,
+      status: filters.status || undefined,
+      startDate: filters.startDate ? new Date(filters.startDate) : undefined,
+      endDate: filters.endDate ? new Date(filters.endDate) : undefined,
+      description: filters.description || undefined,
+    });
+  }, [filters, form]);
+
+  // Handle form submission
+  const onSubmit = (values: FilterValues) => {
+    const newFilters: QueryFinancialsRequest = {};
+    
+    if (values.type && values.type !== 'all') {
+      newFilters.type = values.type as FinancialType;
+    }
+    if (values.status && values.status !== 'all') {
+      newFilters.status = values.status as FinancialStatus;
+    }
+    if (values.startDate) {
+      newFilters.startDate = format(values.startDate, 'yyyy-MM-dd');
+    }
+    if (values.endDate) {
+      newFilters.endDate = format(values.endDate, 'yyyy-MM-dd');
+    }
+    if (values.description) {
+      newFilters.description = values.description;
+    }
+    
+    setFilters(newFilters);
+    handlePageChange(1);
+  };
+
+  // Effect to handle initial data load and filter changes
+  useEffect(() => {
+    refetch();
+  }, [filters]);
 
   return (
     <div className="space-y-4">
@@ -216,7 +296,7 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
                 </label>
                 <div className="flex">
                   <Input
-                    placeholder={t('financial.description')}
+                    placeholder={t('financial.filters.description')}
                     value={filters.description || ''}
                     onChange={(e) => handleFilterChange('description', e.target.value)}
                     className="w-full"
@@ -230,14 +310,19 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
                   {t('financial.filters.type')}
                 </label>
                 <Select
-                  value={filters.type}
-                  onValueChange={(value) => handleFilterChange('type', value)}
+                  defaultValue="all"
+                  value={filters.type || 'all'}
+                  onValueChange={(value) => {
+                    handleFilterChange('type', value);
+                  }}
                 >
                   <SelectTrigger className="w-full bg-background">
-                    <SelectValue placeholder={t('financial.form.type')} />
+                    <SelectValue>
+                      {filters.type ? getTypeText(filters.type as FinancialType) : t('common.all')}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">
+                    <SelectItem value="all">
                       {t('common.all')}
                     </SelectItem>
                     {Object.values(FinancialType).map((type) => (
@@ -255,14 +340,19 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
                   {t('financial.filters.status')}
                 </label>
                 <Select
-                  value={filters.status}
-                  onValueChange={(value) => handleFilterChange('status', value)}
+                  defaultValue="all"
+                  value={filters.status || 'all'}
+                  onValueChange={(value) => {
+                    handleFilterChange('status', value);
+                  }}
                 >
                   <SelectTrigger className="w-full bg-background">
-                    <SelectValue placeholder={t('financial.form.status')} />
+                    <SelectValue>
+                      {filters.status ? getStatusText(filters.status as FinancialStatus) : t('common.all')}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">
+                    <SelectItem value="all">
                       {t('common.all')}
                     </SelectItem>
                     {Object.values(FinancialStatus).map((status) => (
