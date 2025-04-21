@@ -15,6 +15,15 @@ export const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     config.withCredentials = true;
+    
+    // Get the current user from auth store
+    const user = useAuthStore.getState().user;
+    
+    // If user is authenticated and has a tenant ID, add it to headers
+    if (user?.tenantId) {
+      config.headers['x-tenant-id'] = user.tenantId;
+    }
+    
     return config;
   },
   (error) => {

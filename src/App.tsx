@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -36,7 +36,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="system" storageKey="nutritrack-theme">
-        <Router>
+        <BrowserRouter>
           <div className="min-h-screen flex flex-col">
             {!isAuthenticated && <Navbar />}
             <Routes>
@@ -88,7 +88,7 @@ function App() {
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </div>
-        </Router>
+        </BrowserRouter>
         <Toaster />
       </ThemeProvider>
     </QueryClientProvider>

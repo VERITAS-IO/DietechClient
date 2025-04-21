@@ -47,12 +47,12 @@ export default function DietCreateDialog() {
             dietType: data.type,
             dietDuration: Number(data.duration),
             totalCalories: Number(data.calories),
-            tenantId: 1, // Default tenant ID, adjust as needed
-            nutritionInfoIds: [], // Empty array for now, adjust as needed
+            tenantId: 1, 
+            nutritionInfoIds: [], 
             startDate: data.startDate ? new Date(data.startDate).toISOString() : new Date().toISOString(),
             endDate: data.endDate ? new Date(data.endDate).toISOString() : null,
             isActive: !!data.isActive,
-            meals: temporaryMeals // Include the temporary meals in the diet creation request
+            meals: temporaryMeals 
         };
         
         createMutation.mutate(createData, {
@@ -62,7 +62,6 @@ export default function DietCreateDialog() {
         });
     };
 
-    // Render the list of meals that have been added to the diet
     const renderMealsList = () => {
         if (temporaryMeals.length === 0) {
             return (

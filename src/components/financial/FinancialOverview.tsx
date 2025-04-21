@@ -176,7 +176,7 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({ financials
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
-            {t('financial.netIncome')}
+            {t('financial.overview.netIncome')}
           </CardTitle>
           {summary.netIncome >= 0 ? (
             <ArrowUpIcon className="h-4 w-4 text-green-500" />
@@ -195,7 +195,7 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({ financials
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
-            {t('financial.pendingAmount')}
+            {t('financial.overview.pendingAmount')}
           </CardTitle>
           <ClockIcon className="h-4 w-4 text-yellow-500" />
         </CardHeader>
@@ -210,7 +210,7 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({ financials
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
-            {t('financial.completedAmount')}
+            {t('financial.overview.completedAmount')}
           </CardTitle>
           <CheckCircleIcon className="h-4 w-4 text-green-500" />
         </CardHeader>
@@ -225,7 +225,7 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({ financials
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
-            {t('financial.totalTransactions')}
+            {t('financial.overview.totalTransactions')}
           </CardTitle>
           <RefreshCwIcon className="h-4 w-4 text-blue-500" />
         </CardHeader>
@@ -239,18 +239,18 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({ financials
       {/* Financial Overview Chart */}
       <Card className="col-span-full">
         <CardHeader>
-          <CardTitle>{t('financial.overview')}</CardTitle>
+          <CardTitle>{t('financial.overview.chartTitle')}</CardTitle>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="daily" className="space-y-4">
             <TabsList>
-              <TabsTrigger value="daily">{t('financial.daily')}</TabsTrigger>
-              <TabsTrigger value="weekly">{t('financial.weekly')}</TabsTrigger>
-              <TabsTrigger value="monthly">{t('financial.monthly')}</TabsTrigger>
-              <TabsTrigger value="yearly">{t('financial.yearly')}</TabsTrigger>
+              <TabsTrigger value="daily">{t('financial.overview.daily')}</TabsTrigger>
+              <TabsTrigger value="weekly">{t('financial.overview.weekly')}</TabsTrigger>
+              <TabsTrigger value="monthly">{t('financial.overview.monthly')}</TabsTrigger>
+              <TabsTrigger value="yearly">{t('financial.overview.yearly')}</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="daily" className="space-y-4">
+            <TabsContent value="daily">
               <div className="h-[350px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={chartData.daily} margin={{ left: 20 }}>
@@ -274,12 +274,12 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({ financials
                     <Legend />
                     <Bar 
                       dataKey="income" 
-                      name={t('financial.income')} 
+                      name={t('financial.type.income')} 
                       {...getBarProps('income')}
                     />
                     <Bar 
                       dataKey="expense" 
-                      name={t('financial.expense')} 
+                      name={t('financial.type.expense')} 
                       {...getBarProps('expense')}
                     />
                   </BarChart>
@@ -311,12 +311,12 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({ financials
                     <Legend />
                     <Bar 
                       dataKey="income" 
-                      name={t('financial.income')} 
+                      name={t('financial.type.income')} 
                       {...getBarProps('income')}
                     />
                     <Bar 
                       dataKey="expense" 
-                      name={t('financial.expense')} 
+                      name={t('financial.type.expense')} 
                       {...getBarProps('expense')}
                     />
                   </BarChart>
@@ -348,12 +348,12 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({ financials
                     <Legend />
                     <Bar 
                       dataKey="income" 
-                      name={t('financial.income')} 
+                      name={t('financial.type.income')} 
                       {...getBarProps('income')}
                     />
                     <Bar 
                       dataKey="expense" 
-                      name={t('financial.expense')} 
+                      name={t('financial.type.expense')} 
                       {...getBarProps('expense')}
                     />
                   </BarChart>
@@ -385,12 +385,12 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({ financials
                     <Legend />
                     <Bar 
                       dataKey="income" 
-                      name={t('financial.income')} 
+                      name={t('financial.type.income')} 
                       {...getBarProps('income')}
                     />
                     <Bar 
                       dataKey="expense" 
-                      name={t('financial.expense')} 
+                      name={t('financial.type.expense')} 
                       {...getBarProps('expense')}
                     />
                   </BarChart>

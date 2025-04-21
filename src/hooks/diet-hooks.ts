@@ -76,7 +76,7 @@ export const useUpdateDiet = () => {
     });
 };
 
-export const useDeleteDiet = () => {
+export const useDeleteDiet =  () => {
     const queryClient = useQueryClient();
     const { toast } = useToast();
     const { t } = useTranslation();

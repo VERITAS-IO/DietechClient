@@ -40,6 +40,12 @@
     /* Chart colors */
     --color-income: hsl(var(--success));
     --color-expense: hsl(var(--destructive));
+
+    --chart-1: 215 100% 50%;  /* Blue */
+    --chart-2: 142 76% 36%;   /* Green */
+    --chart-3: 349 100% 45%;  /* Red */
+    --chart-4: 47 100% 50%;   /* Yellow */
+    --chart-5: 262 83% 58%;   /* Purple */
   }
  
   .dark {

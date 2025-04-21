@@ -18,6 +18,7 @@ export interface LoginRequest {
     userName: string;
     email: string;
     roles: string[];
+    tenantId: number;
   }
   
   export interface AuthError {

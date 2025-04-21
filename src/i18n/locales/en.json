@@ -334,7 +334,9 @@
     },
     "charts": {
       "overview": "Overview",
-      "description": "Client Growth and Revenue Overview"
+      "description": "Client Growth and Revenue Overview",
+      "clients": "Clients",
+      "revenue": "Revenue"
     },
     "nutrition": {
       "list": {
@@ -547,8 +549,21 @@
   },
   "financial": {
     "title": "Financial",
+    "overview": {
+      "title": "Overview",
+      "netIncome": "Net Income",
+      "pendingAmount": "Pending Amount",
+      "completedAmount": "Completed Amount",
+      "totalTransactions": "Total Transactions",
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "chartTitle": "Financial Overview",
+      "description": "Showing income and expenses over time",
+      "noData": "No data available"
+    },
     "transactions": "Transactions",
-    "overview": "Overview",
     "addTransaction": "Add Transaction",
     "editTransaction": "Edit Transaction",
     "deleteTransaction": "Delete Transaction",
@@ -600,5 +615,11 @@
       "confirm": "Delete",
       "cancel": "Cancel"
     }
+  },
+  "analytics": {
+    "timeRange": "Time Range",
+    "last90Days": "Last 3 months",
+    "last30Days": "Last 30 days",
+    "last7Days": "Last 7 days"
   }
 }

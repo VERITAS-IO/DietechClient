@@ -259,7 +259,9 @@
     },
     "charts": {
       "overview": "Genel Bakış",
-      "description": "Danışan Artışı ve Gelir Genel Bakışı"
+      "description": "Danışan Artışı ve Gelir Genel Bakışı",
+      "clients": "Danışanlar",
+      "revenue": "Gelir"
     },
     "nutrition": {
       "list": {
@@ -478,8 +480,21 @@
   },
   "financial": {
     "title": "Finansal",
+    "overview": {
+      "title": "Genel Bakış",
+      "netIncome": "Net Gelir",
+      "pendingAmount": "Bekleyen Tutar",
+      "completedAmount": "Tamamlanan Tutar",
+      "totalTransactions": "Toplam İşlem",
+      "daily": "Günlük",
+      "weekly": "Haftalık",
+      "monthly": "Aylık",
+      "yearly": "Yıllık",
+      "chartTitle": "Finansal Genel Bakış",
+      "description": "Zaman içindeki gelir ve giderleri gösterir",
+      "noData": "Veri bulunmamaktadır"
+    },
     "transactions": "İşlemler",
-    "overview": "Genel Bakış",
     "addTransaction": "İşlem Ekle",
     "editTransaction": "İşlem Düzenle",
     "deleteTransaction": "İşlem Sil",
@@ -531,5 +546,11 @@
       "confirm": "Sil",
       "cancel": "İptal"
     }
+  },
+  "analytics": {
+    "timeRange": "Zaman Aralığı",
+    "last90Days": "Son 3 ay",
+    "last30Days": "Son 30 gün",
+    "last7Days": "Son 7 gün"
   }
 }
