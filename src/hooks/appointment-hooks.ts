@@ -1,21 +1,20 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { appointmentService } from '@/services/appointment-service';
-import { UpdateAppointmentRequest } from '@/types/appointment';
+import { 
+  UpdateAppointmentRequest, 
+  QueryAppointmentsRequest, 
+  CreateAppointmentNoteRequest,
+  UpdateAppointmentNoteRequest,
+  QueryAppointmentNotesRequest
+} from '@/types/appointment';
 
 //bir hook, hem method doner, hem de property doner.
-export function useAppointments() {
+export function useAppointments(query?: QueryAppointmentsRequest) {
   const queryClient = useQueryClient();
 
-  1.useQueryClient App'de tanimlanan QueryClientProvider' a ait
-  2.useQueryClient import ediyorum.
-  3.useQueryClient'i useAppointments'ta kullanmak istiyorum, queryClient araciligiyla.
-  4.appointment keyine sahip queryi invalidate ettim 
-  5.getAppointments' querysinin icerdeki invalidate propertysi = true => query tekrar calisti. 
-  6.invalidate propertysi = false.
-
   const { data: appointments = [], isLoading } = useQuery({
-    queryKey: ['appointments'],
-    queryFn: appointmentService.getAppointments,
+    queryKey: ['appointments', query],
+    queryFn: () => appointmentService.getAppointments(query),
   });
 
   const createMutation = useMutation({
@@ -26,7 +25,7 @@ export function useAppointments() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<UpdateAppointmentRequest> }) =>
+    mutationFn: ({ id, data }: { id: number; data: Partial<UpdateAppointmentRequest> }) =>
       appointmentService.updateAppointment(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments'] });
@@ -46,5 +45,47 @@ export function useAppointments() {
     createAppointment: createMutation.mutate,
     updateAppointment: updateMutation.mutate,
     deleteAppointment: deleteMutation.mutate,
+  };
+}
+
+export function useAppointmentNotes(query?: QueryAppointmentNotesRequest) {
+  const queryClient = useQueryClient();
+
+  const { data: notes = [], isLoading } = useQuery({
+    queryKey: ['appointment-notes', query],
+    queryFn: () => appointmentService.getAppointmentNotes(query),
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (note: CreateAppointmentNoteRequest & { appointmentId: number }) => 
+      appointmentService.createAppointmentNote(note),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['appointment-notes'] });
+    }
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: UpdateAppointmentNoteRequest }) =>
+      appointmentService.updateAppointmentNote(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['appointment-notes'] });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: appointmentService.deleteAppointmentNote,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['appointment-notes'] });
+    },
+  });
+
+  return {
+    notes,
+    isLoading,
+    createAppointmentNote: createMutation.mutate,
+    updateAppointmentNote: updateMutation.mutate,
+    deleteAppointmentNote: deleteMutation.mutate,
+    isDeletePending: deleteMutation.isPending,
+    deletingNoteId: deleteMutation.variables as number | undefined
   };
 }

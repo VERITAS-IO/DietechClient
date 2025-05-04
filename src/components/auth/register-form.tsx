@@ -13,14 +13,22 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { authService } from "@/services/auth-service";
 import { useMutation } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { cn } from "@/lib/utils";
 
-export function RegisterForm() {
+export function RegisterForm({ className, ...props }: React.ComponentPropsWithoutRef<"div">) {
   const { t } = useTranslation();
 
   const formSchema = z
@@ -121,8 +129,6 @@ export function RegisterForm() {
     },
   });
 
-  const { isPending } = registerMutation;
-
   async function onSubmit(values: FormValues, e: React.FormEvent) {
     e?.preventDefault();
     const { confirmPassword, ...registrationData } = values;
@@ -145,189 +151,212 @@ export function RegisterForm() {
   };
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          form.handleSubmit((data) => onSubmit(data, e))(e);
-        }}
-        className="space-y-4"
-      >
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            disabled={isPending}
-            control={form.control}
-            name="firstName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("auth.register.form.firstName.label")}</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder={t("auth.register.form.firstName.placeholder")}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            disabled={isPending}
-            control={form.control}
-            name="lastName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("auth.register.form.lastName.label")}</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder={t("auth.register.form.lastName.placeholder")}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <FormField
-          disabled={isPending}
-          control={form.control}
-          name="userName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("auth.register.form.userName.label")}</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder={t("auth.register.form.userName.placeholder")}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          disabled={isPending}
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("auth.register.form.email.label")}</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder={t("auth.register.form.email.placeholder")}
-                  autoComplete="email"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          disabled={isPending}
-          control={form.control}
-          name="phoneNumber"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("auth.register.form.phoneNumber.label")}</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder={t("auth.register.form.phoneNumber.placeholder")}
-                  type="tel"
-                  autoComplete="tel"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          disabled={isPending}
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("auth.register.form.password.label")}</FormLabel>
-              <FormControl>
-                <div className="relative">
-                  <Input
-                    type={showPassword ? "text" : "password"}
-                    placeholder={t("auth.register.form.password.placeholder")}
-                    autoComplete="new-password"
-                    {...field}
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-2 top-1/2 -translate-y-1/2"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          disabled={isPending}
-          control={form.control}
-          name="confirmPassword"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                {t("auth.register.form.confirmPassword.label")}
-              </FormLabel>
-              <FormControl>
-                <div className="relative">
-                  <Input
-                    type={showPassword ? "text" : "password"}
-                    placeholder={t(
-                      "auth.register.form.confirmPassword.placeholder"
-                    )}
-                    autoComplete="new-password"
-                    {...field}
-                  />
-                  {confirmPassword && (
-                    <div className={`text-sm mt-1 ${getPasswordMatchColor()}`}>
-                      {passwordMatchStatus === "matching"
-                        ? t("auth.register.form.confirmPassword.matching")
-                        : t("auth.register.form.confirmPassword.notMatching")}
-                    </div>
+    <div className={cn("flex flex-col gap-6", className)} {...props}>
+      <Card>
+        <CardHeader className="text-center">
+          <CardTitle className="text-xl">{t('auth.register.title')}</CardTitle>
+          <CardDescription>{t('auth.register.subtitle')}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                form.handleSubmit((data) => onSubmit(data, e))(e);
+              }}
+              className="space-y-4"
+            >
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  disabled={registerMutation.isPending}
+                  control={form.control}
+                  name="firstName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("auth.register.form.firstName.label")}</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder={t("auth.register.form.firstName.placeholder")}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
-                </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                />
+                <FormField
+                  disabled={registerMutation.isPending}
+                  control={form.control}
+                  name="lastName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("auth.register.form.lastName.label")}</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder={t("auth.register.form.lastName.placeholder")}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={
-            registerMutation.isPending || passwordMatchStatus === "not-matching"
-          }
-        >
-          {registerMutation.isPending
-            ? t("auth.register.form.submit.loading")
-            : t("auth.register.form.submit.default")}
-        </Button>
-      </form>
-    </Form>
+              <FormField
+                disabled={registerMutation.isPending}
+                control={form.control}
+                name="userName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("auth.register.form.userName.label")}</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder={t("auth.register.form.userName.placeholder")}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                disabled={registerMutation.isPending}
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("auth.register.form.email.label")}</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder={t("auth.register.form.email.placeholder")}
+                        autoComplete="email"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                disabled={registerMutation.isPending}
+                control={form.control}
+                name="phoneNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("auth.register.form.phoneNumber.label")}</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder={t("auth.register.form.phoneNumber.placeholder")}
+                        type="tel"
+                        autoComplete="tel"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                disabled={registerMutation.isPending}
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("auth.register.form.password.label")}</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          placeholder={t("auth.register.form.password.placeholder")}
+                          autoComplete="new-password"
+                          {...field}
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="absolute right-2 top-1/2 -translate-y-1/2"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                disabled={registerMutation.isPending}
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      {t("auth.register.form.confirmPassword.label")}
+                    </FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          placeholder={t(
+                            "auth.register.form.confirmPassword.placeholder"
+                          )}
+                          autoComplete="new-password"
+                          {...field}
+                        />
+                        {confirmPassword && (
+                          <div className={`text-sm mt-1 ${getPasswordMatchColor()}`}>
+                            {passwordMatchStatus === "matching"
+                              ? t("auth.register.form.confirmPassword.matching")
+                              : t("auth.register.form.confirmPassword.notMatching")}
+                          </div>
+                        )}
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={
+                  registerMutation.isPending || passwordMatchStatus === "not-matching"
+                }
+              >
+                {registerMutation.isPending
+                  ? t("auth.register.form.submit.loading")
+                  : t("auth.register.form.submit.default")}
+              </Button>
+
+              <div className="text-center text-sm">
+                {t('auth.register.haveAccount')}{" "}
+                <Link to="/login" className="text-primary underline underline-offset-4">
+                  {t('auth.register.signIn')}
+                </Link>
+              </div>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+      <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary">
+        {t('auth.login.termsAndPrivacy', { defaultValue: "By clicking continue, you agree to our " })}
+        <a href="#">{t('auth.login.termsOfService', { defaultValue: "Terms of Service" })}</a>{" "}
+        {t('auth.login.and', { defaultValue: "and" })}{" "}
+        <a href="#">{t('auth.login.privacyPolicy', { defaultValue: "Privacy Policy" })}</a>.
+      </div>
+    </div>
   );
 }
 

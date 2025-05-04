@@ -57,3 +57,13 @@
   .dark .fc-timegrid-slot-label {
     color: hsl(var(--muted-foreground));
   }
+
+/* Make calendar events look clickable */
+.fc-event {
+  cursor: pointer !important;
+  transition: opacity 0.2s ease;
+}
+
+.fc-event:hover {
+  opacity: 0.9;
+}

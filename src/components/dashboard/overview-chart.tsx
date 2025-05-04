@@ -28,43 +28,29 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useDashboardData } from "@/hooks/use-dashboard-data";
 
-// Sample data for different time ranges
-// Daily data - for 7 days view
-const dailyData = [
-  { date: "Jun 24, 2024", clients: 122, revenue: 5480 },
-  { date: "Jun 25, 2024", clients: 146, revenue: 6580 },
-  { date: "Jun 26, 2024", clients: 178, revenue: 8020 },
-  { date: "Jun 27, 2024", clients: 155, revenue: 6980 },
-  { date: "Jun 28, 2024", clients: 137, revenue: 6170 },
-  { date: "Jun 29, 2024", clients: 103, revenue: 4640 },  // Weekend drop
-  { date: "Jun 30, 2024", clients: 92, revenue: 4140 }    // Weekend drop
-];
+interface OverviewChartProps {
+  initialTimeRange?: string;
+  onTimeRangeChange?: (timeRange: string) => void;
+}
 
-// Monthly data - for 30 days view
-const monthlyData = [
-  { date: "May 01, 2024", clients: 240, revenue: 10800 },
-  { date: "May 10, 2024", clients: 255, revenue: 11500 },
-  { date: "May 20, 2024", clients: 268, revenue: 12100 },
-  { date: "Jun 01, 2024", clients: 284, revenue: 12800 },
-  { date: "Jun 10, 2024", clients: 302, revenue: 13600 },
-  { date: "Jun 20, 2024", clients: 318, revenue: 14300 },
-  { date: "Jun 30, 2024", clients: 335, revenue: 15100 }
-];
-
-// Yearly data - for 90 days view
-const yearlyData = [
-  { date: "Jan 2024", clients: 225, revenue: 10100 },
-  { date: "Feb 2024", clients: 238, revenue: 10700 },
-  { date: "Mar 2024", clients: 255, revenue: 11500 },
-  { date: "Apr 2024", clients: 268, revenue: 12100 },
-  { date: "May 2024", clients: 284, revenue: 12800 },
-  { date: "Jun 2024", clients: 335, revenue: 15100 }
-];
-
-export const OverviewChart = () => {
+export const OverviewChart = ({ 
+  initialTimeRange = "monthly", 
+  onTimeRangeChange 
+}: OverviewChartProps) => {
   const { t } = useTranslation();
-  const [timeRange, setTimeRange] = React.useState("90d");
+  const [timeRange, setTimeRange] = React.useState(initialTimeRange);
+
+  const { isLoading, isError, chartData, intervalDisplayName } = useDashboardData({ timeRange });
+
+  // When timeRange changes, notify parent component
+  React.useEffect(() => {
+    if (onTimeRangeChange) {
+      onTimeRangeChange(timeRange);
+    }
+  }, [timeRange, onTimeRangeChange]);
 
   const chartConfig = {
     clients: {
@@ -77,18 +63,47 @@ export const OverviewChart = () => {
     },
   } satisfies ChartConfig;
 
-  // Select appropriate data based on time range
-  const filteredData = React.useMemo(() => {
-    switch(timeRange) {
-      case "7d":
-        return dailyData;
-      case "30d":
-        return monthlyData;
-      case "90d":
-      default:
-        return yearlyData;
-    }
-  }, [timeRange]);
+  // Function to handle timeRange change
+  const handleTimeRangeChange = (value: string) => {
+    setTimeRange(value);
+  };
+
+  if (isLoading) {
+    return (
+      <Card className="col-span-2 w-full">
+        <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
+          <div className="grid flex-1 gap-1 text-center sm:text-left">
+            <Skeleton className="h-6 w-[150px]" />
+            <Skeleton className="h-4 w-[200px]" />
+          </div>
+          <Skeleton className="h-10 w-[160px]" />
+        </CardHeader>
+        <CardContent className="p-6">
+          <Skeleton className="h-[350px] w-full" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Card className="col-span-2 w-full">
+        <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
+          <div className="grid flex-1 gap-1 text-center sm:text-left">
+            <CardTitle>{t('dashboard.charts.overview')}</CardTitle>
+            <CardDescription className="text-red-500">
+              {t('common.errorOccurred')}
+            </CardDescription>
+          </div>
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="flex h-[350px] w-full items-center justify-center">
+            <p>{t('common.errorOccurred')}</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="col-span-2 w-full">
@@ -96,29 +111,28 @@ export const OverviewChart = () => {
         <div className="grid flex-1 gap-1 text-center sm:text-left">
           <CardTitle>{t('dashboard.charts.overview')}</CardTitle>
           <CardDescription>
-            {timeRange === "7d" 
-              ? t('dashboard.charts.last7Days', { defaultValue: "Showing data for the last 7 days" }) 
-              : timeRange === "30d" 
-                ? t('dashboard.charts.last30Days', { defaultValue: "Showing data for the last 30 days" })
-                : t('dashboard.charts.last90Days', { defaultValue: "Showing data for the last 3 months" })}
+            {t('dashboard.charts.interval', { intervalName: t(`dashboard.charts.intervals.${timeRange}`) })}
           </CardDescription>
         </div>
-        <Select value={timeRange} onValueChange={setTimeRange}>
+        <Select value={timeRange} onValueChange={handleTimeRangeChange}>
           <SelectTrigger
             className="w-[160px] rounded-lg sm:ml-auto"
-            aria-label={t('analytics.timeRange', { defaultValue: "Select time range" })}
+            aria-label={t('dashboard.charts.selectTimeRange', { defaultValue: "Select time range" })}
           >
-            <SelectValue placeholder={t('analytics.last90Days', { defaultValue: "Last 3 months" })} />
+            <SelectValue placeholder={t(`dashboard.charts.intervals.${timeRange}`)} />
           </SelectTrigger>
           <SelectContent className="rounded-xl">
-            <SelectItem value="90d" className="rounded-lg">
-              {t('analytics.last90Days', { defaultValue: "Last 3 months" })}
+            <SelectItem value="daily" className="rounded-lg">
+              {t('dashboard.charts.intervals.daily')}
             </SelectItem>
-            <SelectItem value="30d" className="rounded-lg">
-              {t('analytics.last30Days', { defaultValue: "Last 30 days" })}
+            <SelectItem value="weekly" className="rounded-lg">
+              {t('dashboard.charts.intervals.weekly')}
             </SelectItem>
-            <SelectItem value="7d" className="rounded-lg">
-              {t('analytics.last7Days', { defaultValue: "Last 7 days" })}
+            <SelectItem value="monthly" className="rounded-lg">
+              {t('dashboard.charts.intervals.monthly')}
+            </SelectItem>
+            <SelectItem value="yearly" className="rounded-lg">
+              {t('dashboard.charts.intervals.yearly')}
             </SelectItem>
           </SelectContent>
         </Select>
@@ -131,7 +145,7 @@ export const OverviewChart = () => {
           >
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart 
-                data={filteredData}
+                data={chartData}
                 margin={{ top: 30, right: 30, left: 10, bottom: 30 }}
               >
                 <defs>
@@ -151,21 +165,6 @@ export const OverviewChart = () => {
                   axisLine={false}
                   tickMargin={8}
                   minTickGap={32}
-                  tickFormatter={(value) => {
-                    // Different formatting based on time range
-                    if (timeRange === "7d") {
-                      // For daily data, show day
-                      const dateParts = value.split(", ")[0].split(" ");
-                      return `${dateParts[0]} ${dateParts[1]}`;
-                    } else if (timeRange === "30d") {
-                      // For monthly data, show month and day
-                      const dateParts = value.split(", ")[0].split(" ");
-                      return `${dateParts[0]} ${dateParts[1]}`;
-                    } else {
-                      // For yearly data, just show month
-                      return value;
-                    }
-                  }}
                 />
                 <YAxis
                   yAxisId="clients"
@@ -176,7 +175,7 @@ export const OverviewChart = () => {
                   tickMargin={8}
                   domain={['auto', 'auto']}
                   tickFormatter={(value) => value.toString()}
-                  label={{ value: 'Clients', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }}
+                  label={{ value: t('dashboard.charts.clients', { defaultValue: 'Clients' }), angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }}
                 />
                 <YAxis
                   yAxisId="revenue"
@@ -192,24 +191,15 @@ export const OverviewChart = () => {
                     notation: 'compact',
                     compactDisplay: 'short'
                   }).format(value)}
-                  label={{ value: 'Revenue', angle: 90, position: 'insideRight', style: { textAnchor: 'middle' } }}
+                  label={{ value: t('dashboard.charts.revenue', { defaultValue: 'Revenue' }), angle: 90, position: 'insideRight', style: { textAnchor: 'middle' } }}
                 />
                 <Tooltip
                   cursor={{ stroke: "#f0f0f0", strokeWidth: 1 }}
                   content={({ active, payload, label }) => {
-                    if (active && payload && payload.length) {
-                      // Format the date label based on time range
-                      let formattedLabel = label;
-                      if (timeRange === "7d" || timeRange === "30d") {
-                        // For daily and monthly views, add year if not present
-                        if (!label.includes("2024")) {
-                          formattedLabel = `${label}, 2024`;
-                        }
-                      }
-                      
+                    if (active && payload && payload.length) {                      
                       return (
                         <div className="rounded-lg border bg-background p-2 shadow-sm">
-                          <div className="mb-1 font-medium">{formattedLabel}</div>
+                          <div className="mb-1 font-medium">{label}</div>
                           {payload.map((entry, index) => (
                             <div key={`item-${index}`} className="flex items-center justify-between gap-2">
                               <div className="flex items-center gap-1">

@@ -11,6 +11,7 @@
     "viewDemo": "Demo Görüntüle",
     "save": "Kaydet",
     "delete": "Sil",
+    "deleting": "Siliniyor...",
     "edit": "Düzenle",
     "cancel": "İptal",
     "done": "Tamam",
@@ -73,11 +74,16 @@
   },
   "auth": {
     "login": {
-      "title": "Tekrar Hoşgeldiniz",
+      "title": "Tekrar hoş geldiniz",
       "subtitle": "Hesabınıza erişmek için bilgilerinizi girin",
       "forgotPassword": "Şifrenizi mi unuttunuz?",
       "noAccount": "Hesabınız yok mu?",
-      "signUp": "Kaydolun",
+      "signUp": "Kaydol",
+      "orContinueWith": "Veya şununla devam edin",
+      "termsAndPrivacy": "Devam'a tıklayarak şunları kabul etmiş olursunuz:",
+      "termsOfService": "Hizmet Şartları",
+      "and": "ve",
+      "privacyPolicy": "Gizlilik Politikası",
       "form": {
         "email": {
           "label": "E-posta",
@@ -258,10 +264,35 @@
       "vsLastQuarter": "geçen çeyreğe göre"
     },
     "charts": {
-      "overview": "Genel Bakış",
+      "overview": {
+        "error": "Grafik yüklenemedi",
+        "errorDescription": "Grafik verileri yüklenirken bir sorun oluştu. Lütfen daha sonra tekrar deneyin.",
+        "tooltipLabel": "Değer",
+        "interval": "{{intervalName}} veriler gösteriliyor",
+        "tabs": {
+          "daily": "Günlük",
+          "weekly": "Haftalık",
+          "monthly": "Aylık"
+        },
+        "intervals": {
+          "daily": "Günlük",
+          "weekly": "Haftalık", 
+          "monthly": "Aylık",
+          "yearly": "Yıllık"
+        }
+      },
       "description": "Danışan Artışı ve Gelir Genel Bakışı",
       "clients": "Danışanlar",
-      "revenue": "Gelir"
+      "revenue": "Gelir",
+      "overview": "Genel Bakış",
+      "interval": "{{intervalName}} veriler gösteriliyor",
+      "selectTimeRange": "Zaman aralığı seç",
+      "intervals": {
+        "daily": "Günlük",
+        "weekly": "Haftalık", 
+        "monthly": "Aylık",
+        "yearly": "Yıllık"
+      }
     },
     "nutrition": {
       "list": {

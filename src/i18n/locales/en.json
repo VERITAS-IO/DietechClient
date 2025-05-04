@@ -11,6 +11,7 @@
     "viewDemo": "View Demo",
     "save": "Save",
     "delete": "Delete",
+    "deleting": "Deleting...",
     "edit": "Edit",
     "cancel": "Cancel",
     "done": "Done",
@@ -78,6 +79,11 @@
         "forgotPassword": "Forgot your password?",
         "noAccount": "Don't have an account?",
         "signUp": "Sign up",
+        "orContinueWith": "Or continue with",
+        "termsAndPrivacy": "By clicking continue, you agree to our",
+        "termsOfService": "Terms of Service",
+        "and": "and",
+        "privacyPolicy": "Privacy Policy",
         "form": {
           "email": {
             "label": "Email",
@@ -330,13 +336,44 @@
       "revenue": "Revenue",
       "vsLastMonth": "vs. last month",
       "thisWeek": "this week",
-      "vsLastQuarter": "vs. last quarter"
+      "vsLastQuarter": "vs. last quarter",
+      "vsLastYear": "vs. last year",
+      "vsYesterday": "vs. yesterday",
+      "vsLastWeek": "vs. last week",
+      "today": "today",
+      "thisMonth": "this month",
+      "thisYear": "this year"
     },
     "charts": {
-      "overview": "Overview",
+      "overview": {
+        "error": "Unable to load chart",
+        "errorDescription": "There was a problem loading the chart data. Please try again later.",
+        "tooltipLabel": "Value",
+        "interval": "Showing {{intervalName}} data",
+        "tabs": {
+          "daily": "Daily",
+          "weekly": "Weekly",
+          "monthly": "Monthly"
+        },
+        "intervals": {
+          "daily": "Daily",
+          "weekly": "Weekly",
+          "monthly": "Monthly",
+          "yearly": "Yearly"
+        }
+      },
       "description": "Client Growth and Revenue Overview",
       "clients": "Clients",
-      "revenue": "Revenue"
+      "revenue": "Revenue",
+      "overview": "Overview",
+      "interval": "Showing {{intervalName}} data",
+      "selectTimeRange": "Select time range",
+      "intervals": {
+        "daily": "Daily",
+        "weekly": "Weekly",
+        "monthly": "Monthly",
+        "yearly": "Yearly"
+      }
     },
     "nutrition": {
       "list": {

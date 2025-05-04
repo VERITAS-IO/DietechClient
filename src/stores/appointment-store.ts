@@ -30,7 +30,7 @@ interface AppointmentState {
   // Appointment Note Actions
   getAppointmentNotes: (query: QueryAppointmentNotesRequest) => Promise<void>;
   createAppointmentNote: (request: CreateAppointmentNoteRequest & { appointmentId: number }) => Promise<void>;
-  updateAppointmentNote: (request: UpdateAppointmentNoteRequest) => Promise<void>;  
+  updateAppointmentNote: (id: number, data: UpdateAppointmentNoteRequest) => Promise<void>;  
   deleteAppointmentNote: (id: number) => Promise<void>;
 }
 
@@ -266,16 +266,16 @@ export const useAppointmentStore = create<AppointmentState>()(
         }
       },
 
-      updateAppointmentNote: async (request) => {
+      updateAppointmentNote: async (id, data) => {
         set({ isLoading: true });
         try {
           set(state => {
             const updatedNotes = state.appointmentNotes.map(note => {
-              if (note.id === request.id) {
+              if (note.id === id) {
                 return {
                   ...note,
-                  note: request.note,
-                  noteType: request.noteType as NoteType,
+                  note: data.note,
+                  noteType: data.noteType !== undefined ? data.noteType : note.noteType,
                 };
               }
               return note;

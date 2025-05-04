@@ -20,13 +20,7 @@ export function ClientStats() {
       trend: "+18%",
       trendUp: true,
     },
-    {
-      title: t('dashboard.stats.clientGrowth'),
-      value: "24",
-      icon: TrendingUp,
-      trend: "+5%",
-      trendUp: true,
-    },
+
     {
       title: t('appointment.time'),
       value: "45m",

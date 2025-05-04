@@ -1,7 +1,6 @@
 TO CONTINUE:
 - WHEN WE TRY TO DELETE A MEAL, THE DELETE MEAL DIALOG IS NOT BEING OPEN, BECAUSE MEAL IDS ARE NOT COMING FROM BACKEND
 
-
 #SECURITY
 
 ##LOCAL STORAGE
@@ -38,6 +37,8 @@ TO CONTINUE:
         3.An invitation link sent to these emails.
         4.Invited emails click the link and register.
         5.When we create the user, we set the user's tenant id as the value we sent within the invitation token.
+
+    
 
 ## HTTP 
 

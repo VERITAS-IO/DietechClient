@@ -26,6 +26,9 @@ import { Check } from "lucide-react";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from '@/lib/utils/utils';
+import { UseMutateFunction } from '@tanstack/react-query';
+import { QueryAppointmentResponse } from '@/types/appointment';
+import { format, parse, formatISO } from 'date-fns';
 
 const appointmentSchema = z.object({
   clientName: z.string().min(1, 'Client name is required'),
@@ -42,20 +45,34 @@ interface AppointmentDialogProps {
   onClose: () => void;
   selectedDate: Date | null;
   appointment: GetAppointmentResponse | null;
+  createAppointment?: UseMutateFunction<QueryAppointmentResponse, Error, CreateAppointmentRequest, unknown>;
+  updateAppointment?: UseMutateFunction<null, Error, { id: number; data: Partial<UpdateAppointmentRequest> }, unknown>;
+  deleteAppointment?: UseMutateFunction<void, Error, number, unknown>;
 }
 
-// Helper function to format date to local ISO string without timezone offset
+// Helper function to format date to local ISO string for the form input
 const formatLocalISOString = (date: Date): string => {
-  const offset = date.getTimezoneOffset();
-  const adjustedDate = new Date(date.getTime() - (offset * 60 * 1000));
-  return adjustedDate.toISOString().slice(0, 16);
+  return format(date, "yyyy-MM-dd'T'HH:mm");
 };
 
-// Helper function to parse local datetime string to UTC Date
-const parseLocalDateTime = (dateTimeString: string): Date => {
-  const date = new Date(dateTimeString);
-  const offset = date.getTimezoneOffset();
-  return new Date(date.getTime() + (offset * 60 * 1000));
+// Helper function to create a Date object preserving local time but as UTC
+const preserveLocalDateTime = (dateTimeString: string): Date => {
+  // Parse the string in the format 'yyyy-MM-ddTHH:mm' to a Date object
+  const localDate = parse(dateTimeString, "yyyy-MM-dd'T'HH:mm", new Date());
+  
+  // Convert to UTC for PostgreSQL timestamp with time zone column
+  // This is critical - PostgreSQL only accepts UTC for timestamp with time zone
+  return new Date(
+    Date.UTC(
+      localDate.getFullYear(),
+      localDate.getMonth(),
+      localDate.getDate(),
+      localDate.getHours(),
+      localDate.getMinutes(),
+      0,
+      0
+    )
+  );
 };
 
 export function AppointmentDialog({
@@ -63,14 +80,25 @@ export function AppointmentDialog({
   onClose,
   selectedDate,
   appointment,
+  createAppointment: createAppointmentMutation,
+  updateAppointment: updateAppointmentMutation,
+  deleteAppointment: deleteAppointmentMutation,
 }: AppointmentDialogProps) {
   const { t } = useTranslation();
-  const { createAppointment, updateAppointment, deleteAppointment, appointments } = useAppointmentStore();
+  // Use store as fallback for backward compatibility
+  const { createAppointment: storeCreateAppointment, updateAppointment: storeUpdateAppointment, deleteAppointment: storeDeleteAppointment, appointments } = useAppointmentStore();
   const { searchClients } = useClientStore();
   const [open, setOpen] = useState(false);
   const [selectedClient, setSelectedClient] = useState<QueryClientResponse | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Use mutation functions from props if provided, otherwise use store methods
+  const createAppointment = createAppointmentMutation || storeCreateAppointment;
+  const updateAppointment = updateAppointmentMutation ? 
+    (id: number, data: Partial<UpdateAppointmentRequest>) => updateAppointmentMutation({id, data}) : 
+    storeUpdateAppointment;
+  const deleteAppointment = deleteAppointmentMutation || storeDeleteAppointment;
 
   useEffect(() => {
     if (inputRef.current) {
@@ -143,10 +171,23 @@ export function AppointmentDialog({
       noteType: NoteType.PreAppointment
     };
 
+    // Create dates properly preserving local time
+    const startDate = preserveLocalDateTime(values.start);
+    const endDate = preserveLocalDateTime(values.end);
+    
+    console.log('Form submitted with dates:',
+      'Start Input:', values.start,
+      'End Input:', values.end,
+      'Start Created:', startDate.toISOString(),
+      'Start UTC?:', startDate.getTimezoneOffset() === 0 ? 'Yes' : 'No',
+      'End Created:', endDate.toISOString(),
+      'End UTC?:', endDate.getTimezoneOffset() === 0 ? 'Yes' : 'No'
+    );
+
     const baseAppointmentData = {
       title: `${values.clientName} - ${values.type}`,
-      start: parseLocalDateTime(values.start),
-      end: parseLocalDateTime(values.end),
+      start: startDate,
+      end: endDate,
       clientId: selectedClient ? selectedClient.id : undefined,
       clientName: values.clientName,
       type: values.type,
@@ -158,7 +199,6 @@ export function AppointmentDialog({
       const updateData: UpdateAppointmentRequest = {
         ...baseAppointmentData,
         status: appointment.status,
-        appointmentId: appointment.id
       };
       updateAppointment(appointment.id, updateData);
     } else {

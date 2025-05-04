@@ -1,77 +1,130 @@
-// import { Appointment } from '@/types/appointment';
-// import { api } from '@/lib/axios';
+import { 
+  CreateAppointmentRequest, 
+  UpdateAppointmentRequest, 
+  QueryAppointmentsRequest,
+  QueryAppointmentResponse,
+  CreateAppointmentNoteRequest,
+  UpdateAppointmentNoteRequest,
+  QueryAppointmentNotesRequest,
+  GetAppointmentNoteResponse
+} from '@/types/appointment';
+import { api } from '@/lib/axios';
+import { format } from 'date-fns';
 
-// export const appointmentService = {
-//   getAppointments: async () => {
-//     const response = await api.get<Appointment[]>(`/appointments`);
-//     return response.data;
-//   },
+// For timestamp with time zone in PostgreSQL, we MUST use UTC
+const formatDateForApi = (date: Date): string => {
+  // PostgreSQL only accepts UTC for timestamp with time zone columns
+  // Return ISO string with UTC timezone (Z)
+  return date.toISOString();
+};
 
-//   createAppointment: async (appointment: Omit<Appointment, 'id'>) => {
-//     const response = await api.post<Appointment>(
-//       `/appointments`,
-//       appointment
-//     );
-//     return response.data;
-//   },
-
-//   updateAppointment: async (id: string, appointment: Partial<Appointment>) => {
-//     const response = await api.put<Appointment>(
-//       `$/appointments/${id}`,
-//       appointment
-//     );
-//     return response.data;
-//   },
-
-//   deleteAppointment: async (id: string) => {
-//     await api.delete(`$/appointments/${id}`);
-//   },
-// };
-
-import { generateRandomAppointments } from '@/lib/mock-data';
-import { Appointment } from '@/types/appointment';
-
-// Simulate API latency
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-// In-memory storage
-let appointments = generateRandomAppointments(20);
+const prepareAppointmentData = (data: any) => {
+  const prepared = { ...data };
+  
+  if (prepared.start instanceof Date) {
+    const originalDate = new Date(prepared.start);
+    const formattedLocal = format(originalDate, "yyyy-MM-dd'T'HH:mm:ss");
+    
+    // Make sure the date is in UTC
+    if (originalDate.getTimezoneOffset() !== 0) {
+      console.warn('Warning: Converting a non-UTC date to UTC for timestamp with time zone column');
+    }
+    
+    prepared.start = formatDateForApi(prepared.start);
+    console.log('Date conversion - start:', 
+      'Local format:', formattedLocal,
+      'API format (UTC):', prepared.start
+    );
+  }
+  
+  if (prepared.end instanceof Date) {
+    const originalDate = new Date(prepared.end);
+    const formattedLocal = format(originalDate, "yyyy-MM-dd'T'HH:mm:ss");
+    
+    // Make sure the date is in UTC
+    if (originalDate.getTimezoneOffset() !== 0) {
+      console.warn('Warning: Converting a non-UTC date to UTC for timestamp with time zone column');
+    }
+    
+    prepared.end = formatDateForApi(prepared.end);
+    console.log('Date conversion - end:', 
+      'Local format:', formattedLocal,
+      'API format (UTC):', prepared.end
+    );
+  }
+  
+  return prepared;
+};
 
 export const appointmentService = {
-  getAppointments: async () => {
-    await delay(800); // Simulate network delay
-    return appointments;
-  },
-
-  createAppointment: async (appointment: Omit<Appointment, 'id'>) => {
-    await delay(500);
-    const newAppointment = {
-      ...appointment,
-      id: `appointment-${Date.now()}`,
-    };
-    appointments = [...appointments, newAppointment];
-    return newAppointment;
-  },
-
-  updateAppointment: async (id: string, data: Partial<Appointment>) => {
-    await delay(500);
-    const index = appointments.findIndex(apt => apt.id === id);
-    if (index === -1) throw new Error('Appointment not found');
+  getAppointments: async (query?: QueryAppointmentsRequest) => {
+    // Prepare query params if they contain dates
+    const params: any = query ? { ...query } : undefined;
+    if (params?.startDate instanceof Date) {
+      params.startDate = formatDateForApi(params.startDate);
+    }
+    if (params?.endDate instanceof Date) {
+      params.endDate = formatDateForApi(params.endDate);
+    }
     
-    const updatedAppointment = {
-      ...appointments[index],
-      ...data,
-    };
-    appointments = [
-      ...appointments.slice(0, index),
-      updatedAppointment,
-      ...appointments.slice(index + 1),
-    ];
-    return updatedAppointment;
+    const response = await api.get<QueryAppointmentResponse[]>('/appointments', { 
+      params
+    });
+    return response.data;
   },
 
-  deleteAppointment: async (id: string) => {
-    await delay(500);
-    appointments = appointments.filter(apt => apt.id !== id);
+  getAppointment: async (id: number) => {
+    const response = await api.get<QueryAppointmentResponse>(`/appointments/${id}`);
+    return response.data;
   },
+
+  createAppointment: async (appointment: CreateAppointmentRequest) => {
+    const preparedData = prepareAppointmentData(appointment);
+    const response = await api.post<QueryAppointmentResponse>(
+      '/appointments',
+      preparedData
+    );
+    return response.data;
+  },
+
+  updateAppointment: async (id: number, appointment: Partial<UpdateAppointmentRequest>) => {
+    const preparedData = prepareAppointmentData(appointment);
+    await api.patch(
+      `/appointments/${id}`,
+      preparedData
+    );
+    return null;
+  },
+
+  deleteAppointment: async (id: number) => {
+    await api.delete(`/appointments/${id}`);
+  },
+
+  // Appointment Note Methods
+  getAppointmentNotes: async (query?: QueryAppointmentNotesRequest) => {
+    const response = await api.get<GetAppointmentNoteResponse[]>('/appointment-notes', { 
+      params: query 
+    });
+    return response.data;
+  },
+
+  createAppointmentNote: async (note: CreateAppointmentNoteRequest & { appointmentId: number }) => {
+    const response = await api.post<GetAppointmentNoteResponse>(
+      '/appointment-notes',
+      note
+    );
+    return response.data;
+  },
+
+  updateAppointmentNote: async (id: number, note: UpdateAppointmentNoteRequest) => {
+    const response = await api.patch<GetAppointmentNoteResponse>(
+      `/appointment-notes/${id}`,
+      note
+    );
+    return response.data;
+  },
+
+  deleteAppointmentNote: async (id: number) => {
+    await api.delete(`/appointment-notes/${id}`);
+  }
 };

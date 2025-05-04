@@ -1,3 +1,4 @@
+import { GalleryVerticalEnd } from "lucide-react"
 import { Link } from "react-router-dom";
 import { RegisterForm } from "@/components/auth/register-form";
 import { useTranslation } from "react-i18next";
@@ -6,29 +7,16 @@ export default function RegisterPage() {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <main className="flex-1">
-        <div className="container flex items-center justify-center min-h-[calc(100vh-4rem)] px-4 sm:px-8">
-          <div className="w-full max-w-[400px] space-y-6">
-            <div className="text-center space-y-2">
-              <h1 className="text-3xl font-bold">{t('auth.register.title')}</h1>
-              <p className="text-muted-foreground">
-                {t('auth.register.subtitle')}
-              </p>
-            </div>
-            <RegisterForm />
-            <p className="text-center text-sm text-muted-foreground">
-              {t('auth.register.haveAccount')}{" "}
-              <Link
-                to="/login"
-                className="text-primary hover:underline font-medium"
-              >
-                {t('auth.register.signIn')}
-              </Link>
-            </p>
+    <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10">
+      <div className="flex w-full max-w-sm flex-col gap-6">
+        <a href="/" className="flex items-center gap-2 self-center font-medium">
+          <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
+            <GalleryVerticalEnd className="size-4" />
           </div>
-        </div>
-      </main>
+          {t('common.appName')}
+        </a>
+        <RegisterForm />
+      </div>
     </div>
   );
 }

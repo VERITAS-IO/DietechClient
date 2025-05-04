@@ -5,21 +5,21 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { Button } from '@/components/ui/button';
 import { Calendar, Plus } from 'lucide-react';
-import { GetAppointmentResponse, AppointmentType } from '@/types/appointment';
-import { useAppointmentStore } from '@/stores/appointment-store';
+import { GetAppointmentResponse, AppointmentType, QueryAppointmentsRequest } from '@/types/appointment';
 import { cn } from '@/lib/utils/utils';
 import { AppointmentDialog } from './AppointmentDialog';
 import { AppointmentNotesDialog } from './AppointmentNotesDialog';
-import { AppointmentDropdownMenu } from './AppointmentDropdownMenu';
 import trLocale from '@fullcalendar/core/locales/tr';
 import { useTranslation } from 'react-i18next';
 import { createRoot } from 'react-dom/client';
+import { useAppointments } from '@/hooks/appointment-hooks';
 
 import './calendar.css';
 
 export function AppointmentCalendar() {
   const { t } = useTranslation();
-  const { appointments, getAppointments } = useAppointmentStore();
+  const [query, setQuery] = useState<QueryAppointmentsRequest>({});
+  const { appointments = [], isLoading, createAppointment, updateAppointment, deleteAppointment } = useAppointments(query);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedAppointment, setSelectedAppointment] = useState<GetAppointmentResponse | null>(null);
   const [isAppointmentDialogOpen, setIsAppointmentDialogOpen] = useState(false);
@@ -31,7 +31,7 @@ export function AppointmentCalendar() {
     const startDate = new Date(now.getFullYear(), now.getMonth(), 1);
     const endDate = new Date(now.getFullYear(), now.getMonth() + 2, 0);
     
-    getAppointments({
+    setQuery({
       startDate,
       endDate
     });
@@ -48,6 +48,56 @@ export function AppointmentCalendar() {
     const appointment = appointments.find(apt => apt.id === parseInt(clickInfo.event.id));
     if (appointment) {
       setSelectedAppointment(appointment);
+      
+      // Show a context menu at the click position with options
+      const menuX = clickInfo.jsEvent.pageX;
+      const menuY = clickInfo.jsEvent.pageY;
+      
+      // Create and render a context menu
+      const menuContainer = document.createElement('div');
+      menuContainer.style.position = 'absolute';
+      menuContainer.style.left = `${menuX}px`;
+      menuContainer.style.top = `${menuY}px`;
+      menuContainer.style.zIndex = '1000';
+      document.body.appendChild(menuContainer);
+      
+      const root = createRoot(menuContainer);
+      
+      // Function to remove the menu when clicked outside
+      const handleClickOutside = () => {
+        document.body.removeChild(menuContainer);
+        document.removeEventListener('click', handleClickOutside);
+      };
+      
+      // Add a small delay before adding the click listener to prevent immediate removal
+      setTimeout(() => {
+        document.addEventListener('click', handleClickOutside);
+      }, 10);
+      
+      root.render(
+        <div className="bg-white dark:bg-gray-800 rounded-md shadow-md border border-gray-200 dark:border-gray-700 p-1 min-w-[160px]">
+          <button 
+            className="w-full text-left px-2 py-1.5 text-sm rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsAppointmentDialogOpen(true);
+              handleClickOutside();
+            }}
+          >
+            {t('appointment.edit')}
+          </button>
+          <button 
+            className="w-full text-left px-2 py-1.5 text-sm rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsNotesDialogOpen(true);
+              handleClickOutside();
+            }}
+          >
+            {t('appointment.notes.view')}
+          </button>
+        </div>
+      );
     }
   };
   
@@ -80,8 +130,6 @@ export function AppointmentCalendar() {
   }));
 
   const renderEventContent = (eventInfo: any) => {
-    const appointment = eventInfo.event.extendedProps.appointment;
-    
     // Create a container for the event content
     const container = document.createElement('div');
     container.className = 'fc-event-main-content relative';
@@ -91,27 +139,6 @@ export function AppointmentCalendar() {
     titleElement.textContent = eventInfo.event.title;
     container.appendChild(titleElement);
     
-    // Create a container for the dropdown
-    const dropdownContainer = document.createElement('div');
-    dropdownContainer.className = 'absolute top-1 right-1';
-    container.appendChild(dropdownContainer);
-    
-    // Use createRoot to render the React component
-    const root = createRoot(dropdownContainer);
-    root.render(
-      <AppointmentDropdownMenu
-        appointment={appointment}
-        onEditClick={() => {
-          setSelectedAppointment(appointment);
-          setIsAppointmentDialogOpen(true);
-        }}
-        onNotesClick={() => {
-          setSelectedAppointment(appointment);
-          setIsNotesDialogOpen(true);
-        }}
-      />
-    );
-
     return { domNodes: [container] };
   };
 
@@ -168,6 +195,9 @@ export function AppointmentCalendar() {
         onClose={() => setIsAppointmentDialogOpen(false)}
         selectedDate={selectedDate}
         appointment={selectedAppointment}
+        createAppointment={createAppointment}
+        updateAppointment={updateAppointment}
+        deleteAppointment={deleteAppointment}
       />
 
       {selectedAppointment && (

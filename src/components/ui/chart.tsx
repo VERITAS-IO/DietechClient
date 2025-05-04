@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts"
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, AreaChart } from "recharts"
 import { cn } from "@/lib/utils"
 
 export type ChartConfig = {
@@ -62,7 +62,7 @@ const ChartContainer = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & {
     config: ChartConfig
-    children: React.ReactNode
+    children: React.ReactElement
   }
 >(({ className, children, config, ...props }, ref) => {
   const uniqueId = React.useId()
