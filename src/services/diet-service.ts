@@ -1,33 +1,38 @@
-import { api as apiClient } from '@/mocks/axios';
-import { CreateDietRequest, DietDetailResponse, DietListResponse, QueryDietsRequest, UpdateDietRequest } from '../types/diet';
+import { api } from '@/lib/axios';
+import { CreateDietRequest, CreateDietResponse, DietDetailResponse, DietListResponse, QueryDietsRequest, UpdateDietRequest } from '../types/diet';
 
-const BASE_URL = '/api/v1/diets';
+const BASE_URL = '/diets';
 
 export const dietService = {
-    async queryDiets(request: QueryDietsRequest): Promise<{ items: DietListResponse[]; totalCount: number }> {
-        const { data } = await apiClient.get(BASE_URL, { params: request });
-        // Transform the array response into a paginated structure
+    async queryDiets(request: QueryDietsRequest): Promise<{ items: DietListResponse[]; totalCount: number; pageNumber: number; pageSize: number }> {
+        const { data } = await api.get(BASE_URL, { params: request });
+        
+        // Handle the array response from the API
+        const items = Array.isArray(data) ? data : [];
+        
         return {
-            items: data,
-            totalCount: data.length,
+            items,
+            totalCount: items.length,
+            pageNumber: request.pageNumber || 1,
+            pageSize: request.pageSize || 10
         };
     },
 
     async getDiet(id: number): Promise<DietDetailResponse> {
-        const { data } = await apiClient.get(`${BASE_URL}/${id}`);
+        const { data } = await api.get(`${BASE_URL}/${id}`);
         return data;
     },
 
-    async createDiet(request: CreateDietRequest): Promise<{ id: number; name: string }> {
-        const { data } = await apiClient.post(BASE_URL, request);
+    async createDiet(request: CreateDietRequest): Promise<CreateDietResponse> {
+        const { data } = await api.post(BASE_URL, request);
         return data;
     },
 
     async updateDiet(id: number, request: UpdateDietRequest): Promise<void> {
-        await apiClient.put(`${BASE_URL}/${id}`, request);
+        await api.put(`${BASE_URL}/${id}`, request);
     },
 
     async deleteDiet(id: number): Promise<void> {
-        await apiClient.delete(`${BASE_URL}/${id}`);
+        await api.delete(`${BASE_URL}/${id}`);
     }
 };

@@ -21,10 +21,15 @@ export default function DietList(){
     const setFilters = useDietStore((state) => state.setFilters);
     const setSelectedDietId = useDietStore((state) => state.setSelectedDietId);
     const setDetailModalOpen = useDietStore((state) => state.setDetailModalOpen);
+    const isDetailModalOpen = useDietStore((state) => state.isDetailModalOpen);
     
     const { data, isLoading, error, isError } = useQueryDiets(filters);
 
     console.log('Diet List Data:', data);
+    console.log('Diet List Error:', error);
+    console.log('Filters:', filters);
+    console.log('Is Loading:', isLoading);
+    console.log('Is Error:', isError);
 
     const handleRowClick = (diet: DietListResponse) => {
         setSelectedDietId(diet.id);
@@ -75,19 +80,24 @@ export default function DietList(){
             );
         }
 
-        return data.items.map((diet: DietListResponse) => (
-            <TableRow
-                key={diet.id}
-                className="cursor-pointer hover:bg-muted/50"
-                onClick={() => handleRowClick(diet)}
-            >
-                <TableCell>{diet.name}</TableCell>
-                <TableCell>{t(`diet.types.${diet.dietType.toLowerCase()}`)}</TableCell>
-                <TableCell>{diet.dietDuration} {t('diet.days')}</TableCell>
-                <TableCell>{diet.totalCalories} kcal</TableCell>
-                <TableCell className="truncate max-w-md">{diet.dietDescription}</TableCell>
-            </TableRow>
-        ));
+        return data.items.map((diet: DietListResponse) => {
+            // Handle diet type that could be either a number or a string
+            const dietTypeKey = typeof diet.dietType === 'string' ? diet.dietType : diet.dietType.toString();
+            
+            return (
+                <TableRow
+                    key={diet.id}
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => handleRowClick(diet)}
+                >
+                    <TableCell>{diet.name}</TableCell>
+                    <TableCell>{t(`diet.types.${dietTypeKey}`)}</TableCell>
+                    <TableCell>{diet.dietDuration} {t('diet.days')}</TableCell>
+                    <TableCell>{diet.totalCalories} kcal</TableCell>
+                    <TableCell className="truncate max-w-md">{diet.dietDescription || "-"}</TableCell>
+                </TableRow>
+            );
+        });
     };
 
     return (
@@ -113,8 +123,8 @@ export default function DietList(){
 
             {data && data.totalCount > 0 && (
                 <DataTablePagination
-                    currentPage={filters.pageNumber}
-                    pageSize={filters.pageSize}
+                    currentPage={data.pageNumber}
+                    pageSize={data.pageSize}
                     totalItems={data.totalCount}
                     onPageChange={(page) => setFilters({ pageNumber: page })}
                     onPageSizeChange={handlePageSizeChange}
@@ -124,7 +134,7 @@ export default function DietList(){
                 />
             )}
 
-            <DietDetailDialog />
+            {isDetailModalOpen && <DietDetailDialog />}
         </div>
     );
 };

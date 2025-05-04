@@ -10,15 +10,37 @@ export default function DietFilters() {
     const { t } = useTranslation();
     const { filters, setFilters, resetFilters } = useDietStore();
 
+    // Create an array of diet types for rendering select options
+    const dietTypes = [
+        { value: DietType.Unknown, label: t('diet.types.0') },
+        { value: DietType.Standard, label: t('diet.types.1') },
+        { value: DietType.Mediterranean, label: t('diet.types.2') },
+        { value: DietType.LowCarb, label: t('diet.types.3') },
+        { value: DietType.Ketogenic, label: t('diet.types.4') },
+        { value: DietType.Vegetarian, label: t('diet.types.5') },
+        { value: DietType.Vegan, label: t('diet.types.6') },
+        { value: DietType.PaleoStyle, label: t('diet.types.7') },
+        { value: DietType.GlutenFree, label: t('diet.types.8') },
+        { value: DietType.DairyFree, label: t('diet.types.9') },
+        { value: DietType.LowFat, label: t('diet.types.10') },
+        { value: DietType.LowSodium, label: t('diet.types.11') },
+        { value: DietType.DiabetesFriendly, label: t('diet.types.12') },
+        { value: DietType.HighProtein, label: t('diet.types.13') },
+        { value: DietType.WeightLoss, label: t('diet.types.14') },
+        { value: DietType.WeightGain, label: t('diet.types.15') },
+        { value: DietType.Elimination, label: t('diet.types.16') },
+        { value: DietType.Custom, label: t('diet.types.99') }
+    ];
+
     return (
         <Card className="mb-4">
             <CardContent className="p-4">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
                         <Select
-                            value={filters.dietType?.toString() || 'all'}
+                            value={filters.dietType !== undefined ? String(filters.dietType) : 'all'}
                             onValueChange={(value) =>
-                                setFilters({ dietType: value !== 'all' ? (value as DietType) : undefined })
+                                setFilters({ dietType: value !== 'all' ? Number(value) as DietType : undefined })
                             }
                         >
                             <SelectTrigger>
@@ -26,9 +48,9 @@ export default function DietFilters() {
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="all">{t('common.all')}</SelectItem>
-                                {Object.values(DietType).map((type) => (
-                                    <SelectItem key={type} value={type}>
-                                        {t(`diet.types.${type.toLowerCase()}`)}
+                                {dietTypes.map((type) => (
+                                    <SelectItem key={type.value} value={String(type.value)}>
+                                        {type.label}
                                     </SelectItem>
                                 ))}
                             </SelectContent>

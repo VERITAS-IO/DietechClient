@@ -9,6 +9,7 @@ import { Plus } from 'lucide-react';
 export default function DietListPage() {
     const { t } = useTranslation();
     const setCreateModalOpen = useDietStore((state) => state.setCreateModalOpen);
+    const isCreateModalOpen = useDietStore((state) => state.isCreateModalOpen);
 
     const handleCreate = () => {
         setCreateModalOpen(true);
@@ -26,7 +27,7 @@ export default function DietListPage() {
 
             <DietFilters />
             <DietList />
-            <DietCreateDialog />
+            {isCreateModalOpen && <DietCreateDialog />}
         </div>
     );
 }

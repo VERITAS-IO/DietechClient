@@ -25,7 +25,7 @@ export default function DietCreateDialog() {
         defaultValues: {
             name: '',
             description: '',
-            type: DietType.VEGETARIAN,
+            type: DietType.Standard,
             duration: 7,
             calories: 2000,
             startDate: new Date().toISOString().split('T')[0],
@@ -44,7 +44,7 @@ export default function DietCreateDialog() {
         const createData = {
             name: data.name,
             dietDescription: data.description,
-            dietType: data.type,
+            dietType: Number(data.type),
             dietDuration: Number(data.duration),
             totalCalories: Number(data.calories),
             tenantId: 1, 

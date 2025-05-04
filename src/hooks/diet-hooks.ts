@@ -19,10 +19,11 @@ export const useQueryDiets = (request: QueryDietsRequest) => {
     });
 };
 
-export const useGetDiet = (id: number) => {
+export const useGetDiet = (id: number | null) => {
     return useQuery({
-        queryKey: DIET_KEYS.detail(id),
-        queryFn: () => dietService.getDiet(id),
+        queryKey: DIET_KEYS.detail(id as number),
+        queryFn: () => dietService.getDiet(id as number),
+        enabled: id !== null && id !== undefined,
     });
 };
 

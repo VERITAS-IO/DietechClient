@@ -58,6 +58,28 @@ export default function BaseDietDialog({
 }: BaseDietDialogProps) {
     const { t } = useTranslation();
 
+    // Create an array of diet types for rendering select options
+    const dietTypes = [
+        { value: DietType.Unknown, label: t('diet.types.0') },
+        { value: DietType.Standard, label: t('diet.types.1') },
+        { value: DietType.Mediterranean, label: t('diet.types.2') },
+        { value: DietType.LowCarb, label: t('diet.types.3') },
+        { value: DietType.Ketogenic, label: t('diet.types.4') },
+        { value: DietType.Vegetarian, label: t('diet.types.5') },
+        { value: DietType.Vegan, label: t('diet.types.6') },
+        { value: DietType.PaleoStyle, label: t('diet.types.7') },
+        { value: DietType.GlutenFree, label: t('diet.types.8') },
+        { value: DietType.DairyFree, label: t('diet.types.9') },
+        { value: DietType.LowFat, label: t('diet.types.10') },
+        { value: DietType.LowSodium, label: t('diet.types.11') },
+        { value: DietType.DiabetesFriendly, label: t('diet.types.12') },
+        { value: DietType.HighProtein, label: t('diet.types.13') },
+        { value: DietType.WeightLoss, label: t('diet.types.14') },
+        { value: DietType.WeightGain, label: t('diet.types.15') },
+        { value: DietType.Elimination, label: t('diet.types.16') },
+        { value: DietType.Custom, label: t('diet.types.99') }
+    ];
+
     if (isLoading) {
         return (
             <Dialog open={isOpen} onOpenChange={onClose}>
@@ -96,16 +118,18 @@ export default function BaseDietDialog({
                                 <label>{t('diet.type')}</label>
                                 <Select
                                     disabled={isDisabled}
-                                    onValueChange={(value) => setValue('type', value)}
-                                    defaultValue={defaultValues.type || DietType.VEGETARIAN}
+                                    onValueChange={(value) => setValue('type', Number(value))}
+                                    defaultValue={defaultValues.type !== undefined 
+                                        ? String(defaultValues.type) 
+                                        : String(DietType.Standard)}
                                 >
                                     <SelectTrigger>
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {Object.values(DietType).map((type) => (
-                                            <SelectItem key={type} value={type}>
-                                                {t(`diet.types.${type.toLowerCase()}`)}
+                                        {dietTypes.map((type) => (
+                                            <SelectItem key={type.value} value={String(type.value)}>
+                                                {type.label}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
@@ -129,24 +153,6 @@ export default function BaseDietDialog({
                                     {...register('calories', { required: true, min: 0 })}
                                     disabled={isDisabled}
                                     placeholder="2000"
-                                />
-                            </div>
-                            
-                            <div className="space-y-2">
-                                <label>{t('diet.startDate')}</label>
-                                <Input
-                                    type="date"
-                                    {...register('startDate')}
-                                    disabled={isDisabled}
-                                />
-                            </div>
-                            
-                            <div className="space-y-2">
-                                <label>{t('diet.endDate')}</label>
-                                <Input
-                                    type="date"
-                                    {...register('endDate')}
-                                    disabled={isDisabled}
                                 />
                             </div>
                             

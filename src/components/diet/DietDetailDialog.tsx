@@ -31,8 +31,6 @@ interface DietFormValues {
     type: DietType;
     duration: number;
     calories: number;
-    startDate?: string;
-    endDate?: string;
     isActive?: boolean;
 }
 
@@ -126,8 +124,6 @@ export default function DietDetailDialog() {
             type: diet.dietType as DietType,
             duration: diet.dietDuration || 0,
             calories: diet.totalCalories || 0,
-            startDate: diet.startDate ? new Date(diet.startDate).toISOString().split('T')[0] : '',
-            endDate: diet.endDate ? new Date(diet.endDate).toISOString().split('T')[0] : '',
             isActive: diet.isActive || false
         } : {}
     });
@@ -141,28 +137,25 @@ export default function DietDetailDialog() {
     React.useEffect(() => {
         if (diet) {
             const nameValue = diet.name || '';
-
-            const startDate = diet.startDate ? new Date(diet.startDate).toISOString().split('T')[0] : '';
-            const endDate = diet.endDate ? new Date(diet.endDate).toISOString().split('T')[0] : '';
+            // Ensure dietType is handled correctly whether it's a string or a number
+            const dietType = typeof diet.dietType === 'string' 
+                ? DietType[diet.dietType as keyof typeof DietType] 
+                : diet.dietType as DietType;
 
             reset({
                 name: nameValue,
                 description: diet.dietDescription || '',
-                type: diet.dietType as DietType,
+                type: dietType,
                 duration: diet.dietDuration || 0,
                 calories: diet.totalCalories || 0,
-                startDate: startDate,
-                endDate: endDate,
                 isActive: diet.isActive || false
             }, { keepDirtyValues: false }); // Force reset all values
 
             setValue('name', nameValue);
             setValue('description', diet.dietDescription || '');
-            setValue('type', diet.dietType as DietType);
+            setValue('type', dietType);
             setValue('duration', diet.dietDuration || 0);
             setValue('calories', diet.totalCalories || 0);
-            setValue('startDate', startDate);
-            setValue('endDate', endDate);
             setValue('isActive', diet.isActive || false);
         }
     }, [diet, reset, setValue, isEditMode]);
@@ -181,11 +174,9 @@ export default function DietDetailDialog() {
         const updateData: UpdateDietRequest = {
             name: data.name !== diet.name ? data.name : undefined,
             dietDescription: data.description !== diet.dietDescription ? data.description : undefined,
-            dietType: data.type !== diet.dietType ? data.type : undefined,
+            dietType: data.type !== diet.dietType ? Number(data.type) : undefined,
             dietDuration: data.duration !== diet.dietDuration ? data.duration : undefined,
             totalCalories: data.calories !== diet.totalCalories ? data.calories : undefined,
-            startDate: data.startDate ? new Date(data.startDate).toISOString() : diet.startDate,
-            endDate: data.endDate ? new Date(data.endDate).toISOString() : diet.endDate,
             isActive: data.isActive !== undefined ? !!data.isActive : diet.isActive,
         };
         
@@ -219,17 +210,13 @@ export default function DietDetailDialog() {
         type: diet.dietType as DietType,
         duration: diet.dietDuration || 0,
         calories: diet.totalCalories || 0,
-        startDate: diet.startDate ? new Date(diet.startDate).toISOString().split('T')[0] : '',
-        endDate: diet.endDate ? new Date(diet.endDate).toISOString().split('T')[0] : '',
         isActive: diet.isActive || false
     } : {
         name: '',
         description: '',
-        type: DietType.VEGETARIAN,
+        type: DietType.Standard,
         duration: 0,
         calories: 0,
-        startDate: '',
-        endDate: '',
         isActive: false
     };
 
@@ -275,7 +262,6 @@ export default function DietDetailDialog() {
         </>
     );
 
-    // Add this function to convert temporary meals to MealListResponse format
     const convertTemporaryMealsToListResponse = (temporaryMeals: CreateMealRequest[]): MealListResponse[] => {
         return temporaryMeals.map((meal, index) => ({
             id: -(index + 1), // Use negative IDs to distinguish temporary meals
