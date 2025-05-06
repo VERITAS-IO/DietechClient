@@ -48,12 +48,11 @@ export const NutritionInfoDetail = () => {
     const onSubmit = (data: UpdateNutritionInfoRequest) => {
         if (!selectedNutritionInfo) return;
 
-        // Convert number fields to ensure they are not sent as strings
         const formattedData: UpdateNutritionInfoRequest = {
             ...data,
             servingSize: Number(data.servingSize),
-            servingUnit: Number(data.servingUnit),
-            foodCategory: Number(data.foodCategory),
+            servingUnit: data.servingUnit as ServingUnit,
+            foodCategory: data.foodCategory as FoodCategory,
             caloriesPerServing: Number(data.caloriesPerServing),
             totalFat: Number(data.totalFat),
             protein: Number(data.protein),
@@ -105,7 +104,7 @@ export const NutritionInfoDetail = () => {
                             <label>Serving Unit</label>
                             <Select
                                 disabled={!isEditMode}
-                                onValueChange={(value) => setValue('servingUnit', Number(value))}
+                                onValueChange={(value) => setValue('servingUnit', value as ServingUnit)}
                                 defaultValue={String(selectedNutritionInfo.servingUnit)}
                             >
                                 <SelectTrigger>
@@ -127,7 +126,7 @@ export const NutritionInfoDetail = () => {
                             <label>Category</label>
                             <Select
                                 disabled={!isEditMode}
-                                onValueChange={(value) => setValue('foodCategory', Number(value))}
+                                onValueChange={(value) => setValue('foodCategory', value as FoodCategory)}
                                 defaultValue={String(selectedNutritionInfo.foodCategory)}
                             >
                                 <SelectTrigger>

@@ -1,21 +1,22 @@
 import { PagedRequest } from './request-parameters';
 
 export enum ServingUnit {
-    Unknown = 0,
-    Grams = 1,
-    Milliliters = 2,
-    Pieces = 3,
-    Cups = 4,
-    Tablespoons = 5
+    Unknown = "Unknown",
+    Grams = "Grams",
+    Milliliters = "Milliliters",
+    Pieces = "Pieces",
+    Cups = "Cups",
+    Tablespoons = "Tablespoons"
 }
 
+
 export enum FoodCategory {
-    Unknown = 0,
-    Dairy = 1,
-    Proteins = 2,
-    Grains = 3,
-    Vegetables = 4,
-    Fruits = 5
+    Unknown = "Unknown",
+    Dairy = "Dairy",
+    Proteins = "Proteins",
+    Grains = "Grains",
+    Vegetables = "Vegetables",
+    Fruits = "Fruits"
 }
 
 export interface CreateNutritionInfoRequest {
@@ -23,7 +24,7 @@ export interface CreateNutritionInfoRequest {
     servingSize: number;
     servingUnit: ServingUnit;
     foodCategory: FoodCategory;
-    caloriesPerServing?: number;
+    totalCalories?: number;
     totalFat?: number;
     carbohydrates?: number;
     protein?: number;

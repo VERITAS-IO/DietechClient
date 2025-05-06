@@ -30,7 +30,7 @@ const formSchema = z.object({
     z.object({
       name: z.string().min(1, { message: t('validation.required') }),
       description: z.string().optional(),
-      caloriesPerServing: z.number().min(0).optional(),
+      totalCalories: z.number().min(0).optional(),
       proteinPerServing: z.number().min(0).optional(),
       carbsPerServing: z.number().min(0).optional(),
       fatPerServing: z.number().min(0).optional(),
@@ -87,7 +87,6 @@ export default function MealUpdateDialog() {
   const onSubmit = (data: FormValues) => {
     if (!selectedMealId) return;
 
-    // Convert form data to match the UpdateMealRequest interface
     const updateRequest: UpdateMealRequest = {
       name: data.name,
       description: data.description || '',
@@ -104,7 +103,7 @@ export default function MealUpdateDialog() {
           servingSize: info.servingSize || 100,
           servingUnit: ServingUnit.Grams, // Default to grams
           foodCategory: FoodCategory.Unknown, // Default to unknown
-          caloriesPerServing: info.caloriesPerServing,
+          totalCalories: info.totalCalories,
           protein: info.proteinPerServing,
           carbohydrates: info.carbsPerServing,
           totalFat: info.fatPerServing

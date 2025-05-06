@@ -37,7 +37,7 @@ const formSchema = z.object({
     servingSize: z.number().min(0.1, { message: t('validation.min', { min: 0.1 }) }),
     servingUnit: z.nativeEnum(ServingUnit),
     foodCategory: z.nativeEnum(FoodCategory),
-    caloriesPerServing: z.number().min(0, { message: t('validation.min', { min: 0 }) }).optional(),
+    totalCalories: z.number().min(0, { message: t('validation.min', { min: 0 }) }).optional(),
     protein: z.number().min(0).optional(),
     carbohydrates: z.number().min(0).optional(),
     totalFat: z.number().min(0).optional(),
@@ -72,26 +72,25 @@ export const NutritionInfoCreate = ({
             servingSize: 100,
             servingUnit: ServingUnit.Grams,
             foodCategory: FoodCategory.Unknown,
-            caloriesPerServing: 0,
+            totalCalories: 0,
         },
     });
 
     const onSubmit = async (data: CreateNutritionInfoRequest) => {
+        console.log('Submitting request:', data);
+
         try {
-            // Ensure numeric fields are properly converted
+            // Ensure numeric fields are properly converted, but keep string enums as is
             const request = {
                 ...data,
                 servingSize: Number(data.servingSize),
-                servingUnit: Number(data.servingUnit),
-                foodCategory: Number(data.foodCategory),
-                caloriesPerServing: data.caloriesPerServing ? Number(data.caloriesPerServing) : undefined,
+                totalCalories: data.totalCalories ? Number(data.totalCalories) : undefined,
                 protein: data.protein ? Number(data.protein) : undefined,
                 carbohydrates: data.carbohydrates ? Number(data.carbohydrates) : undefined,
                 totalFat: data.totalFat ? Number(data.totalFat) : undefined,
                 fiber: data.fiber ? Number(data.fiber) : undefined,
             };
             
-            console.log('Submitting request:', request);
             const response = await nutritionService.create(request);
             
             // If we have a callback for when nutrition is created, call it
@@ -197,7 +196,9 @@ export const NutritionInfoCreate = ({
                                 <FormItem>
                                     <FormLabel>{t('nutrition.servingUnit')}</FormLabel>
                                     <Select
-                                        onValueChange={(value) => field.onChange(parseInt(value))}
+                                        onValueChange={(value) => {
+                                            field.onChange(value as ServingUnit);
+                                        }}
                                         defaultValue={field.value.toString()}
                                     >
                                         <FormControl>
@@ -209,7 +210,7 @@ export const NutritionInfoCreate = ({
                                             {Object.entries(ServingUnit)
                                                 .filter(([key]) => isNaN(Number(key)))
                                                 .map(([key, value]) => (
-                                                    <SelectItem key={value} value={value.toString()}>
+                                                    <SelectItem key={key} value={value}>
                                                         {t(`nutrition.servingUnits.${key.toLowerCase()}`)}
                                                     </SelectItem>
                                                 ))}
@@ -226,7 +227,9 @@ export const NutritionInfoCreate = ({
                                 <FormItem>
                                     <FormLabel>{t('nutrition.foodCategory')}</FormLabel>
                                     <Select
-                                        onValueChange={(value) => field.onChange(parseInt(value))}
+                                        onValueChange={(value) => {
+                                            field.onChange(value as FoodCategory);
+                                        }}
                                         defaultValue={field.value.toString()}
                                     >
                                         <FormControl>
@@ -238,7 +241,7 @@ export const NutritionInfoCreate = ({
                                             {Object.entries(FoodCategory)
                                                 .filter(([key]) => isNaN(Number(key)))
                                                 .map(([key, value]) => (
-                                                    <SelectItem key={value} value={value.toString()}>
+                                                    <SelectItem key={key} value={value}>
                                                         {t(`nutrition.foodCategories.${key.toLowerCase()}`)}
                                                     </SelectItem>
                                                 ))}
@@ -250,7 +253,7 @@ export const NutritionInfoCreate = ({
                         />
                         <FormField
                             control={form.control}
-                            name="caloriesPerServing"
+                            name="totalCalories"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>{t('nutrition.calories')}</FormLabel>
