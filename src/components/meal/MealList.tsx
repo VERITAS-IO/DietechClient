@@ -27,7 +27,8 @@ export default function MealList() {
     const setSelectedMealId = useMealStore((state) => state.setSelectedMealId);
     const setDetailModalOpen = useMealStore((state) => state.setDetailModalOpen);
     const setCreateMealModalOpen = useMealStore((state) => state.setCreateMealModalOpen);
-    
+
+    console.log("filters:", filters);
     const { data, isLoading, error, isError } = useQueryMeals(filters);
 
     const handleRowClick = (meal: MealListResponse) => {
@@ -42,15 +43,9 @@ export default function MealList() {
         });
     };
 
-    const getMealTypeName = (mealType: number): string => {
-        const mealTypeKeys = Object.keys(MealType)
-            .filter(key => !isNaN(Number(key)))
-            .map(key => Number(key));
-        
-        const mealTypeKey = mealTypeKeys.find(key => key === mealType);
-        return mealTypeKey !== undefined 
-            ? t(`meal.types.${MealType[mealTypeKey].toLowerCase()}`) 
-            : t('meal.types.unknown');
+    const getMealTypeName = (mealType: MealType): string => {
+        // Use the enum value directly if it's a string type
+        return t(`meal.types.${mealType.toLowerCase()}`);
     };
 
     const renderTableContent = () => {

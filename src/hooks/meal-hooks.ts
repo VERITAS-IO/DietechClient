@@ -19,11 +19,11 @@ export const useQueryMeals = (request: QueryMealRequest) => {
     });
 };
 
-export const useGetMeal = (id: number) => {
+export const useGetMeal = (id: number, options = {}) => {
     return useQuery({
         queryKey: MEAL_KEYS.detail(id),
-        queryFn: () => mealService.getMeal(id),
-        enabled: !!id, // Only run the query if id is provided
+        queryFn: () => mealService.getById(id),
+        ...options
     });
 };
 
@@ -33,7 +33,7 @@ export const useCreateMeal = () => {
     const { t } = useTranslation();
 
     return useMutation({
-        mutationFn: (request: CreateMealRequest) => mealService.createMeal(request),
+        mutationFn: (request: CreateMealRequest) => mealService.create(request),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: MEAL_KEYS.lists() });
             toast({
@@ -58,7 +58,7 @@ export const useUpdateMeal = () => {
 
     return useMutation({
         mutationFn: ({ id, request }: { id: number; request: UpdateMealRequest }) =>
-            mealService.updateMeal(id, request),
+            mealService.update(id, request),
         onSuccess: (_, { id }) => {
             queryClient.invalidateQueries({ queryKey: MEAL_KEYS.lists() });
             queryClient.invalidateQueries({ queryKey: MEAL_KEYS.detail(id) });
@@ -83,7 +83,7 @@ export const useDeleteMeal = () => {
     const { t } = useTranslation();
 
     return useMutation({
-        mutationFn: (id: number) => mealService.deleteMeal(id),
+        mutationFn: (id: number) => mealService.delete(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: MEAL_KEYS.lists() });
             toast({

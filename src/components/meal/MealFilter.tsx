@@ -1,10 +1,12 @@
 import { useTranslation } from 'react-i18next';
 import { useMealStore } from '@/stores/meal-store';
-import { MealType } from '@/types/meal';
+import { MealType, MealOrder } from '@/types/meal';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useDebounce } from '@/hooks/use-debounce';
 
 export default function MealFilter() {
     const { t } = useTranslation();
@@ -12,19 +14,41 @@ export default function MealFilter() {
     const setFilters = useMealStore((state) => state.setFilters);
     const resetFilters = useMealStore((state) => state.resetFilters);
 
+    const [searchTerm, setSearchTerm] = useState(filters.searchTerm || '');
+    const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+    useEffect(() => {
+        setFilters({ searchTerm: debouncedSearchTerm || undefined, pageNumber: 1 });
+    }, [debouncedSearchTerm, setFilters]);
+
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFilters({ searchTerm: e.target.value, pageNumber: 1 });
+        setSearchTerm(e.target.value);
     };
 
     const handleMealTypeChange = (value: string) => {
-        setFilters({ mealType: value ? parseInt(value) : undefined, pageNumber: 1 });
+        setFilters({ 
+            mealType: value && value !== 'all' ? value as MealType : undefined, 
+            pageNumber: 1 
+        });
+    };
+
+    const handleMealOrderChange = (value: string) => {
+        setFilters({ 
+            mealOrder: value && value !== 'all' ? value as MealOrder : undefined, 
+            pageNumber: 1 
+        });
     };
 
     const handleSortChange = (value: string) => {
-        setFilters({ orderBy: value, pageNumber: 1 });
+        console.log("handleSortChange triggered, value:", value);
+        setFilters({ 
+            orderBy: value && value !== 'all' ? value : undefined, 
+            pageNumber: 1 
+        });
     };
 
     const handleResetFilters = () => {
+        setSearchTerm('');
         resetFilters();
     };
 
@@ -38,7 +62,7 @@ export default function MealFilter() {
                             type="search"
                             placeholder={t('common.search')}
                             className="pl-8"
-                            value={filters.searchTerm || ''}
+                            value={searchTerm}
                             onChange={handleSearchChange}
                         />
                     </div>
@@ -46,7 +70,7 @@ export default function MealFilter() {
 
                 <div className="flex flex-row gap-2">
                     <Select
-                        value={filters.mealType?.toString() || ''}
+                        value={(filters.mealType || 'all')}
                         onValueChange={handleMealTypeChange}
                     >
                         <SelectTrigger className="w-[180px]">
@@ -54,29 +78,32 @@ export default function MealFilter() {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">{t('common.all')}</SelectItem>
-                            {Object.keys(MealType)
-                                .filter(key => !isNaN(Number(key)))
-                                .map(key => (
-                                    <SelectItem key={key} value={key}>
-                                        {t(`meal.types.${MealType[Number(key)].toLowerCase()}`)}
+                            {Object.entries(MealType)
+                                .filter(([key]) => key !== 'Unknown')
+                                .map(([key, value]) => (
+                                    <SelectItem key={key} value={value}>
+                                        {t(`meal.types.${key.toLowerCase()}`)}
                                     </SelectItem>
                                 ))}
                         </SelectContent>
                     </Select>
 
                     <Select
-                        value={filters.orderBy || ''}
-                        onValueChange={handleSortChange}
+                        value={(filters.mealOrder || 'all')}
+                        onValueChange={handleMealOrderChange}
                     >
                         <SelectTrigger className="w-[180px]">
-                            <SelectValue placeholder={t('common.sortBy')} />
+                            <SelectValue placeholder={t('meal.filterOrder')} />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">{t('common.default')}</SelectItem>
-                            <SelectItem value="name:asc">{t('meal.name')} (A-Z)</SelectItem>
-                            <SelectItem value="name:desc">{t('meal.name')} (Z-A)</SelectItem>
-                            <SelectItem value="mealType:asc">{t('meal.type')} (A-Z)</SelectItem>
-                            <SelectItem value="mealType:desc">{t('meal.type')} (Z-A)</SelectItem>
+                            <SelectItem value="all">{t('common.all')}</SelectItem>
+                            {Object.entries(MealOrder)
+                                .filter(([key]) => key !== 'Unknown' && key !== 'Custom')
+                                .map(([key, value]) => (
+                                    <SelectItem key={key} value={value}>
+                                        {t(`meal.orders.${key.toLowerCase()}`)}
+                                    </SelectItem>
+                                ))}
                         </SelectContent>
                     </Select>
 

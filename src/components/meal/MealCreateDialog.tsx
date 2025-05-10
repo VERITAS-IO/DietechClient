@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { useMealStore } from '@/stores/meal-store';
 import { useDietStore } from '@/stores/diet-store';
 import { useCreateMeal } from '@/hooks/meal-hooks';
-import { MealType } from '@/types/meal';
+import { MealType, MealOrder } from '@/types/meal';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -20,13 +20,15 @@ import { NutritionInfoCreate } from '../nutrition/NutritionInfoCreate';
 import { CreateNutritionInfoRequest, NutritionInfoDetail } from '@/types/nutrition';
 import { Separator } from '@/components/ui/separator';
 import { t } from 'i18next';
+import { format, parse, formatISO } from 'date-fns';
 
 const formSchema = z.object({
   name: z.string().min(1, { message: t('validation.required') }),
   description: z.string().optional(),
   mealType: z.string().min(1, { message: t('validation.required') }),
   mealOrder: z.string().min(1, { message: t('validation.required') }).default('1'),
-  time: z.string().optional(),
+  startTime: z.string().min(1, { message: t('validation.required') }),
+  endTime: z.string().min(1, { message: t('validation.required') }),
   dietId: z.number().optional(),
   nutritionInfoIds: z.array(z.number()).optional()
 });
@@ -37,6 +39,28 @@ interface MealCreateDialogProps {
   forDietCreation?: boolean;
   forDietUpdate?: boolean;
 }
+
+// Helper function to create a Date object preserving local time but as UTC
+const preserveLocalDateTime = (timeString: string): Date => {
+  // Create today's date
+  const today = new Date();
+  const dateString = format(today, "yyyy-MM-dd");
+  
+  // Parse the time string to create a full datetime
+  const localDate = parse(`${dateString}T${timeString}`, "yyyy-MM-dd'T'HH:mm", new Date());
+  
+  // Convert to UTC for PostgreSQL timestamp with time zone column
+  return new Date(
+    Date.UTC(
+      localDate.getFullYear(),
+      localDate.getMonth(),
+      localDate.getDate(),
+      localDate.getHours(),
+      localDate.getMinutes(),
+      0, 0
+    )
+  );
+};
 
 export default function MealCreateDialog({ forDietCreation = false, forDietUpdate = false }: MealCreateDialogProps) {
   const { t } = useTranslation();
@@ -72,7 +96,8 @@ export default function MealCreateDialog({ forDietCreation = false, forDietUpdat
       description: '',
       mealType: '',
       mealOrder: '1',
-      time: '',
+      startTime: '',
+      endTime: '',
       nutritionInfoIds: []
     }
   });
@@ -103,13 +128,42 @@ export default function MealCreateDialog({ forDietCreation = false, forDietUpdat
   };
 
   const onSubmit = (data: FormValues) => {
+    // Create dates properly preserving local time as UTC
+    let startTime, endTime;
+    
+    // Handle start time
+    if (data.startTime) {
+      startTime = preserveLocalDateTime(data.startTime);
+    } else {
+      // If no start time, use current time
+      startTime = new Date();
+      // Ensure it's in UTC
+      startTime = new Date(Date.UTC(
+        startTime.getFullYear(),
+        startTime.getMonth(),
+        startTime.getDate(),
+        startTime.getHours(),
+        startTime.getMinutes(),
+        0, 0
+      ));
+    }
+    
+    // Handle end time
+    if (data.endTime) {
+      endTime = preserveLocalDateTime(data.endTime);
+    } else {
+      // If no end time, use start time + 30 minutes
+      endTime = new Date(startTime);
+      endTime.setUTCMinutes(endTime.getUTCMinutes() + 30);
+    }
+    
     const mealRequest = {
       name: data.name,
       description: data.description || '',
-      mealType: parseInt(data.mealType),
-      mealOrder: parseInt(data.mealOrder),
-      startTime: data.time ? `2025-01-01T${data.time}:00` : new Date().toISOString(),
-      endTime: data.time ? `2025-01-01T${data.time}:00` : new Date().toISOString(),
+      mealType: data.mealType as MealType,
+      mealOrder: data.mealOrder as MealOrder,
+      startTime: startTime.toISOString(),
+      endTime: endTime.toISOString(),
       dietId: data.dietId || 1, 
       tenantId: 1, 
       nutritionInfoIds: selectedNutritionIds,
@@ -131,7 +185,8 @@ export default function MealCreateDialog({ forDietCreation = false, forDietUpdat
         description: '',
         mealType: '',
         mealOrder: '1',
-        time: '',
+        startTime: '',
+        endTime: '',
         nutritionInfoIds: []
       });
       
@@ -228,11 +283,11 @@ export default function MealCreateDialog({ forDietCreation = false, forDietUpdat
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {Object.keys(MealType)
-                          .filter(key => !isNaN(Number(key)))
-                          .map(key => (
-                            <SelectItem key={key} value={key}>
-                              {t(`meal.types.${MealType[Number(key)].toLowerCase()}`)}
+                        {Object.entries(MealType)
+                          .filter(([key]) => key !== 'Unknown')
+                          .map(([key, value]) => (
+                            <SelectItem key={key} value={value}>
+                              {t(`meal.types.${value.toLowerCase()}`)}
                             </SelectItem>
                           ))}
                       </SelectContent>
@@ -243,10 +298,52 @@ export default function MealCreateDialog({ forDietCreation = false, forDietUpdat
               />
               <FormField
                 control={form.control}
-                name="time"
+                name="mealOrder"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('meal.time')}</FormLabel>
+                    <FormLabel>{t('meal.order')}</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={t('meal.selectOrder')} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {Object.entries(MealOrder)
+                          .filter(([key]) => key !== 'Unknown' && key !== 'Custom')
+                          .map(([key, value]) => (
+                            <SelectItem key={key} value={value}>
+                              {t(`meal.orders.${value.toLowerCase()}`)}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="startTime"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('meal.startTime')}</FormLabel>
+                    <FormControl>
+                      <Input type="time" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="endTime"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('meal.endTime')}</FormLabel>
                     <FormControl>
                       <Input type="time" {...field} />
                     </FormControl>

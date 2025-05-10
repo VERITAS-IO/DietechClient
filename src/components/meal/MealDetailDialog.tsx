@@ -16,17 +16,12 @@ export default function MealDetailDialog() {
     const setEditMode = useMealStore((state) => state.setEditMode);
     const setDeleteModalOpen = useMealStore((state) => state.setDeleteModalOpen);
 
-    const { data: meal, isLoading, error, isError } = useGetMeal(selectedMealId || 0);
+    const { data: meal, isLoading, error, isError } = useGetMeal(selectedMealId || 0, {
+        enabled: !!selectedMealId && isDetailModalOpen
+    });
 
-    const getMealTypeName = (mealType: number): string => {
-        const mealTypeKeys = Object.keys(MealType)
-            .filter(key => !isNaN(Number(key)))
-            .map(key => Number(key));
-        
-        const mealTypeKey = mealTypeKeys.find(key => key === mealType);
-        return mealTypeKey !== undefined 
-            ? t(`meal.types.${MealType[mealTypeKey].toLowerCase()}`) 
-            : t('meal.types.unknown');
+    const getMealTypeName = (mealType: MealType): string => {
+        return t(`meal.types.${mealType.toLowerCase()}`);
     };
 
     const handleEditClick = () => {

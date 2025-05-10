@@ -5,32 +5,32 @@ import { PagedRequest } from "./request-parameters";
  * Enum representing different meal types
  */
 export enum MealType {
-    Unknown = 0,
-    Breakfast = 1,
-    Lunch = 2,
-    Dinner = 3,
-    Snack = 4,
-    PreWorkout = 5,
-    PostWorkout = 6,
-    Custom = 99
+    Unknown = "Unknown",
+    Breakfast = "Breakfast",
+    Lunch = "Lunch",
+    Dinner = "Dinner",
+    Snack = "Snack",
+    PreWorkout = "PreWorkout",
+    PostWorkout = "PostWorkout",
+    Custom = "Custom"
 }
 
 /**
  * Enum representing the order of meals
  */
 export enum MealOrder {
-    Unknown = 0,
-    FirstMeal = 1,
-    SecondMeal = 2,
-    ThirdMeal = 3,
-    FourthMeal = 4,
-    FifthMeal = 5,
-    SixthMeal = 6,
-    SeventhMeal = 7,
-    EighthMeal = 8,
-    NinthMeal = 9,
-    TenthMeal = 10,
-    Custom = 99
+    Unknown = "Unknown",
+    FirstMeal = "FirstMeal",
+    SecondMeal = "SecondMeal",
+    ThirdMeal = "ThirdMeal",
+    FourthMeal = "FourthMeal",
+    FifthMeal = "FifthMeal",
+    SixthMeal = "SixthMeal",
+    SeventhMeal = "SeventhMeal",
+    EighthMeal = "EighthMeal",
+    NinthMeal = "NinthMeal",
+    TenthMeal = "TenthMeal",
+    Custom = "Custom"
 }
 
 
@@ -39,8 +39,8 @@ export interface CreateMealRequest {
     description: string;
     mealType: MealType;
     mealOrder: MealOrder;
-    startTime: string; 
-    endTime: string; 
+    startTime?: string; 
+    endTime?: string; 
     dietId: number;
     tenantId: number;
     nutritionInfoIds?: number[];

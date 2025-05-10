@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Plus } from "lucide-react";
+import { Search, Plus, Loader2 } from "lucide-react";
 import { useDebounce } from '@/hooks/use-debounce';
 import { nutritionService } from '@/services/nutrition-service';
 import { NutritionInfoListItem } from '@/types/nutrition';
@@ -36,6 +36,7 @@ export default function NutritionSearch({
     const [searchResults, setSearchResults] = useState<NutritionInfoListItem[]>([]);
     const [selectedItems, setSelectedItems] = useState<NutritionInfoListItem[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     
     const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
@@ -44,19 +45,24 @@ export default function NutritionSearch({
         const fetchSearchResults = async () => {
             if (!debouncedSearchTerm || debouncedSearchTerm.length < 2) {
                 setSearchResults([]);
+                setError(null);
                 return;
             }
 
             setIsLoading(true);
+            setError(null);
+            
             try {
                 const response = await nutritionService.query({
                     pageNumber: 1,
                     pageSize: 10,
                     name: debouncedSearchTerm
                 });
-                setSearchResults(response.items);
+                
+                setSearchResults(response.items || []);
             } catch (error) {
                 console.error('Error searching nutrition info:', error);
+                setError(t('nutrition.searchError'));
                 setSearchResults([]);
             } finally {
                 setIsLoading(false);
@@ -64,7 +70,7 @@ export default function NutritionSearch({
         };
 
         fetchSearchResults();
-    }, [debouncedSearchTerm]);
+    }, [debouncedSearchTerm, t]);
 
     // Fetch selected nutrition items when selectedNutritionIds changes
     useEffect(() => {
@@ -123,8 +129,30 @@ export default function NutritionSearch({
                 </Button>
             </div>
 
+            {/* Loading state */}
+            {isLoading && (
+                <div className="text-center py-4">
+                    <Loader2 className="h-5 w-5 animate-spin mx-auto" />
+                    <p className="text-sm text-muted-foreground mt-2">{t('common.loading')}</p>
+                </div>
+            )}
+
+            {/* Error state */}
+            {error && (
+                <div className="text-center py-4 text-destructive">
+                    <p>{error}</p>
+                </div>
+            )}
+
+            {/* No results state */}
+            {!isLoading && !error && debouncedSearchTerm.length >= 2 && searchResults.length === 0 && (
+                <div className="text-center py-4 text-muted-foreground">
+                    {t('nutrition.noResults')}
+                </div>
+            )}
+
             {/* Search Results */}
-            {searchResults.length > 0 && (
+            {!isLoading && searchResults.length > 0 && (
                 <Card className="border shadow-sm">
                     <CardContent className="p-0">
                         <ScrollArea className="h-[200px]">
