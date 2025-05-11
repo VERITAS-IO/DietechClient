@@ -16,14 +16,23 @@ import { useAuthStore } from "./stores/auth-store";
 import DashboardLayout from "./layouts/DashboadLayouts";
 import { Navbar } from "./components/common/navbar";
 import AppointmentsCalendarPage from "./pages/nested/appointments";
-import AppointmentNotesPage from "./pages/appointment/appointment-notes";
+import AppointmentNotesPage from "./pages/nested/appointment-notes";
 import NutritionInfoListPage from "./pages/nested/nutrition-info";
 import DietListPage from "./pages/nested/diet-list";
 import NotFoundPage from "@/pages/not-found";
-import MealListPage from "./pages/nested/meal-list";
+import MealListPage from "./pages/nested/meals";
 import { FinancialPage } from "./pages/nested/financial";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 0,
+      refetchOnMount: true,
+      refetchOnWindowFocus: true,
+      retry: false
+    }
+  }
+});
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated); 

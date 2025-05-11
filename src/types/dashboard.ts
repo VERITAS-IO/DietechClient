@@ -1,9 +1,8 @@
 export enum MainPageInterval {
-  Unknown = 0,
-  Daily = 1,
-  Weekly = 2,
-  Monthly = 3,
-  Yearly = 4
+  Daily = 'Daily',
+  Weekly = 'Weekly',
+  Monthly = 'Monthly',
+  Yearly = 'Yearly'
 }
 
 export interface MainPageOverviewItem {

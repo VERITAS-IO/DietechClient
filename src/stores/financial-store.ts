@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Financial, QueryFinancialsRequest, FinancialType, FinancialStatus } from '../types/financial';
+import { Financial, QueryFinancialsRequest, FinancialType, FinancialStatus, FinancialInterval } from '../types/financial';
+import { useAuthStore } from '@/stores/auth-store';
 
 interface FinancialState {
     filters: QueryFinancialsRequest;
@@ -24,28 +25,82 @@ interface FinancialState {
     
     chartView: 'daily' | 'weekly' | 'monthly' | 'yearly';
     setChartView: (view: 'daily' | 'weekly' | 'monthly' | 'yearly') => void;
+    
+    selectedInterval: FinancialInterval;
+    setSelectedInterval: (interval: FinancialInterval) => void;
 }
 
-const defaultFilters: QueryFinancialsRequest = {
+// Helper function to get current dieticianId from auth store
+const getCurrentDieticianId = (): number | undefined => {
+    const user = useAuthStore.getState().user;
+    
+    // If user is not authenticated, cannot get dieticianId
+    if (!user) {
+        console.warn('User is not authenticated');
+        return getFallbackDieticianId();
+    }
+    
+    // If dieticianId exists, use it
+    if (user.dieticianId) {
+        console.log('Using dieticianId from user profile:', user.dieticianId);
+        return user.dieticianId;
+    }
+    
+    // If no dieticianId, but user has Dietician role, try to use their ID as a fallback
+    if (user.id && user.roles && user.roles.includes('Dietician')) {
+        const fallbackId = Number(user.id);
+        console.warn('DieticianId not found in user profile, using user ID as fallback for Dietician role:', fallbackId);
+        return fallbackId;
+    }
+    
+    return getFallbackDieticianId();
+};
+
+// Fallback function for development environments
+const getFallbackDieticianId = (): number | undefined => {
+    // In development, provide a fallback ID for testing
+    if (process.env.NODE_ENV === 'development') {
+        console.warn('Using development fallback dieticianId (1)');
+        return 1;
+    }
+    
+    console.error('Neither dieticianId nor userId with Dietician role available in user profile');
+    return undefined;
+};
+
+// Get initial filters with current dieticianId
+const getDefaultFilters = (): QueryFinancialsRequest => ({
     pageNumber: 1,
     pageSize: 10,
+    dieticianId: getCurrentDieticianId(),
     type: undefined,
     status: undefined,
     startDate: undefined,
     endDate: undefined,
     description: undefined,
-};
+});
 
 export const useFinancialStore = create<FinancialState>()(
     persist(
         (set) => ({
             // Filters
-            filters: defaultFilters,
+            filters: getDefaultFilters(),
             setFilters: (newFilters) =>
-                set((state) => ({
-                    filters: { ...state.filters, ...newFilters },
-                })),
-            resetFilters: () => set({ filters: defaultFilters }),
+                set((state) => {
+                    // Always ensure dieticianId is included in filters
+                    const dieticianId = newFilters.dieticianId !== undefined 
+                        ? newFilters.dieticianId 
+                        : state.filters.dieticianId || getCurrentDieticianId();
+                    
+                    return {
+                        filters: { 
+                            ...state.filters, 
+                            ...newFilters,
+                            dieticianId 
+                        },
+                    };
+                }),
+            resetFilters: () => set({ filters: getDefaultFilters() }),
             
             // Selected financial
             selectedFinancial: null,
@@ -68,6 +123,10 @@ export const useFinancialStore = create<FinancialState>()(
             // Chart view
             chartView: 'daily' as const,
             setChartView: (view) => set({ chartView: view }),
+            
+            // Selected interval for overview charts
+            selectedInterval: FinancialInterval.Daily,
+            setSelectedInterval: (interval) => set({ selectedInterval: interval }),
         }),
         {
             name: 'financial-store',

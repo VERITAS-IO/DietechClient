@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { format } from 'date-fns';
-import { Search, X } from 'lucide-react';
+import { Search, X, AlertTriangle } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -25,8 +25,10 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Financial, FinancialType, FinancialStatus, CreateFinancialRequest, UpdateFinancialRequest } from '@/types/financial';
-import { useCreateFinancial, useUpdateFinancial } from '@/hooks/useFinancials';
 import { DatePicker } from '../ui/date-picker';
+import { useCreateFinancial, useUpdateFinancial } from '@/hooks/useFinancials';
+import { useAuthStore } from '@/stores/auth-store';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useClientStore } from '@/stores/client-store';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
@@ -46,7 +48,7 @@ const formSchema = z.object({
   amount: z.coerce.number().positive({ message: 'Amount must be positive' }),
   date: z.date({ required_error: 'Date is required' }),
   description: z.string().min(1, { message: 'Description is required' }).max(500, { message: 'Description is too long' }),
-  clientId: z.string().optional(),
+  clientId: z.number().optional(),
   subject: z.string().optional(),
   isClient: z.boolean().default(false),
 });
@@ -61,16 +63,20 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
   onSuccess,
 }) => {
   const { t } = useTranslation();
-  const createFinancialMutation = useCreateFinancial();
-  const updateFinancialMutation = useUpdateFinancial();
   const isEditing = !!financial;
   const [prevStatus, setPrevStatus] = useState<FinancialStatus | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [commandOpen, setCommandOpen] = useState(false);
   const { searchClients } = useClientStore();
   const [searchResults, setSearchResults] = useState<Array<{id: number, fullName: string}>>([]);
+  const { user } = useAuthStore();
+  const [error, setError] = useState<string | null>(null);
 
-  // Initialize form
+  // Use mutations
+  const createFinancialMutation = useCreateFinancial();
+  const updateFinancialMutation = useUpdateFinancial();
+  const isLoading = createFinancialMutation.isPending || updateFinancialMutation.isPending;
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -84,6 +90,14 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
       isClient: false,
     },
   });
+
+  useEffect(() => {
+    if (!user?.dieticianId) {
+      setError('DieticianId is not available in your profile. Please contact support.');
+    } else {
+      setError(null);
+    }
+  }, [user]);
 
   // Track status changes
   useEffect(() => {
@@ -159,7 +173,7 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
 
   // Handle client selection
   const handleClientSelect = (clientId: string) => {
-    form.setValue('clientId', clientId);
+    form.setValue('clientId', parseInt(clientId));
     setCommandOpen(false);
     
     // Find the selected client to display name
@@ -189,41 +203,35 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
   // Handle form submission
   const onSubmit = async (values: FormValues) => {
     try {
+      if (!user?.dieticianId) {
+        setError('DieticianId is required but not available in your profile');
+        return;
+      }
+
       const { isClient, ...formData } = values;
-      
-      // Prepare request data based on whether it's for a client or not
-      const requestData = {
-        ...formData,
-        clientId: isClient ? formData.clientId : undefined,
-        subject: !isClient ? formData.subject : undefined,
-      };
       
       if (isEditing && financial) {
         // Update existing financial
-        const updateData = {
-          id: parseInt(financial.id),
-          request: {
-            id: financial.id,
-            type: requestData.type as FinancialType,
-            status: requestData.status as FinancialStatus,
-            amount: requestData.amount,
-            date: format(requestData.date, 'yyyy-MM-dd'),
-            description: requestData.description,
-            clientId: requestData.clientId,
-            subject: requestData.subject,
-          }
+        const updateData: UpdateFinancialRequest = {
+          id: financial.id,
+          type: formData.type as FinancialType,
+          status: formData.status as FinancialStatus,
+          amount: formData.amount,
+          description: formData.description
         };
         await updateFinancialMutation.mutateAsync(updateData);
       } else {
         // Create new financial
         const createData: CreateFinancialRequest = {
-          type: requestData.type as FinancialType,
-          status: requestData.status as FinancialStatus,
-          amount: requestData.amount,
-          date: format(requestData.date, 'yyyy-MM-dd'),
-          description: requestData.description,
-          clientId: requestData.clientId,
-          subject: requestData.subject,
+          type: formData.type as FinancialType,
+          status: formData.status as FinancialStatus,
+          amount: formData.amount,
+          date: formData.date,
+          description: formData.description,
+          clientId: isClient ? formData.clientId : undefined,
+          subject: !isClient ? formData.subject : undefined,
+          dieticianId: user.dieticianId,
+          tenantId: user.tenantId
         };
         await createFinancialMutation.mutateAsync(createData);
       }
@@ -232,6 +240,7 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
       onOpenChange(false);
     } catch (error) {
       console.error('Error submitting form:', error);
+      setError(error instanceof Error ? error.message : 'An error occurred while saving');
     }
   };
 
@@ -261,6 +270,14 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
           </DialogTitle>
         </DialogHeader>
         
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>{t('common.error')}</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+        
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             {/* Type */}
@@ -281,7 +298,7 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {Object.values(FinancialType).map((type) => (
+                      {Object.values(FinancialType).filter(type => type !== FinancialType.Unknown).map((type) => (
                         <SelectItem key={type} value={type}>
                           {t(`financial.type.${type.toLowerCase()}`)}
                         </SelectItem>
@@ -311,7 +328,7 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {Object.values(FinancialStatus).map((status) => (
+                      {Object.values(FinancialStatus).filter(status => status !== FinancialStatus.Unknown).map((status) => (
                         <SelectItem key={status} value={status}>
                           {t(`financial.status.${status.toLowerCase()}`)}
                         </SelectItem>
@@ -501,9 +518,9 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
               </Button>
               <Button
                 type="submit"
-                disabled={createFinancialMutation.isPending || updateFinancialMutation.isPending}
+                disabled={isLoading || !user?.dieticianId}
               >
-                {createFinancialMutation.isPending || updateFinancialMutation.isPending
+                {isLoading
                   ? t('common.saving')
                   : isEditing
                   ? t('financial.editTransaction')

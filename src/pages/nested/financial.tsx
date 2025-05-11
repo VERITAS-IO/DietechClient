@@ -1,85 +1,275 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { PlusIcon } from 'lucide-react';
-import { FinancialOverview } from '../../components/financial/FinancialOverview';
-import { FinancialList } from '../../components/financial/FinancialList';
-import { FinancialDialog } from '../../components/financial/FinancialDialog';
-import { Financial } from '@/types/financial';
-import { useGetFinancials } from '@/hooks/useFinancials';
+import { FinancialOverview } from '@/components/financial/FinancialOverview';
+import { FinancialList } from '@/components/financial/FinancialList';
+import { FinancialDialog } from '@/components/financial/FinancialDialog';
+import { useGetFinancialOverview, useGetFinancials } from '@/hooks/useFinancials';
 import { useFinancialStore } from '@/stores/financial-store';
+import { useAuthStore } from '@/stores/auth-store';
+import { FinancialInterval } from '@/types/financial';
 
 export const FinancialPage: React.FC = () => {
+  console.log('FinancialPage component rendering');
   const { t } = useTranslation();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [financials, setFinancials] = useState<Financial[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
+  const initialFetchRef = useRef<{overview: boolean, transactions: boolean}>({
+    overview: false,
+    transactions: false
+  });
   
-  // Use financial store for tab state
+  const user = useAuthStore.getState().user;
+  const isAuthenticated = useAuthStore.getState().isAuthenticated;
+  console.log('Auth state in FinancialPage - Details:', { 
+    isAuthenticated, 
+    user,
+    userId: user?.id,
+    userRoles: user?.roles,
+    userDieticianId: user?.dieticianId,
+    userTenantId: user?.tenantId
+  });
+  
   const activeTab = useFinancialStore(state => state.activeTab);
   const setActiveTab = useFinancialStore(state => state.setActiveTab);
+  const filters = useFinancialStore(state => state.filters);
+  const setFilters = useFinancialStore(state => state.setFilters);
+  const selectedInterval = useFinancialStore(state => state.selectedInterval);
+  const setSelectedInterval = useFinancialStore(state => state.setSelectedInterval);
 
-  const { data, isLoading: isLoadingFinancials, refetch } = useGetFinancials({
-    pageNumber: 1,
-    pageSize: 1000, // Get all for the overview charts
-  });
-
-  useEffect(() => {
-    if (data && !isLoadingFinancials) {
-      setFinancials(data.items);
-      setIsLoading(false);
+  // Get dieticianId deterministically
+  const getDieticianId = () => {
+    // Check if user exists
+    if (!user) {
+      console.warn('Cannot get dieticianId: User is not authenticated');
+      return undefined;
     }
-  }, [data, isLoadingFinancials]);
 
-  const handleTabChange = (value: string) => {
-    setActiveTab(value as 'overview' | 'transactions');
+    // If dieticianId exists, use it
+    if (user.dieticianId) {
+      console.log('Using dieticianId from user profile:', user.dieticianId);
+      return user.dieticianId;
+    }
+    
+    // If user has Dietician role, use their ID as fallback
+    if (user.id && user.roles && user.roles.includes('Dietician')) {
+      const fallbackId = Number(user.id);
+      console.log('Using user.id as fallback dieticianId:', fallbackId);
+      return fallbackId;
+    }
+    
+    // Final fallback - just use an arbitrary ID if we need to (in development only)
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Using development fallback dieticianId (1)');
+      return 1; // Use a default ID in development
+    }
+    
+    console.error('No valid dietician ID available in user profile');
+    return undefined;
+  };
+  
+  // Create a fallback dieticianId to guarantee we have one
+  const ensureDieticianId = () => {
+    const id = getDieticianId();
+    if (id) return id;
+    
+    // Last resort - use 1 as a fallback ID in development
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Forcing development fallback dieticianId to 1');
+      return 1;
+    }
+    
+    console.error('Failed to get dieticianId - this may cause API failures');
+    return undefined;
+  };
+  
+  const dieticianId = ensureDieticianId();
+
+  // Ensure dieticianId is set in filters when component mounts
+  useEffect(() => {
+    if (dieticianId && !initialLoadDone) {
+      console.log('Setting initial dieticianId in financial filters:', dieticianId);
+      setFilters({ dieticianId });
+      setInitialLoadDone(true);
+    }
+  }, [dieticianId, initialLoadDone, setFilters]);
+
+  // Make sure dieticianId is set whenever user or filters change
+  useEffect(() => {
+    if (dieticianId && (!filters.dieticianId || filters.dieticianId !== dieticianId)) {
+      console.log('Updating dieticianId in financial filters:', dieticianId);
+      setFilters({ dieticianId });
+    }
+  }, [dieticianId, filters, setFilters]);
+
+  // Handler for interval changes
+  const handleIntervalChange = useCallback((interval: FinancialInterval) => {
+    console.log('Interval changed to:', interval);
+    setSelectedInterval(interval);
+    // No need to manually refetch here - React Query will handle it based on query key changes
+  }, [setSelectedInterval]);
+
+  // Use explicitly passed dieticianId and interval for the overview
+  const { 
+    data: overviewData, 
+    isLoading: isLoadingOverview, 
+    refetch: refetchOverview,
+    error: overviewError
+  } = useGetFinancialOverview({
+    dieticianId,
+    interval: selectedInterval
+  }, {
+    enabled: activeTab === 'overview' && !!dieticianId,
+    staleTime: 5 * 60 * 1000, // 5 minutes stale time to reduce refetches
+    refetchOnWindowFocus: false, // Disable refetch on window focus
+  });
+  
+  // Log any errors with the overview
+  useEffect(() => {
+    if (overviewError) {
+      console.error('Financial overview error:', overviewError);
+    }
+  }, [overviewError]);
+  
+  const {
+    data: transactionsData,
+    isLoading: isLoadingTransactions,
+    refetch: refetchTransactions,
+    error: transactionsError
+  } = useGetFinancials({
+    ...filters,
+    dieticianId: dieticianId, // Always use the deterministic dieticianId
+    pageNumber: 1,
+    pageSize: 10
+  }, {
+    enabled: activeTab === 'transactions' && !!dieticianId,
+    staleTime: 60000, // 1 minute stale time
+    refetchOnWindowFocus: false, // Disable refetch on window focus
+  });
+  
+  // Log any errors with transactions
+  useEffect(() => {
+    if (transactionsError) {
+      console.error('Financial transactions error:', transactionsError);
+    }
+  }, [transactionsError]);
+  
+  // Single useEffect for handling tab changes and initial data loading
+  useEffect(() => {
+    if (!dieticianId) {
+      console.warn('Cannot fetch financial data: dieticianId is missing');
+      return;
+    }
+    
+    // Check if this is an initial load for this tab
+    const isInitialForTab = !initialFetchRef.current[activeTab as keyof typeof initialFetchRef.current];
+    
+    if (isInitialForTab) {
+      console.log(`Initial data fetch for ${activeTab} tab`);
+      initialFetchRef.current[activeTab as keyof typeof initialFetchRef.current] = true;
+      
+      if (activeTab === 'overview') {
+        console.log('Loading overview data with dieticianId:', dieticianId);
+        // Don't need to manually call refetch - React Query will handle it based on the enabled option
+      } else if (activeTab === 'transactions') {
+        console.log('Loading transactions data with dieticianId:', dieticianId);
+        // Don't need to manually call refetch - React Query will handle it based on the enabled option
+      }
+    } else {
+      console.log(`Tab ${activeTab} already loaded, skipping fetch`);
+    }
+  }, [activeTab, dieticianId]);
+  
+  // Reset the initial fetch flag when dependencies change
+  useEffect(() => {
+    if (selectedInterval) {
+      initialFetchRef.current.overview = false;
+    }
+  }, [selectedInterval]);
+  
+  useEffect(() => {
+    console.log('FinancialPage API data status:', { 
+      overviewData: overviewData ? 'loaded' : 'not loaded', 
+      isLoadingOverview,
+      transactionsData: transactionsData ? 'loaded' : 'not loaded',
+      isLoadingTransactions,
+      dieticianId,
+      selectedInterval,
+      activeTab
+    });
+  }, [overviewData, isLoadingOverview, transactionsData, isLoadingTransactions, dieticianId, selectedInterval, activeTab]);
+
+  const handleAddClick = () => {
+    setIsCreateDialogOpen(true);
   };
 
   const handleDialogOpenChange = (open: boolean) => {
-    setIsDialogOpen(open);
+    setIsCreateDialogOpen(open);
   };
 
-  const handleTransactionSuccess = () => {
-    refetch();
-    setIsDialogOpen(false);
+  const handleTabChange = (value: string) => {
+    setActiveTab(value as 'overview' | 'transactions');
   };
 
   return (
     <div className="container mx-auto py-6 space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold tracking-tight">{t('financial.title')}</h1>
-        <Button onClick={() => setIsDialogOpen(true)}>
-          <PlusIcon className="mr-2 h-4 w-4" />
+        <Button onClick={handleAddClick}>
+          <PlusIcon className="h-4 w-4 mr-2" />
           {t('financial.addTransaction')}
         </Button>
       </div>
-
-      <Tabs defaultValue="overview" value={activeTab} onValueChange={handleTabChange}>
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="overview">{t('financial.overview')}</TabsTrigger>
+      
+      <Tabs 
+        defaultValue={activeTab} 
+        value={activeTab}
+        onValueChange={handleTabChange}
+        className="space-y-4"
+      >
+        <TabsList>
+          <TabsTrigger value="overview">{t('financial.overview.title')}</TabsTrigger>
           <TabsTrigger value="transactions">{t('financial.transactions')}</TabsTrigger>
         </TabsList>
         
         <TabsContent value="overview" className="mt-6">
-          {isLoading ? (
+          {isLoadingOverview ? (
             <div className="flex justify-center items-center h-64">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
             </div>
+          ) : overviewData ? (
+            <FinancialOverview 
+              overviewData={overviewData} 
+              selectedInterval={selectedInterval}
+              onIntervalChange={handleIntervalChange}
+            />
           ) : (
-            <FinancialOverview financials={financials} />
+            <div className="text-center py-10">
+              <p>{t('financial.overview.noData')}</p>
+            </div>
           )}
         </TabsContent>
         
         <TabsContent value="transactions" className="mt-6">
-          <FinancialList />
+          <FinancialList onAddClick={handleAddClick} />
         </TabsContent>
       </Tabs>
-
-      <FinancialDialog 
-        open={isDialogOpen} 
-        onOpenChange={handleDialogOpenChange} 
-        onSuccess={handleTransactionSuccess}
+      
+      <FinancialDialog
+        open={isCreateDialogOpen}
+        onOpenChange={handleDialogOpenChange}
+        onSuccess={() => {
+          // Only invalidate data for the active tab
+          if (activeTab === 'overview') {
+            initialFetchRef.current.overview = false; // Force a refetch next time
+            refetchOverview();
+          } else {
+            initialFetchRef.current.transactions = false; // Force a refetch next time
+            refetchTransactions();
+          }
+        }}
       />
     </div>
   );

@@ -1,10 +1,9 @@
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import DietList from '@/components/diet/DietList';
-import DietFilters from '@/components/diet/DietFilters';
 import DietCreateDialog from '@/components/diet/DietCreateDialog';
 import { useDietStore } from '@/stores/diet-store';
 import { Plus } from 'lucide-react';
+import DietCardList from '@/components/diet/DietCardList';
 
 export default function DietListPage() {
     const { t } = useTranslation();
@@ -25,8 +24,7 @@ export default function DietListPage() {
                 </Button>
             </div>
 
-            <DietFilters />
-            <DietList />
+            <DietCardList />
             {isCreateModalOpen && <DietCreateDialog />}
         </div>
     );

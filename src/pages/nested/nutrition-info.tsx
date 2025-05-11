@@ -1,8 +1,8 @@
-import { NutritionInfoList } from "@/components/nutrition/NutritionInfoList";
+import { NutritionInfoCardList } from "@/components/nutrition/NutritionInfoCardList";
 
 const NutritionInfoListPage = () => {
   return (
-    <NutritionInfoList />
+    <NutritionInfoCardList />
   )
 }
 

@@ -13,22 +13,22 @@ const BASE_URL = '/nutrition-info';
 export const nutritionService = {
     async query(request: QueryNutritionInfoRequest): Promise<PagedDataResponse<NutritionInfoListItem>> {
         try {
-            const { data } = await api.get<PagedDataResponse<NutritionInfoListItem> | NutritionInfoListItem[]>(BASE_URL, { params: request });
-            
-            // Handle both array and paginated responses
-            if (Array.isArray(data)) {
-                const pageNumber = request.pageNumber || 1;
-                const pageSize = request.pageSize || 10;
-                return {
-                    items: data,
-                    totalCount: data.length,
-                    pageNumber: pageNumber,
-                    pageSize: pageSize,
-                    totalPages: Math.ceil(data.length / pageSize),
-                    hasPreviousPage: pageNumber > 1,
-                    hasNextPage: pageNumber * pageSize < data.length
-                };
-            }
+        const { data } = await api.get<PagedDataResponse<NutritionInfoListItem> | NutritionInfoListItem[]>(BASE_URL, { params: request });
+        
+        // Handle both array and paginated responses
+        if (Array.isArray(data)) {
+            const pageNumber = request.pageNumber || 1;
+            const pageSize = request.pageSize || 10;
+            return {
+                items: data,
+                totalCount: data.length,
+                pageNumber: pageNumber,
+                pageSize: pageSize,
+                totalPages: Math.ceil(data.length / pageSize),
+                hasPreviousPage: pageNumber > 1,
+                hasNextPage: pageNumber * pageSize < data.length
+            };
+        }
             
             // Ensure data.items is always an array
             if (data && !data.items) {
@@ -37,8 +37,8 @@ export const nutritionService = {
                     items: []
                 };
             }
-            
-            return data;
+        
+        return data;
         } catch (error) {
             console.error('Error querying nutrition info:', error);
             // Return empty response on error to prevent UI crashes
@@ -56,8 +56,8 @@ export const nutritionService = {
 
     async getById(id: number): Promise<NutritionInfoDetail> {
         try {
-            const { data } = await api.get<NutritionInfoDetail>(`${BASE_URL}/${id}`);
-            return data;
+        const { data } = await api.get<NutritionInfoDetail>(`${BASE_URL}/${id}`);
+        return data;
         } catch (error) {
             console.error(`Error fetching nutrition info with id ${id}:`, error);
             throw error;
@@ -66,8 +66,8 @@ export const nutritionService = {
 
     async create(request: CreateNutritionInfoRequest): Promise<{ id: number }> {
         try {
-            const { data } = await api.post<{ id: number }>(BASE_URL, request);
-            return data;
+        const { data } = await api.post<{ id: number }>(BASE_URL, request);
+        return data;
         } catch (error) {
             console.error('Error creating nutrition info:', error);
             throw error;
@@ -76,7 +76,7 @@ export const nutritionService = {
 
     async update(id: number, request: UpdateNutritionInfoRequest): Promise<void> {
         try {
-            await api.put(`${BASE_URL}/${id}`, request);
+        await api.put(`${BASE_URL}/${id}`, request);
         } catch (error) {
             console.error(`Error updating nutrition info with id ${id}:`, error);
             throw error;
@@ -85,7 +85,7 @@ export const nutritionService = {
 
     async delete(id: number): Promise<void> {
         try {
-            await api.delete(`${BASE_URL}/${id}`);
+        await api.delete(`${BASE_URL}/${id}`);
         } catch (error) {
             console.error(`Error deleting nutrition info with id ${id}:`, error);
             throw error;

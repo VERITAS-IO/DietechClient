@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { CreateClientRequest, QueryClientRequest, QueryClientResponse } from '@/types/client';
-import { fakeClientResponses } from '@/mocks/fake-client-responses';
+import { queryClients, searchClientsByName } from '@/services/client-service';
 
 type StepKey = 'userRegistrationRequest' | 'createPersonaInfoRequest' | 'createLifeStyleInfoRequest' | 'createHealthInfoRequest';
 
@@ -14,7 +14,7 @@ interface ClientStore {
   updateStepData: (step: StepKey, data: any) => void;
   resetForm: () => void;
   getClients: (request: QueryClientRequest) => Promise<QueryClientResponse[]>;
-  searchClients: (query: string) => QueryClientResponse[];
+  searchClients: (query: string) => Promise<QueryClientResponse[]>;
 }
 
 const initialFormData: CreateClientRequest = {
@@ -77,26 +77,31 @@ export const useClientStore = create<ClientStore>()(
         set({ formData: initialFormData, currentStep: 0 }),
       
       getClients: async (request) => {
-        const filtered = fakeClientResponses.filter(client => {
-          return true; // Add filtering logic based on request
-        });
-        set({ clients: filtered });
-        return filtered;
+        try {
+          const clients = await queryClients(request);
+          set({ clients });
+          return clients;
+        } catch (error) {
+          console.error('Error fetching clients:', error);
+          return [];
+        }
       },
       
-      searchClients: (query) => {
-        if (!query) return [];
-        const lowercaseQuery = query.toLowerCase();
-        return fakeClientResponses.filter(
-          client =>
-            client.fullName.toLowerCase().includes(lowercaseQuery)
-        );
+      searchClients: async (query) => {
+        if (!query || query.length < 2) return [];
+        
+        try {
+          const results = await searchClientsByName(query);
+          return results;
+        } catch (error) {
+          console.error('Error searching clients:', error);
+          return [];
+        }
       },
     }),
     {
       name: 'client-storage',
       partialize: (state) => ({
-        clients: state.clients,
         formData: state.formData,
         currentStep: state.currentStep,
       }),

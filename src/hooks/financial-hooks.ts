@@ -5,9 +5,18 @@ import {
   CreateFinancialRequest,
   Financial,
   QueryFinancialsRequest,
-  UpdateFinancialRequest
+  UpdateFinancialRequest,
+  GetFinancialOverviewInitRequest,
+  GetFinancialOverviewInitResponse,
+  QueryFinancialsResponse
 } from '@/types/financial';
 import { useToast } from './use-toast';
+
+// Define interface for the paginated API response
+interface PaginatedResponse<T> {
+  items: T[];
+  totalCount: number;
+}
 
 export const useFinancials = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -20,8 +29,17 @@ export const useFinancials = () => {
     setIsLoading(true);
     try {
       const response = await financialService.queryFinancials(request);
-      setFinancials(response.items);
-      setTotalCount(response.totalCount);
+      
+      // Handle both array responses and paginated responses
+      if (Array.isArray(response)) {
+        setFinancials(response);
+        setTotalCount(response.length);
+      } else if (response && typeof response === 'object' && 'items' in response) {
+        const paginatedResponse = response as PaginatedResponse<Financial>;
+        setFinancials(paginatedResponse.items);
+        setTotalCount(paginatedResponse.totalCount);
+      }
+      
       return response;
     } catch (error) {
       toast({
@@ -40,6 +58,38 @@ export const useFinancials = () => {
     totalCount,
     isLoading,
     fetchFinancials,
+  };
+};
+
+export const useFinancialOverview = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [overview, setOverview] = useState<GetFinancialOverviewInitResponse | null>(null);
+  const { toast } = useToast();
+  const { t } = useTranslation();
+
+  const fetchOverview = async (request: GetFinancialOverviewInitRequest = {}) => {
+    setIsLoading(true);
+    try {
+      const response = await financialService.getFinancialOverview(request);
+      console.log('Financial overview data received:', JSON.stringify(response, null, 2));
+      setOverview(response);
+      return response;
+    } catch (error) {
+      toast({
+        title: t('financial.fetchOverviewError'),
+        description: t('common.errorOccurred'),
+        variant: 'destructive',
+      });
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return {
+    overview,
+    isLoading,
+    fetchOverview,
   };
 };
 
@@ -88,10 +138,10 @@ export const useFinancial = (id?: number) => {
     }
   };
 
-  const updateFinancial = async (financialId: number, data: UpdateFinancialRequest) => {
+  const updateFinancial = async (data: UpdateFinancialRequest) => {
     setIsLoading(true);
     try {
-      await financialService.updateFinancial(financialId, data);
+      await financialService.updateFinancial(data);
       toast({
         title: t('financial.updateSuccess'),
         description: t('financial.recordUpdated'),

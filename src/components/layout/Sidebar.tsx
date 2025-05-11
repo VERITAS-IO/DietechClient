@@ -55,8 +55,6 @@ const Sidebar = () => {
       href: '/dashboard/clients',
       subItems: [
         { title: t('dashboard.menu.clientList'), href: '/dashboard/clients' },
-        { title: t('dashboard.menu.addClient'), href: '/dashboard/clients/new' },
-        { title: t('dashboard.menu.progress'), href: '/dashboard/clients/progress' },
       ],
     },
     {
@@ -65,7 +63,6 @@ const Sidebar = () => {
       href: '/dashboard/appointments',
       subItems: [
         { title: t('dashboard.menu.calendar'), href: '/dashboard/appointments/calendar' },
-        { title: t('dashboard.menu.schedule'), href: '/dashboard/appointments/schedule' },
         { title: t('dashboard.menu.history'), href: '/dashboard/appointments/history' },
         { title: t('dashboard.menu.notes'), href: '/dashboard/appointments/notes' },
       ],
@@ -76,7 +73,6 @@ const Sidebar = () => {
       href: '/dashboard/diets',
       subItems: [
         { title: t('dashboard.menu.diet.manage'), href: '/dashboard/diets' },
-        { title: t('dashboard.menu.diet.templates'), href: '/dashboard/diet/templates' },
         { title: t('dashboard.menu.diet.nutritions'), href: '/dashboard/diets/nutritions' },
         { title: t('dashboard.menu.diet.meals'), href: '/dashboard/diets/meals' },
       ],
@@ -87,18 +83,6 @@ const Sidebar = () => {
       href: '/dashboard/analytics',
       subItems: [
         { title: t('dashboard.menu.financial'), href: '/dashboard/analytics' },
-        { title: t('dashboard.menu.reports'), href: '/dashboard/analytics/reports' },
-        { title: t('dashboard.menu.statistics'), href: '/dashboard/analytics/stats' },
-      ],
-    },
-    {
-      title: t('dashboard.menu.resources'),
-      icon: <BookOpen className="w-5 h-5" />,
-      href: '/dashboard/resources',
-      subItems: [
-        { title: t('dashboard.menu.materials'), href: '/dashboard/resources' },
-        { title: t('dashboard.menu.resourceTemplates'), href: '/dashboard/resources/templates' },
-        { title: t('dashboard.menu.documents'), href: '/dashboard/resources/documents' },
       ],
     },
     {
@@ -107,7 +91,6 @@ const Sidebar = () => {
       href: '/dashboard/settings',
       subItems: [
         { title: t('dashboard.menu.profile'), href: '/dashboard/settings' },
-        { title: t('dashboard.menu.business'), href: '/dashboard/settings/business' },
         { title: t('dashboard.menu.preferences'), href: '/dashboard/settings/preferences' },
       ],
     },

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import {
@@ -14,15 +14,13 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { DataTablePagination } from '@/components/ui/data-table-pagination';
 import { DatePicker } from '@/components/ui/date-picker';
 import { 
-  PlusIcon, 
   FilterIcon, 
-  SearchIcon, 
   EditIcon, 
   TrashIcon, 
-  XIcon 
+  XIcon,
+  AlertTriangle
 } from 'lucide-react';
 import { 
   Financial, 
@@ -35,21 +33,8 @@ import { FinancialDialog } from './FinancialDialog';
 import { formatCurrency } from '@/lib/utils/format';
 import { useFinancialStore } from '@/stores/financial-store';
 import FinancialDeleteDialog from './FinancialDeleteDialog';
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-
-// Form schema for filters
-const filterSchema = z.object({
-  type: z.string().optional(),
-  status: z.string().optional(),
-  startDate: z.date().optional(),
-  endDate: z.date().optional(),
-  description: z.string().optional(),
-});
-
-type FilterValues = z.infer<typeof filterSchema>;
+import { useAuthStore } from '@/stores/auth-store';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 interface FinancialListProps {
   onAddClick?: () => void;
@@ -59,6 +44,11 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
   const { t } = useTranslation();
   const [showFilters, setShowFilters] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [financials, setFinancials] = useState<Financial[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalItems, setTotalItems] = useState(0);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   
   // Use financial store for state management
   const {
@@ -71,22 +61,128 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
     setDeleteModalOpen
   } = useFinancialStore();
 
+  // Get user info from auth store
+  const user = useAuthStore.getState().user;
+
+  // Helper function to get dieticianId with fallback
+  const getDieticianId = () => {
+    if (user?.dieticianId) {
+      console.log('FinancialList - Using dieticianId from user profile:', user.dieticianId);
+      return user.dieticianId;
+    }
+    
+    if (user?.id && user.roles?.includes('Dietician')) {
+      const fallbackId = Number(user.id);
+      console.log('FinancialList - Using user ID as fallback dieticianId:', fallbackId);
+      return fallbackId;
+    }
+    
+    // Development fallback
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('FinancialList - Using development fallback dieticianId (1)');
+      return 1;
+    }
+    
+    return undefined;
+  };
+
+  // Check if we have a dieticianId
+  useEffect(() => {
+    const availableDieticianId = getDieticianId();
+    
+    if (!availableDieticianId) {
+      setErrorMessage('DieticianId is not available. Please check your profile settings.');
+    } else {
+      console.log('FinancialList - Using dieticianId:', availableDieticianId);
+      setErrorMessage(null);
+    }
+    
+    // Set dieticianId in filters if not already set
+    if (availableDieticianId && !filters.dieticianId) {
+      setFilters({ dieticianId: availableDieticianId });
+    }
+  }, [user, filters, setFilters]);
+
+  console.log('FinancialList - current filters:', filters);
+
+  // Create a stable query object to prevent unnecessary rerenders
+  const queryParams = useMemo(() => {
+    // Get current user from auth store if needed
+    const dieticianId = filters.dieticianId || (user?.dieticianId ? user.dieticianId : undefined);
+    
+    if (!dieticianId) {
+      console.error('FinancialList - No dieticianId available for request');
+      setErrorMessage('DieticianId is required but not available');
+    } else {
+      console.log('FinancialList - Using dieticianId:', dieticianId);
+      setErrorMessage(null);
+    }
+    
+    return {
+      ...filters,
+      dieticianId, // Explicitly include dieticianId
+      pageNumber: currentPage,
+      pageSize: pageSize
+    };
+  }, [filters, currentPage, pageSize, user]);
+
   // Fetch financials with current filters
-  const { data, isLoading, refetch } = useGetFinancials(filters);
-  const deleteFinancialMutation = useDeleteFinancial();
+  const { data, isLoading, error, refetch } = useGetFinancials(queryParams, {
+    staleTime: 30000, // 30 seconds
+    refetchOnWindowFocus: false,
+    retry: 3
+  });
+
+  // Handle errors from API calls
+  useEffect(() => {
+    if (error) {
+      console.error('Error fetching financials:', error);
+      setErrorMessage(error instanceof Error ? error.message : 'Failed to load financial data');
+    }
+  }, [error]);
+
+  console.log('FinancialList - useGetFinancials result:', { data, isLoading, error });
+
+  // Initial data load when component mounts
+  useEffect(() => {
+    console.log('FinancialList - Component mounted, loading data');
+    // Ensure we have a dieticianId before making the request
+    if (queryParams.dieticianId) {
+      refetch();
+    }
+  }, []);
+
+  useEffect(() => {
+    // When data changes, update our local state
+    if (data) {
+      console.log('FinancialList - received data, updating state:', data);
+      setFinancials(data);
+      setTotalItems(data.length);
+    }
+  }, [data]);
+
+  // Only refetch when filters, page or page size actually change
+  // This uses a memorized query params object to prevent unnecessary refetches
+  useEffect(() => {
+    console.log('FinancialList - query params changed, refetching data');
+    if (queryParams.dieticianId) {
+      refetch();
+    }
+  }, [queryParams, refetch]);
 
   // Handle page change
   const handlePageChange = (page: number) => {
-    setFilters({ pageNumber: page });
+    setCurrentPage(page);
   };
 
   // Handle page size change
   const handlePageSizeChange = (size: number) => {
-    setFilters({ pageSize: size, pageNumber: 1 });
+    setPageSize(size);
+    setCurrentPage(1); // Reset to first page when changing page size
   };
 
   // Handle filter changes
-  const handleFilterChange = (field: keyof FilterValues, value: any) => {
+  const handleFilterChange = (field: keyof QueryFinancialsRequest, value: any) => {
     const newFilters = { ...filters };
     
     // Remove the field from filters if 'all' is selected or value is empty
@@ -96,18 +192,23 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
       newFilters[field] = value;
     }
     
+    // Make sure we keep dieticianId
+    if (!newFilters.dieticianId) {
+      newFilters.dieticianId = user?.dieticianId;
+    }
+    
     // Update filters and reset to first page
-    setFilters({ 
-      ...newFilters, 
-      pageNumber: 1,
-      pageSize: filters.pageSize || 10 
-    });
+    setFilters(newFilters);
+    setCurrentPage(1);
   };
 
-  // Apply filters
+  // Apply filters with debounce to prevent rapid-fire API calls
   const applyFilters = () => {
+    console.log('Applying filters manually');
     refetch();
   };
+
+  const deleteFinancialMutation = useDeleteFinancial();
 
   // Handle edit click
   const handleEditClick = (financial: Financial) => {
@@ -204,60 +305,21 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
     }
   };
 
-  // Initialize form with current filters
-  const form = useForm<FilterValues>({
-    resolver: zodResolver(filterSchema),
-    defaultValues: {
-      type: filters.type || undefined,
-      status: filters.status || undefined,
-      startDate: filters.startDate ? new Date(filters.startDate) : undefined,
-      endDate: filters.endDate ? new Date(filters.endDate) : undefined,
-      description: filters.description || undefined,
-    },
-  });
-
-  // Update form when filters change
-  useEffect(() => {
-    form.reset({
-      type: filters.type || undefined,
-      status: filters.status || undefined,
-      startDate: filters.startDate ? new Date(filters.startDate) : undefined,
-      endDate: filters.endDate ? new Date(filters.endDate) : undefined,
-      description: filters.description || undefined,
-    });
-  }, [filters, form]);
-
-  // Handle form submission
-  const onSubmit = (values: FilterValues) => {
-    const newFilters: QueryFinancialsRequest = {};
-    
-    if (values.type && values.type !== 'all') {
-      newFilters.type = values.type as FinancialType;
-    }
-    if (values.status && values.status !== 'all') {
-      newFilters.status = values.status as FinancialStatus;
-    }
-    if (values.startDate) {
-      newFilters.startDate = format(values.startDate, 'yyyy-MM-dd');
-    }
-    if (values.endDate) {
-      newFilters.endDate = format(values.endDate, 'yyyy-MM-dd');
-    }
-    if (values.description) {
-      newFilters.description = values.description;
-    }
-    
-    setFilters(newFilters);
-    handlePageChange(1);
-  };
-
-  // Effect to handle initial data load and filter changes
-  useEffect(() => {
-    refetch();
-  }, [filters]);
+  // Calculate pagination
+  const totalPages = Math.ceil(totalItems / pageSize);
+  const hasNextPage = currentPage < totalPages;
+  const hasPreviousPage = currentPage > 1;
 
   return (
     <div className="space-y-4">
+      {errorMessage && (
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>{t('common.error')}</AlertTitle>
+          <AlertDescription>{errorMessage}</AlertDescription>
+        </Alert>
+      )}
+      
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-2">
           <Button 
@@ -325,7 +387,7 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
                     <SelectItem value="all">
                       {t('common.all')}
                     </SelectItem>
-                    {Object.values(FinancialType).map((type) => (
+                    {Object.values(FinancialType).filter(t => t !== FinancialType.Unknown).map((type) => (
                       <SelectItem key={type} value={type}>
                         {getTypeText(type)}
                       </SelectItem>
@@ -355,7 +417,7 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
                     <SelectItem value="all">
                       {t('common.all')}
                     </SelectItem>
-                    {Object.values(FinancialStatus).map((status) => (
+                    {Object.values(FinancialStatus).filter(s => s !== FinancialStatus.Unknown).map((status) => (
                       <SelectItem key={status} value={status}>
                         {getStatusText(status)}
                       </SelectItem>
@@ -419,8 +481,8 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
                   </div>
                 </TableCell>
               </TableRow>
-            ) : data?.items && data.items.length > 0 ? (
-              data.items.map((financial) => (
+            ) : financials && financials.length > 0 ? (
+              financials.map((financial) => (
                 <TableRow key={financial.id}>
                   <TableCell>
                     {format(new Date(financial.date), 'dd/MM/yyyy')}
@@ -477,16 +539,45 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
       </div>
 
       {/* Pagination */}
-      {data && data.totalCount > 0 && (
-        <DataTablePagination
-          currentPage={filters.pageNumber || 1}
-          pageSize={filters.pageSize || 10}
-          totalItems={data.totalCount}
-          onPageChange={handlePageChange}
-          onPageSizeChange={handlePageSizeChange}
-          pageSizeOptions={[5, 10, 25, 50]}
-          showPageSizeSelect={true}
-        />
+      {financials && financials.length > 0 && (
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-muted-foreground">
+            {t('common.showing')} {(currentPage - 1) * pageSize + 1} - {Math.min(currentPage * pageSize, totalItems)} {t('common.of')} {totalItems}
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={!hasPreviousPage}
+            >
+              {t('common.previous')}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={!hasNextPage}
+            >
+              {t('common.next')}
+            </Button>
+            <Select
+              value={pageSize.toString()}
+              onValueChange={(value) => handlePageSizeChange(parseInt(value))}
+            >
+              <SelectTrigger className="w-[100px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {[5, 10, 25, 50].map((size) => (
+                  <SelectItem key={size} value={size.toString()}>
+                    {size} {t('common.perPage')}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
       )}
 
       {/* Edit/Create Dialog */}

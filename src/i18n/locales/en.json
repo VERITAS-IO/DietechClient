@@ -38,7 +38,14 @@
     "reset": "Reset",
     "search": "Search",
     "sortBy": "Sort By",
-    "default": "Default"
+    "default": "Default",
+    "filters": "Filters",
+    "active": "Active",
+    "inactive": "Inactive",
+    "invalidDate": "Invalid date",
+    "createdAt": "Created At",
+    "noDataAvailable": "No data available",
+    "noItemsFound": "No items found matching your criteria."
   },
   "validation": {
     "required": "This field is required",
@@ -240,8 +247,15 @@
     "allTypes": "All Types",
     "selectType": "Select appointment type",
     "selectStatus": "Select status",
+    "label": "Appointment",
+    "filter": {
+      "selectAppointment": "Select appointment"
+    },
     "notes": {
       "title": "Appointment Notes",
+      "list": {
+        "title": "Appointment Notes"
+      },
       "add": "Add Note",
       "edit": "Edit Note",
       "delete": "Delete Note",
@@ -249,6 +263,7 @@
       "type": "Note Type",
       "noNotes": "No notes found",
       "appointmentNotFound": "Appointment not found",
+      "invalidAppointment": "Invalid appointment reference",
       "createSuccess": "Note Added",
       "createSuccessDesc": "The note has been added successfully",
       "updateSuccess": "Note Updated",
@@ -261,17 +276,23 @@
         "0": "Unknown",
         "1": "Pre-Appointment",
         "2": "During Appointment",
-        "3": "After Appointment"
+        "3": "After Appointment",
+        "unknown": "Unknown"
       },
       "select": "Select Appointment",
       "selectPlaceholder": "Choose an appointment...",
+      "detail": {
+        "title": "Note Details"
+      },
       "filter": {
-        "all": "All Appointments",
-        "type": "Filter by Type",
         "search": "Search notes...",
-        "sortBy": "Sort by",
+        "type": "Filter by Type",
+        "all": "All Types",
         "newest": "Newest First",
-        "oldest": "Oldest First"
+        "oldest": "Oldest First",
+        "selectType": "Select note type",
+        "sortBy": "Sort by",
+        "all": "All Appointments"
       }
     },
     "types": {
@@ -616,6 +637,7 @@
     "notes": "Notes",
     "search": "Search by name, email, or phone...",
     "sort": "Sort by",
+    "filterStatus": "Filter by Status",
     "sortOptions": {
       "nameAsc": "Name (A-Z)",
       "nameDesc": "Name (Z-A)",
@@ -686,13 +708,16 @@
       "expense": "Expense",
       "consultation": "Consultation",
       "appointment": "Appointment",
-      "other": "Other"
+      "other": "Other",
+      "unknown": "Unknown"
     },
     "status": {
       "pending": "Pending",
       "completed": "Completed",
       "cancelled": "Cancelled",
-      "refunded": "Refunded"
+      "refunded": "Refunded",
+      "failed": "Failed",
+      "unknown": "Unknown"
     },
     "filters": {
       "title": "Filters",
@@ -706,7 +731,9 @@
       "apply": "Apply Filters",
       "search": "Search transactions...",
       "noResults": "No transactions found",
-      "loading": "Loading transactions..."
+      "loading": "Loading transactions...",
+      "selectType": "Select type",
+      "selectStatus": "Select status"
     },
     "form": {
       "type": "Type",
@@ -717,14 +744,23 @@
       "client": "Client",
       "subject": "Subject",
       "subjectPlaceholder": "Enter subject name or institution",
+      "clientPlaceholder": "Enter client ID",
       "isClientSubject": "Subject is a client"
     },
-    "delete": {
-      "title": "Delete Transaction",
-      "description": "Are you sure you want to delete this transaction? This action cannot be undone.",
-      "confirm": "Delete",
-      "cancel": "Cancel"
-    }
+    "clientName": "Client/Subject",
+    "unknown": "Unknown",
+    "fetchError": "Failed to fetch financials",
+    "createSuccess": "Financial record created successfully",
+    "recordCreated": "The financial record has been created",
+    "createError": "Failed to create financial record",
+    "updateSuccess": "Financial record updated successfully",
+    "recordUpdated": "The financial record has been updated",
+    "updateError": "Failed to update financial record",
+    "deleteSuccess": "Financial record deleted successfully",
+    "recordDeleted": "The financial record has been deleted",
+    "deleteError": "Failed to delete financial record",
+    "deleteConfirmTitle": "Delete Financial Record",
+    "deleteConfirmMessage": "Are you sure you want to delete this financial record? This action cannot be undone."
   },
   "analytics": {
     "timeRange": "Time Range",

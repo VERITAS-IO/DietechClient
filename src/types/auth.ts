@@ -19,6 +19,7 @@ export interface LoginRequest {
     email: string;
     roles: string[];
     tenantId: number;
+    dieticianId?: number;
   }
   
   export interface AuthError {

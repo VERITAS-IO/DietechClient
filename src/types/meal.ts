@@ -5,7 +5,6 @@ import { PagedRequest } from "./request-parameters";
  * Enum representing different meal types
  */
 export enum MealType {
-    Unknown = "Unknown",
     Breakfast = "Breakfast",
     Lunch = "Lunch",
     Dinner = "Dinner",
@@ -19,7 +18,6 @@ export enum MealType {
  * Enum representing the order of meals
  */
 export enum MealOrder {
-    Unknown = "Unknown",
     FirstMeal = "FirstMeal",
     SecondMeal = "SecondMeal",
     ThirdMeal = "ThirdMeal",

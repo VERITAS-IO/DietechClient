@@ -1,24 +1,21 @@
 export enum AppointmentType {
-  Unknown = 0,
-  Initial = 1,
-  FollowUp = 2,
-  Assessment = 3,
-  Emergency = 4
+  Initial = 'Initial',
+  FollowUp = 'FollowUp',
+  Assessment = 'Assessment',
+  Emergency = 'Emergency'
 }
 
 export enum AppointmentStatus {
-  Unknown = 0,
-  Scheduled = 1,
-  Confirmed = 2,
-  Cancelled = 3,
-  Completed = 4
+  Scheduled = 'Scheduled',
+  Confirmed = 'Confirmed',
+  Cancelled = 'Cancelled',
+  Completed = 'Completed'
 }
 
 export enum NoteType {
-  Unknown = 0,
-  PreAppointment = 1,
-  DuringAppointment = 2,
-  AfterAppointment = 3
+  PreAppointment = 'PreAppointment',
+  DuringAppointment = 'DuringAppointment',
+  AfterAppointment = 'AfterAppointment'
 }
 
 export interface CreateAppointmentRequest {

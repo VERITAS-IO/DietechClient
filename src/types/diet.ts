@@ -2,24 +2,23 @@ import { CreateMealRequest, MealListResponse } from "./meal";
 import { PagedRequest } from "./request-parameters";
 
 export enum DietType {
-    Unknown = 0,
-    Standard = 1,
-    Mediterranean = 2,
-    LowCarb = 3,
-    Ketogenic = 4,
-    Vegetarian = 5,
-    Vegan = 6,
-    PaleoStyle = 7,
-    GlutenFree = 8,
-    DairyFree = 9,
-    LowFat = 10,
-    LowSodium = 11,
-    DiabetesFriendly = 12,
-    HighProtein = 13,
-    WeightLoss = 14,
-    WeightGain = 15,
-    Elimination = 16,
-    Custom = 99
+    Standard = 'Standard',
+    Mediterranean = 'Mediterranean',
+    LowCarb = 'LowCarb',
+    Ketogenic = 'Ketogenic',
+    Vegetarian = 'Vegetarian',
+    Vegan = 'Vegan',
+    PaleoStyle = 'PaleoStyle',
+    GlutenFree = 'GlutenFree',
+    DairyFree = 'DairyFree',
+    LowFat = 'LowFat',
+    LowSodium = 'LowSodium',
+    DiabetesFriendly = 'DiabetesFriendly',
+    HighProtein = 'HighProtein',
+    WeightLoss = 'WeightLoss',
+    WeightGain = 'WeightGain',
+    Elimination = 'Elimination',
+    Custom = 'Custom'
 }
 
 export interface CreateDietRequest {

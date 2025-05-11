@@ -15,12 +15,12 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
-import NutritionSearch from '../nutrition/NutritionSearch';
 import { NutritionInfoCreate } from '../nutrition/NutritionInfoCreate';
 import { CreateNutritionInfoRequest, NutritionInfoDetail } from '@/types/nutrition';
 import { Separator } from '@/components/ui/separator';
 import { t } from 'i18next';
 import { format, parse, formatISO } from 'date-fns';
+import NutritionSearch from '../nutrition/NutritionSearch';
 
 const formSchema = z.object({
   name: z.string().min(1, { message: t('validation.required') }),

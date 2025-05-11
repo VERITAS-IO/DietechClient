@@ -1,7 +1,7 @@
+import { IntervalData } from './financial';
 import { PagedRequest } from './request-parameters';
 
 export enum ServingUnit {
-    Unknown = "Unknown",
     Grams = "Grams",
     Milliliters = "Milliliters",
     Pieces = "Pieces",
@@ -11,7 +11,6 @@ export enum ServingUnit {
 
 
 export enum FoodCategory {
-    Unknown = "Unknown",
     Dairy = "Dairy",
     Proteins = "Proteins",
     Grains = "Grains",
@@ -121,4 +120,30 @@ export interface NutritionInfoDetail {
     tenantId: number;
     createdAt: Date;
     lastModifiedAt: Date;
+}
+
+export enum FinancialInterval {
+    Unknown = 0,
+    Daily = 1,
+    Weekly = 2,
+    Monthly = 3,
+    Yearly = 4
+}
+
+export interface GetFinancialOverviewInitRequest {
+    startDate?: Date;
+    endDate?: Date;
+    interval?: FinancialInterval;
+    dieticianId?: number;
+}
+
+export interface GetFinancialOverviewInitResponse {
+    intervals: Record<FinancialInterval, IntervalData[]>;
+    totalNetIncome: number;
+    totalExpenses: number;
+    pendingExpenses: number;
+    pendingIncome: number;
+    pendingNetIncome: number;
+    completedIncomes: number;
+    totalTransactions: number;
 }

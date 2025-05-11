@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ChevronLeftIcon,
@@ -22,7 +22,7 @@ interface DataTablePaginationProps {
   onPageChange: (page: number) => void;
   onPageSizeChange?: (pageSize: number) => void;
   pageSizeOptions?: number[];
-  showPageSizeSelect?: boolean;
+  showPageSizeSelector?: boolean;
   className?: string;
 }
 
@@ -33,13 +33,22 @@ export function DataTablePagination({
   onPageChange,
   onPageSizeChange,
   pageSizeOptions = [10, 20, 30, 40, 50],
-  showPageSizeSelect = false,
+  showPageSizeSelector = false,
   className,
 }: DataTablePaginationProps) {
-  const { t } = useTranslation();
-  const totalPages = Math.ceil(totalItems / pageSize);
-  const startItem = (currentPage - 1) * pageSize + 1;
+  const { t, i18n } = useTranslation();
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  
+  // Calculate start and end item numbers
+  const startItem = totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1;
   const endItem = Math.min(currentPage * pageSize, totalItems);
+
+  // Ensure current page is within valid range
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      onPageChange(totalPages);
+    }
+  }, [currentPage, totalPages, onPageChange]);
 
   // Handle page size change
   const handlePageSizeChange = (value: string) => {
@@ -49,52 +58,59 @@ export function DataTablePagination({
     }
   };
 
-  // Go to first page
+  // Navigation functions
   const goToFirstPage = () => {
     if (currentPage !== 1) {
       onPageChange(1);
     }
   };
 
-  // Go to previous page
   const goToPreviousPage = () => {
     if (currentPage > 1) {
       onPageChange(currentPage - 1);
     }
   };
 
-  // Go to next page
   const goToNextPage = () => {
     if (currentPage < totalPages) {
       onPageChange(currentPage + 1);
     }
   };
 
-  // Go to last page
   const goToLastPage = () => {
     if (currentPage !== totalPages) {
       onPageChange(totalPages);
     }
   };
 
+  // If there are no items, don't render pagination
+  if (totalItems === 0) {
+    return (
+      <div className={`text-sm text-muted-foreground py-2 ${className || ''}`}>
+        {t('pagination.noResults')}
+      </div>
+    );
+  }
+
   return (
-    <div className={`flex flex-col sm:flex-row items-center justify-between space-y-3 sm:space-y-0 ${className}`}>
+    <div className={`flex flex-col xs:flex-row items-center justify-between gap-4 py-1 ${className || ''}`}>
+      {/* Results summary */}
       <div className="text-sm text-muted-foreground">
-        {totalItems > 0 ? (
-          t('pagination.showing', {
+        {t('pagination.showing', {
             from: startItem,
             to: endItem,
             total: totalItems,
-          })
-        ) : (
-          t('pagination.noResults')
-        )}
+        })}
       </div>
-      <div className="flex items-center space-x-6 lg:space-x-8">
+
+      {/* Pagination controls */}
+      <div className="flex flex-col xs:flex-row items-center gap-4 xs:gap-6">
         {/* Page size selector */}
-        {showPageSizeSelect && onPageSizeChange && (
-          <div className="flex items-center space-x-2">
-            <p className="text-sm font-medium">{t('pagination.rowsPerPage')}</p>
+        {showPageSizeSelector && onPageSizeChange && (
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium whitespace-nowrap">
+              {t('pagination.rowsPerPage')}
+            </span>
             <Select
               value={pageSize.toString()}
               onValueChange={handlePageSizeChange}
@@ -113,51 +129,56 @@ export function DataTablePagination({
           </div>
         )}
 
-        {/* Pagination controls */}
-        <div className="flex items-center space-x-2">
+        {/* Navigation buttons */}
+        <div className="flex items-center gap-1">
           <Button
             variant="outline"
             size="icon"
-            className="h-8 w-8"
+            className="h-8 w-8 rounded-md"
             onClick={goToFirstPage}
             disabled={currentPage === 1}
             aria-label={t('pagination.firstPage')}
+            title={t('pagination.firstPage')}
           >
             <ChevronsLeftIcon className="h-4 w-4" />
           </Button>
           <Button
             variant="outline"
             size="icon"
-            className="h-8 w-8"
+            className="h-8 w-8 rounded-md"
             onClick={goToPreviousPage}
             disabled={currentPage === 1}
             aria-label={t('pagination.previousPage')}
+            title={t('pagination.previousPage')}
           >
             <ChevronLeftIcon className="h-4 w-4" />
           </Button>
-          <div className="flex items-center gap-1">
-            <span className="text-sm font-medium">{t('pagination.page')}</span>
+          
+          <div className="flex items-center mx-2 min-w-[5.5rem] justify-center">
             <span className="text-sm font-medium">
-              {currentPage} {t('pagination.of')} {totalPages || 1}
+              {t('pagination.page')} {currentPage} {t('pagination.of')} {totalPages}
             </span>
           </div>
+          
           <Button
             variant="outline"
             size="icon"
-            className="h-8 w-8"
+            className="h-8 w-8 rounded-md"
             onClick={goToNextPage}
-            disabled={currentPage === totalPages || totalPages === 0}
+            disabled={currentPage === totalPages}
             aria-label={t('pagination.nextPage')}
+            title={t('pagination.nextPage')}
           >
             <ChevronRightIcon className="h-4 w-4" />
           </Button>
           <Button
             variant="outline"
             size="icon"
-            className="h-8 w-8"
+            className="h-8 w-8 rounded-md"
             onClick={goToLastPage}
-            disabled={currentPage === totalPages || totalPages === 0}
+            disabled={currentPage === totalPages}
             aria-label={t('pagination.lastPage')}
+            title={t('pagination.lastPage')}
           >
             <ChevronsRightIcon className="h-4 w-4" />
           </Button>

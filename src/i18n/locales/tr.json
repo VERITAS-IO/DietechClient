@@ -38,7 +38,14 @@
     "reset": "Sıfırla",
     "search": "Ara",
     "sortBy": "Sıralama",
-    "default": "Varsayılan"
+    "default": "Varsayılan",
+    "filters": "Filtreler",
+    "active": "Aktif",
+    "inactive": "Pasif",
+    "invalidDate": "Geçersiz tarih",
+    "createdAt": "Oluşturulma Tarihi",
+    "noDataAvailable": "Veri bulunamadı",
+    "noItemsFound": "Kriterlerinize uygun öğe bulunamadı."
   },
   "validation": {
     "required": "Bu alan zorunludur",
@@ -215,12 +222,79 @@
     "create": "Randevu Oluştur",
     "edit": "Randevu Düzenle",
     "delete": "Randevu Sil",
-    "clientName": "Danışan Adı",
-    "newClient": "Yeni Danışan",
-    "searchClient": "Danışan ara...",
-    "searchExistingClient": "Mevcut bir danışan ara veya seç",
-    "enterClientName": "Yeni danışan adını girin",
-    "noClientsFound": "Danışan bulunamadı"
+    "clientName": "Müşteri Adı",
+    "newClient": "Yeni Müşteri",
+    "searchClient": "Müşteri ara...",
+    "searchExistingClient": "Mevcut bir müşteri ara veya seç",
+    "enterClientName": "Yeni müşteri adını girin",
+    "noClientsFound": "Müşteri bulunamadı",
+    "startTime": "Başlangıç Zamanı",
+    "endTime": "Bitiş Zamanı",
+    "appointmentType": "Tür",
+    "appointmentStatus": "Durum",
+    "preparationInstructions": "Hazırlık Talimatları",
+    "search": "Randevularda ara...",
+    "calendarView": "Takvim",
+    "tableView": "Liste",
+    "update": "Randevu Güncelle",
+    "cancel": "İptal",
+    "clientId": "Müşteri ID",
+    "date": "Tarih",
+    "time": "Saat",
+    "filterByStatus": "Duruma Göre Filtrele",
+    "filterByType": "Türe Göre Filtrele",
+    "allStatuses": "Tüm Durumlar",
+    "allTypes": "Tüm Türler",
+    "selectType": "Randevu türü seçin",
+    "selectStatus": "Durum seçin",
+    "label": "Randevu",
+    "filter": {
+      "selectAppointment": "Randevu seçin"
+    },
+    "notes": {
+      "title": "Randevu Notları",
+      "list": {
+        "title": "Randevu Notları"
+      },
+      "add": "Not Ekle",
+      "edit": "Notu Düzenle",
+      "delete": "Notu Sil",
+      "content": "Not İçeriği",
+      "type": "Not Türü",
+      "noNotes": "Not bulunamadı",
+      "appointmentNotFound": "Randevu bulunamadı",
+      "invalidAppointment": "Geçersiz randevu referansı",
+      "createSuccess": "Not Eklendi",
+      "createSuccessDesc": "Not başarıyla eklendi",
+      "updateSuccess": "Not Güncellendi",
+      "updateSuccessDesc": "Not başarıyla güncellendi",
+      "deleteSuccess": "Not Silindi",
+      "deleteSuccessDesc": "Not başarıyla silindi",
+      "saveFailed": "Not kaydedilemedi",
+      "deleteFailed": "Not silinemedi",
+      "types": {
+        "0": "Bilinmiyor",
+        "1": "Randevu Öncesi",
+        "2": "Randevu Sırasında",
+        "3": "Randevu Sonrası",
+        "unknown": "Bilinmiyor"
+      },
+      "select": "Randevu Seç",
+      "selectPlaceholder": "Bir randevu seçin...",
+      "detail": {
+        "title": "Not Detayları"
+      },
+      "filter": {
+        "search": "Notlarda ara...",
+        "type": "Türe Göre Filtrele",
+        "all": "Tüm Türler",
+        "newest": "En Yeni Önce",
+        "oldest": "En Eski Önce",
+        "selectType": "Not türü seçin",
+        "sortBy": "Sıralama",
+        "all": "Tüm Randevular"
+      }
+    }
   },
   "calendar": {
     "next": "İleri",
@@ -535,6 +609,7 @@
     "notes": "Notlar",
     "search": "İsim, e-posta veya telefon ile ara...",
     "sort": "Sıralama",
+    "filterStatus": "Duruma Göre Filtrele",
     "sortOptions": {
       "nameAsc": "İsim (A-Z)",
       "nameDesc": "İsim (Z-A)",
@@ -605,13 +680,16 @@
       "expense": "Gider",
       "consultation": "Danışmanlık",
       "appointment": "Randevu",
-      "other": "Diğer"
+      "other": "Diğer",
+      "unknown": "Bilinmiyor"
     },
     "status": {
       "pending": "Beklemede",
       "completed": "Tamamlandı",
       "cancelled": "İptal Edildi",
-      "refunded": "İade Edildi"
+      "refunded": "İade Edildi",
+      "failed": "Başarısız",
+      "unknown": "Bilinmiyor"
     },
     "filters": {
       "title": "Filtreler",
@@ -625,7 +703,9 @@
       "apply": "Filtreleri Uygula",
       "search": "İşlem ara...",
       "noResults": "İşlem bulunamadı",
-      "loading": "İşlemler yükleniyor..."
+      "loading": "İşlemler yükleniyor...",
+      "selectType": "Tür seçin",
+      "selectStatus": "Durum seçin"
     },
     "form": {
       "type": "Tür",
@@ -633,17 +713,26 @@
       "amount": "Tutar",
       "date": "Tarih",
       "description": "Açıklama",
-      "client": "Danışan",
+      "client": "Müşteri",
       "subject": "Konu",
-      "subjectPlaceholder": "Konu adı veya kurum girin",
-      "isClientSubject": "Konu bir danışan"
+      "subjectPlaceholder": "Konu veya kurum adı girin",
+      "clientPlaceholder": "Müşteri ID'si girin",
+      "isClientSubject": "Konu bir müşteridir"
     },
-    "delete": {
-      "title": "İşlem Sil",
-      "description": "Bu işlemi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.",
-      "confirm": "Sil",
-      "cancel": "İptal"
-    }
+    "clientName": "Müşteri/Konu",
+    "unknown": "Bilinmiyor",
+    "fetchError": "Finansal kayıtlar getirilemedi",
+    "createSuccess": "Finansal kayıt başarıyla oluşturuldu",
+    "recordCreated": "Finansal kayıt oluşturuldu",
+    "createError": "Finansal kayıt oluşturulamadı",
+    "updateSuccess": "Finansal kayıt başarıyla güncellendi",
+    "recordUpdated": "Finansal kayıt güncellendi",
+    "updateError": "Finansal kayıt güncellenemedi",
+    "deleteSuccess": "Finansal kayıt başarıyla silindi",
+    "recordDeleted": "Finansal kayıt silindi",
+    "deleteError": "Finansal kayıt silinemedi",
+    "deleteConfirmTitle": "Finansal Kaydı Sil",
+    "deleteConfirmMessage": "Bu finansal kaydı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz."
   },
   "analytics": {
     "timeRange": "Zaman Aralığı",

@@ -1,45 +1,142 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Financial, FinancialType, FinancialStatus } from '@/types/financial';
+import { Financial, GetFinancialOverviewInitResponse, IntervalData, FinancialInterval, FinancialIntervalMapping } from '@/types/financial';
 import { formatCurrency } from '@/lib/utils/format';
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { ArrowDownIcon, ArrowUpIcon, ClockIcon, CheckCircleIcon, RefreshCwIcon } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { format, parseISO } from 'date-fns';
 
 interface FinancialOverviewProps {
-  financials: Financial[];
+  overviewData: GetFinancialOverviewInitResponse;
+  selectedInterval?: FinancialInterval;
+  onIntervalChange?: (interval: FinancialInterval) => void;
 }
 
-export const FinancialOverview: React.FC<FinancialOverviewProps> = ({ financials }) => {
+export const FinancialOverview: React.FC<FinancialOverviewProps> = ({ 
+  overviewData,
+  selectedInterval = FinancialInterval.Daily,
+  onIntervalChange 
+}) => {
   const { t } = useTranslation();
 
-  // Calculate summary statistics
-  const summary = React.useMemo(() => {
-    const totalIncome = financials
-      .filter(f => f.type === FinancialType.Income)
-      .reduce((sum, f) => sum + f.amount, 0);
+  // Convert interval to tab value
+  const getTabValue = (interval: FinancialInterval): string => {
+    switch (interval) {
+      case FinancialInterval.Daily:
+        return 'daily';
+      case FinancialInterval.Weekly:
+        return 'weekly';
+      case FinancialInterval.Monthly:
+        return 'monthly';
+      case FinancialInterval.Yearly:
+        return 'yearly';
+      default:
+        return 'daily';
+    }
+  };
 
-    const totalExpense = financials
-      .filter(f => f.type === FinancialType.Expense)
-      .reduce((sum, f) => sum + f.amount, 0);
+  // Convert tab value to interval
+  const getIntervalFromTab = (tab: string): FinancialInterval => {
+    switch (tab) {
+      case 'daily':
+        return FinancialInterval.Daily;
+      case 'weekly':
+        return FinancialInterval.Weekly;
+      case 'monthly':
+        return FinancialInterval.Monthly;
+      case 'yearly':
+        return FinancialInterval.Yearly;
+      default:
+        return FinancialInterval.Daily;
+    }
+  };
 
-    const pendingAmount = financials
-      .filter(f => f.status === FinancialStatus.Pending)
-      .reduce((sum, f) => sum + f.amount, 0);
+  // Handle tab change
+  const handleTabChange = (value: string) => {
+    const interval = getIntervalFromTab(value);
+    onIntervalChange?.(interval);
+  };
 
-    const completedAmount = financials
-      .filter(f => f.status === FinancialStatus.Completed)
-      .reduce((sum, f) => sum + f.amount, 0);
+  // Helper function to get the correct interval data array
+  const getIntervalData = (intervals: Record<string | number, IntervalData[]>, intervalType: FinancialInterval): IntervalData[] => {
+    // Try to get data using string key first
+    const stringKey = intervalType;
+    if (intervals[stringKey] && intervals[stringKey].length > 0) {
+      return intervals[stringKey];
+    }
+    
+    // If not found, try using the numeric mapping
+    const numericKey = FinancialIntervalMapping.toNumber[intervalType];
+    if (numericKey && intervals[numericKey] && intervals[numericKey].length > 0) {
+      return intervals[numericKey];
+    }
+    
+    // If all else fails, return empty array
+    return [];
+  };
+
+  // Transform interval data to chart format
+  const chartData = useMemo(() => {
+    if (!overviewData.intervals) {
+      return { daily: [], weekly: [], monthly: [], yearly: [] };
+    }
+    
+    // Get data for each interval type using the helper function
+    const dailyData = getIntervalData(overviewData.intervals, FinancialInterval.Daily);
+    const weeklyData = getIntervalData(overviewData.intervals, FinancialInterval.Weekly);
+    const monthlyData = getIntervalData(overviewData.intervals, FinancialInterval.Monthly);
+    const yearlyData = getIntervalData(overviewData.intervals, FinancialInterval.Yearly);
+    
+    const formatIntervalData = (intervalData: IntervalData[]) => {
+      return intervalData.map(item => {
+        try {
+          // Parse the ISO date string
+          const date = parseISO(item.date);
+          
+          // Format the date based on interval type
+          let label = format(date, 'MMM dd');
+          
+          // For monthly data, use month only
+          if (item.date.includes('T00:00:00')) {
+            if (item.date.endsWith('T00:00:00')) {
+              label = format(date, 'MMM yyyy'); // Monthly format
+            } else if (item.date.endsWith('T00:00:00Z')) {
+              label = format(date, 'MMM dd'); // Weekly/Daily format
+            }
+          }
+          
+          // For yearly data, use year only
+          if (item.date.includes('-01-01T00:00:00')) {
+            label = format(date, 'yyyy');
+          }
+          
+          return {
+            label,
+            income: item.totalIncome || 0,
+            expense: item.totalExpenses || 0,
+            netIncome: item.totalNetIncome || 0,
+          };
+        } catch (error) {
+          console.error('Error formatting interval data:', error, item);
+          return {
+            label: 'Error',
+            income: 0,
+            expense: 0,
+            netIncome: 0
+          };
+        }
+      });
+    };
 
     return {
-      totalIncome,
-      totalExpense,
-      netIncome: totalIncome - totalExpense,
-      pendingAmount,
-      completedAmount,
+      daily: formatIntervalData(dailyData),
+      weekly: formatIntervalData(weeklyData),
+      monthly: formatIntervalData(monthlyData),
+      yearly: formatIntervalData(yearlyData),
     };
-  }, [financials]);
+  }, [overviewData?.intervals]);
 
   const formatYAxis = (value: number) => {
     return value.toLocaleString();
@@ -49,101 +146,6 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({ financials
     return formatCurrency(value);
   };
 
-  // Prepare data for charts
-  const chartData = React.useMemo(() => {
-    const dailyData = financials.reduce((acc, f) => {
-      const date = new Date(f.date);
-      const day = date.toLocaleDateString('default', { weekday: 'short' });
-      
-      if (!acc[day]) {
-        acc[day] = { income: 0, expense: 0 };
-      }
-
-      if (f.type === FinancialType.Income) {
-        acc[day].income += f.amount;
-      } else if (f.type === FinancialType.Expense) {
-        acc[day].expense += f.amount;
-      }
-
-      return acc;
-    }, {} as Record<string, { income: number; expense: number }>);
-
-    const weeklyData = financials.reduce((acc, f) => {
-      const date = new Date(f.date);
-      const week = `Week ${Math.ceil(date.getDate() / 7)}`;
-      
-      if (!acc[week]) {
-        acc[week] = { income: 0, expense: 0 };
-      }
-
-      if (f.type === FinancialType.Income) {
-        acc[week].income += f.amount;
-      } else if (f.type === FinancialType.Expense) {
-        acc[week].expense += f.amount;
-      }
-
-      return acc;
-    }, {} as Record<string, { income: number; expense: number }>);
-
-    const monthlyData = financials.reduce((acc, f) => {
-      const date = new Date(f.date);
-      const month = date.toLocaleString('default', { month: 'short' });
-      
-      if (!acc[month]) {
-        acc[month] = { income: 0, expense: 0 };
-      }
-
-      if (f.type === FinancialType.Income) {
-        acc[month].income += f.amount;
-      } else if (f.type === FinancialType.Expense) {
-        acc[month].expense += f.amount;
-      }
-
-      return acc;
-    }, {} as Record<string, { income: number; expense: number }>);
-
-    const yearlyData = financials.reduce((acc, f) => {
-      const date = new Date(f.date);
-      const year = date.getFullYear().toString();
-      
-      if (!acc[year]) {
-        acc[year] = { income: 0, expense: 0 };
-      }
-
-      if (f.type === FinancialType.Income) {
-        acc[year].income += f.amount;
-      } else if (f.type === FinancialType.Expense) {
-        acc[year].expense += f.amount;
-      }
-
-      return acc;
-    }, {} as Record<string, { income: number; expense: number }>);
-
-    return {
-      daily: Object.entries(dailyData).map(([day, data]) => ({
-        name: day,
-        income: data.income,
-        expense: data.expense,
-      })),
-      weekly: Object.entries(weeklyData).map(([week, data]) => ({
-        name: week,
-        income: data.income,
-        expense: data.expense,
-      })),
-      monthly: Object.entries(monthlyData).map(([month, data]) => ({
-        name: month,
-        income: data.income,
-        expense: data.expense,
-      })),
-      yearly: Object.entries(yearlyData).map(([year, data]) => ({
-        name: year,
-        income: data.income,
-        expense: data.expense,
-      })),
-    };
-  }, [financials]);
-
-  // Custom mouse-over styles for bars
   const getBarProps = (dataKey: string) => {
     if (dataKey === 'income') {
       return {
@@ -160,7 +162,6 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({ financials
     }
   };
 
-  // Custom tooltip style
   const tooltipStyle = {
     backgroundColor: 'rgba(22, 22, 22, 0.9)',
     border: 'none',
@@ -178,7 +179,7 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({ financials
           <CardTitle className="text-sm font-medium">
             {t('financial.overview.netIncome')}
           </CardTitle>
-          {summary.netIncome >= 0 ? (
+          {(overviewData.totalNetIncome || 0) >= 0 ? (
             <ArrowUpIcon className="h-4 w-4 text-green-500" />
           ) : (
             <ArrowDownIcon className="h-4 w-4 text-red-500" />
@@ -186,7 +187,7 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({ financials
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {formatCurrency(summary.netIncome)}
+            {formatCurrency(overviewData.totalNetIncome || 0)}
           </div>
         </CardContent>
       </Card>
@@ -201,7 +202,7 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({ financials
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {formatCurrency(summary.pendingAmount)}
+            {formatCurrency(overviewData.pendingIncome || 0)}
           </div>
         </CardContent>
       </Card>
@@ -216,7 +217,7 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({ financials
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {formatCurrency(summary.completedAmount)}
+            {formatCurrency(overviewData.completedIncomes || 0)}
           </div>
         </CardContent>
       </Card>
@@ -231,7 +232,7 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({ financials
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {financials.length}
+            {overviewData.totalTransactions || 0}
           </div>
         </CardContent>
       </Card>
@@ -242,7 +243,12 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({ financials
           <CardTitle>{t('financial.overview.chartTitle')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="daily" className="space-y-4">
+          <Tabs 
+            defaultValue={getTabValue(selectedInterval)} 
+            value={getTabValue(selectedInterval)} 
+            onValueChange={handleTabChange}
+            className="space-y-4"
+          >
             <TabsList>
               <TabsTrigger value="daily">{t('financial.overview.daily')}</TabsTrigger>
               <TabsTrigger value="weekly">{t('financial.overview.weekly')}</TabsTrigger>
@@ -255,7 +261,7 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({ financials
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={chartData.daily} margin={{ left: 20 }}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
+                    <XAxis dataKey="label" />
                     <YAxis 
                       width={50} 
                       tickFormatter={formatYAxis} 
@@ -292,7 +298,7 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({ financials
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={chartData.weekly} margin={{ left: 20 }}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
+                    <XAxis dataKey="label" />
                     <YAxis 
                       width={50} 
                       tickFormatter={formatYAxis} 
@@ -329,7 +335,7 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({ financials
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={chartData.monthly} margin={{ left: 20 }}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
+                    <XAxis dataKey="label" />
                     <YAxis 
                       width={50} 
                       tickFormatter={formatYAxis} 
@@ -366,7 +372,7 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({ financials
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={chartData.yearly} margin={{ left: 20 }}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
+                    <XAxis dataKey="label" />
                     <YAxis 
                       width={50} 
                       tickFormatter={formatYAxis} 
