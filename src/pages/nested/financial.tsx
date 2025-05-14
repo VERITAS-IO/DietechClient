@@ -182,13 +182,6 @@ export const FinancialPage: React.FC = () => {
     }
   }, [activeTab, dieticianId]);
   
-  // Reset the initial fetch flag when dependencies change
-  useEffect(() => {
-    if (selectedInterval) {
-      initialFetchRef.current.overview = false;
-    }
-  }, [selectedInterval]);
-  
   useEffect(() => {
     console.log('FinancialPage API data status:', { 
       overviewData: overviewData ? 'loaded' : 'not loaded', 

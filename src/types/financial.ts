@@ -45,10 +45,10 @@ export const FinancialIntervalMapping = {
   },
   // Number to string
   toString: {
-    1: FinancialInterval.Daily,
-    2: FinancialInterval.Weekly,
-    3: FinancialInterval.Monthly,
-    4: FinancialInterval.Yearly
+    'Daily': FinancialInterval.Daily,
+    'Weekly': FinancialInterval.Weekly,
+    'Monthly': FinancialInterval.Monthly,
+    'Yearly': FinancialInterval.Yearly
   }
 };
 

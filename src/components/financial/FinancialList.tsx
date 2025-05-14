@@ -181,23 +181,19 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
     setCurrentPage(1); // Reset to first page when changing page size
   };
 
-  // Handle filter changes
   const handleFilterChange = (field: keyof QueryFinancialsRequest, value: any) => {
     const newFilters = { ...filters };
     
-    // Remove the field from filters if 'all' is selected or value is empty
     if (value === 'all' || !value) {
       delete newFilters[field];
     } else {
       newFilters[field] = value;
     }
     
-    // Make sure we keep dieticianId
     if (!newFilters.dieticianId) {
       newFilters.dieticianId = user?.dieticianId;
     }
     
-    // Update filters and reset to first page
     setFilters(newFilters);
     setCurrentPage(1);
   };
@@ -387,7 +383,7 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
                     <SelectItem value="all">
                       {t('common.all')}
                     </SelectItem>
-                    {Object.values(FinancialType).filter(t => t !== FinancialType.Unknown).map((type) => (
+                    {Object.values(FinancialType).map((type) => (
                       <SelectItem key={type} value={type}>
                         {getTypeText(type)}
                       </SelectItem>
@@ -417,7 +413,7 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
                     <SelectItem value="all">
                       {t('common.all')}
                     </SelectItem>
-                    {Object.values(FinancialStatus).filter(s => s !== FinancialStatus.Unknown).map((status) => (
+                    {Object.values(FinancialStatus).map((status) => (
                       <SelectItem key={status} value={status}>
                         {getStatusText(status)}
                       </SelectItem>

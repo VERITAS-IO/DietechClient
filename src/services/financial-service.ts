@@ -54,14 +54,11 @@ const getFallbackDieticianId = (): number | undefined => {
   throw new Error('No valid dietician ID available in user profile');
 };
 
-// Helper to convert dates to UTC ISO strings for API requests
 const formatDateForApi = (date?: Date): string | undefined => {
   if (!date) return undefined;
-  // Ensure the date is in UTC format with Z suffix
   return formatISO(date, { representation: 'complete' });
 };
 
-// Convert interval to numeric value for API
 const getNumericInterval = (interval?: FinancialInterval | number): number | undefined => {
   if (interval === undefined) return undefined;
   if (typeof interval === 'number') return interval;
