@@ -4,48 +4,40 @@ import {
     MealDetailResponse, 
     MealListResponse, 
     QueryMealRequest, 
-    UpdateMealRequest,
-    PaginatedMealListResponse
+    UpdateMealRequest
 } from '../types/meal';
-import { PagedDataResponse } from '@/types/response-types';
+import { ApiService } from '@/types/api';
+import { ApiResponse, PagedResponse } from '@/types/common';
 
 const BASE_URL = '/meals';
 
-export const mealService = {
-    async queryMeals(request: QueryMealRequest): Promise<PagedDataResponse<MealListResponse>> {
-        const { data } = await api.get<PagedDataResponse<MealListResponse> | MealListResponse[]>(BASE_URL, { params: request });        
-        if (Array.isArray(data)) {
-            const pageNumber = request.pageNumber || 1;
-            const pageSize = request.pageSize || 10;
-            return {
-                items: data,
-                totalCount: data.length,
-                pageNumber: pageNumber,
-                pageSize: pageSize,
-                totalPages: Math.ceil(data.length / pageSize),
-                hasPreviousPage: pageNumber > 1,
-                hasNextPage: pageNumber * pageSize < data.length
-            };
-        }
-        
-        return data;
-    },
+// ✅ Meal Service Class (Rehberinizden: API template kullan)
+class MealService extends ApiService {
+  constructor() {
+    super(BASE_URL);
+  }
 
-    async getById(id: number): Promise<MealDetailResponse> {
-        const { data } = await api.get<MealDetailResponse>(`${BASE_URL}/${id}`);
-        return data;
-    },
+  // ✅ Generic methods using template
+  async queryMeals(request: QueryMealRequest): Promise<PagedResponse<MealListResponse>> {
+    return this.getPaged('', request as Record<string, unknown>);
+  }
 
-    async create(request: CreateMealRequest): Promise<{ id: number }> {
-        const { data } = await api.post<{ id: number }>(BASE_URL, request);
-        return data;
-    },
+  async getById(id: number): Promise<ApiResponse<MealDetailResponse>> {
+    return this.get(`/${id}`);
+  }
 
-    async update(id: number, request: UpdateMealRequest): Promise<void> {
-        await api.put(`${BASE_URL}/${id}`, request);
-    },
+  async create(request: CreateMealRequest): Promise<ApiResponse<{ id: number }>> {
+    return this.post('', request);
+  }
 
-    async delete(id: number): Promise<void> {
-        await api.delete(`${BASE_URL}/${id}`);
-    }
-};
+  async update(id: number, request: UpdateMealRequest): Promise<ApiResponse<void>> {
+    return this.put(`/${id}`, request);
+  }
+
+  async deleteMeal(id: number): Promise<ApiResponse<void>> {
+    return this.delete(`/${id}`);
+  }
+}
+
+// ✅ Service instance (Rehberinizden: Singleton pattern)
+export const mealService = new MealService();

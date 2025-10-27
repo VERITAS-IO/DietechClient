@@ -1,48 +1,22 @@
 import { CreateNutritionInfoRequest } from "./nutrition";
 import { PagedRequest } from "./request-parameters";
 
-/**
- * Enum representing different meal types
- */
-export enum MealType {
-    Breakfast = "Breakfast",
-    Lunch = "Lunch",
-    Dinner = "Dinner",
-    Snack = "Snack",
-    PreWorkout = "PreWorkout",
-    PostWorkout = "PostWorkout",
-    Custom = "Custom"
-}
+// ✅ Union Types (Rehberinizden: Enum yerine union kullan)
+export type MealType = 'Breakfast' | 'Lunch' | 'Dinner' | 'Snack' | 'PreWorkout' | 'PostWorkout' | 'Custom';
+export type MealOrder = 'FirstMeal' | 'SecondMeal' | 'ThirdMeal' | 'FourthMeal' | 'FifthMeal' | 'SixthMeal' | 'SeventhMeal' | 'EighthMeal' | 'NinthMeal' | 'TenthMeal' | 'Custom';
 
-/**
- * Enum representing the order of meals
- */
-export enum MealOrder {
-    FirstMeal = "FirstMeal",
-    SecondMeal = "SecondMeal",
-    ThirdMeal = "ThirdMeal",
-    FourthMeal = "FourthMeal",
-    FifthMeal = "FifthMeal",
-    SixthMeal = "SixthMeal",
-    SeventhMeal = "SeventhMeal",
-    EighthMeal = "EighthMeal",
-    NinthMeal = "NinthMeal",
-    TenthMeal = "TenthMeal",
-    Custom = "Custom"
-}
-
-
+// ✅ Basit Interface (Rehberinizden: Karmaşık yapma)
 export interface CreateMealRequest {
-    name: string;
-    description: string;
-    mealType: MealType;
-    mealOrder: MealOrder;
-    startTime?: string; 
-    endTime?: string; 
-    dietId: number;
-    tenantId: number;
-    nutritionInfoIds?: number[];
-    newNutritionInfoRequests?: any[]; 
+  name: string;
+  description: string;
+  mealType: MealType;
+  mealOrder: MealOrder;
+  startTime?: string; 
+  endTime?: string; 
+  dietId: number;
+  tenantId: number;
+  nutritionInfoIds?: number[];
+  newNutritionInfoRequests?: CreateNutritionInfoRequest[]; 
 }
 
 /**
@@ -105,7 +79,7 @@ export interface MealListResponse {
     dietId: number;
     tenantId: number;
     isActive: boolean;
-    nutritionInfoList: any[]; // Replace with actual type when available
+    nutritionInfoList: unknown[]; // ✅ Unknown kullan (Rehberinizden)
 }
 
 /**

@@ -1,60 +1,25 @@
-/**
- * Enum representing different types of financial transactions
- */
-export enum FinancialType {
-  Income = 'Income',
-  Expense = 'Expense',
-  Consultation = 'Consultation',
-  Appointment = 'Appointment',
-  Other = 'Other'
-}
+// ✅ Union Types (Rehberinizden: Enum yerine union kullan)
+export type FinancialType = 'Income' | 'Expense' | 'Consultation' | 'Appointment' | 'Other';
+export type FinancialStatus = 'Pending' | 'Completed' | 'Failed' | 'Refunded' | 'Cancelled';
+export type FinancialInterval = 'Daily' | 'Weekly' | 'Monthly' | 'Yearly';
 
-/**
- * Enum representing different statuses of financial transactions
- */
-export enum FinancialStatus {
-  Pending = 'Pending',
-  Completed = 'Completed',
-  Failed = 'Failed',
-  Refunded = 'Refunded',
-  Cancelled = 'Cancelled'
-}
-
-/**
- * Enum representing different interval types for financial data
- * The string values are used in the UI, but the API expects numeric values
- * Daily = 1, Weekly = 2, Monthly = 3, Yearly = 4
- */
-export enum FinancialInterval {
-  Daily = 'Daily',    // 1 in API
-  Weekly = 'Weekly',  // 2 in API
-  Monthly = 'Monthly', // 3 in API
-  Yearly = 'Yearly'   // 4 in API
-}
-
-/**
- * Mapping object to convert between UI string values and API numeric values
- */
+// ✅ Mapping Object (Rehberinizden: Record pattern)
 export const FinancialIntervalMapping = {
-  // String to number
   toNumber: {
-    [FinancialInterval.Daily]: 1,
-    [FinancialInterval.Weekly]: 2,
-    [FinancialInterval.Monthly]: 3,
-    [FinancialInterval.Yearly]: 4
+    'Daily': 1,
+    'Weekly': 2,
+    'Monthly': 3,
+    'Yearly': 4
   },
-  // Number to string
   toString: {
-    'Daily': FinancialInterval.Daily,
-    'Weekly': FinancialInterval.Weekly,
-    'Monthly': FinancialInterval.Monthly,
-    'Yearly': FinancialInterval.Yearly
+    1: 'Daily',
+    2: 'Weekly', 
+    3: 'Monthly',
+    4: 'Yearly'
   }
-};
+} as const;
 
-/**
- * Interface representing a financial transaction
- */
+// ✅ Basit Interface (Rehberinizden: Karmaşık yapma)
 export interface Financial {
   id: number;
   type: FinancialType;

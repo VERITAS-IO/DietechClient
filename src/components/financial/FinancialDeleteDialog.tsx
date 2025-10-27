@@ -25,7 +25,6 @@ const FinancialDeleteDialog: React.FC = () => {
                 await deleteFinancialMutation.mutateAsync(selectedFinancial.id);
                 setDeleteModalOpen(false);
             } catch (error) {
-                console.error('Error deleting financial:', error);
             }
         }
     };

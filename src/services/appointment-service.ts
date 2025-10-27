@@ -8,7 +8,8 @@ import {
   QueryAppointmentNotesRequest,
   GetAppointmentNoteResponse
 } from '@/types/appointment';
-import { api } from '@/lib/axios';
+import { ApiService } from '@/types/api';
+import { ApiResponse, PagedResponse } from '@/types/common';
 import { format } from 'date-fns';
 
 // For timestamp with time zone in PostgreSQL, we MUST use UTC
@@ -18,8 +19,8 @@ const formatDateForApi = (date: Date): string => {
   return date.toISOString();
 };
 
-const prepareAppointmentData = (data: any) => {
-  const prepared = { ...data };
+const prepareAppointmentData = (data: unknown) => {
+  const prepared = { ...(data as Record<string, unknown>) };
   
   if (prepared.start instanceof Date) {
     const originalDate = new Date(prepared.start);
@@ -27,14 +28,10 @@ const prepareAppointmentData = (data: any) => {
     
     // Make sure the date is in UTC
     if (originalDate.getTimezoneOffset() !== 0) {
-      console.warn('Warning: Converting a non-UTC date to UTC for timestamp with time zone column');
+      // Convert to UTC
     }
     
     prepared.start = formatDateForApi(prepared.start);
-    console.log('Date conversion - start:', 
-      'Local format:', formattedLocal,
-      'API format (UTC):', prepared.start
-    );
   }
   
   if (prepared.end instanceof Date) {
@@ -43,88 +40,70 @@ const prepareAppointmentData = (data: any) => {
     
     // Make sure the date is in UTC
     if (originalDate.getTimezoneOffset() !== 0) {
-      console.warn('Warning: Converting a non-UTC date to UTC for timestamp with time zone column');
+      // Convert to UTC
     }
     
     prepared.end = formatDateForApi(prepared.end);
-    console.log('Date conversion - end:', 
-      'Local format:', formattedLocal,
-      'API format (UTC):', prepared.end
-    );
   }
   
   return prepared;
 };
 
-export const appointmentService = {
-  getAppointments: async (query?: QueryAppointmentsRequest) => {
+// ✅ Appointment Service Class (Rehberinizden: API template kullan)
+class AppointmentService extends ApiService {
+  constructor() {
+    super('/appointments');
+  }
+
+  // ✅ Generic methods using template
+  async getAppointments(query?: QueryAppointmentsRequest): Promise<PagedResponse<QueryAppointmentResponse>> {
     // Prepare query params if they contain dates
-    const params: any = query ? { ...query } : undefined;
-    if (params?.startDate instanceof Date) {
+    const params: Record<string, unknown> = query ? { ...query } : {};
+    if (params.startDate instanceof Date) {
       params.startDate = formatDateForApi(params.startDate);
     }
-    if (params?.endDate instanceof Date) {
+    if (params.endDate instanceof Date) {
       params.endDate = formatDateForApi(params.endDate);
     }
     
-    const response = await api.get<QueryAppointmentResponse[]>('/appointments', { 
-      params
-    });
-    return response.data;
-  },
-
-  getAppointment: async (id: number) => {
-    const response = await api.get<QueryAppointmentResponse>(`/appointments/${id}`);
-    return response.data;
-  },
-
-  createAppointment: async (appointment: CreateAppointmentRequest) => {
-    const preparedData = prepareAppointmentData(appointment);
-    const response = await api.post<QueryAppointmentResponse>(
-      '/appointments',
-      preparedData
-    );
-    return response.data;
-  },
-
-  updateAppointment: async (id: number, appointment: Partial<UpdateAppointmentRequest>) => {
-    const preparedData = prepareAppointmentData(appointment);
-    await api.patch(
-      `/appointments/${id}`,
-      preparedData
-    );
-    return null;
-  },
-
-  deleteAppointment: async (id: number) => {
-    await api.delete(`/appointments/${id}`);
-  },
-
-  // Appointment Note Methods
-  getAppointmentNotes: async (query?: QueryAppointmentNotesRequest) => {
-    const response = await api.get<GetAppointmentNoteResponse[]>('/appointment-notes', { 
-      params: query 
-    });
-    return response.data;
-  },
-
-  createAppointmentNote: async (note: CreateAppointmentNoteRequest & { appointmentId: number }) => {
-    const response = await api.post<GetAppointmentNoteResponse>(
-      '/appointment-notes',
-      note
-    );
-    return response.data;
-  },
-
-  updateAppointmentNote: async (id: number, note: UpdateAppointmentNoteRequest) => {
-    const response = await api.patch<GetAppointmentNoteResponse>(
-      `/appointment-notes/${id}`,
-      note
-    );
-    return response.data;
-  },
-
-  deleteAppointmentNote: async (id: number) => {
-    await api.delete(`/appointment-notes/${id}`);
+    return this.getPaged('', params);
   }
-};
+
+  async getAppointment(id: number): Promise<ApiResponse<QueryAppointmentResponse>> {
+    return this.get(`/${id}`);
+  }
+
+  async createAppointment(appointment: CreateAppointmentRequest): Promise<ApiResponse<QueryAppointmentResponse>> {
+    const preparedData = prepareAppointmentData(appointment);
+    return this.post('', preparedData);
+  }
+
+  async updateAppointment(id: number, appointment: Partial<UpdateAppointmentRequest>): Promise<ApiResponse<void>> {
+    const preparedData = prepareAppointmentData(appointment);
+    return this.put(`/${id}`, preparedData);
+  }
+
+  async deleteAppointment(id: number): Promise<ApiResponse<void>> {
+    return this.delete(`/${id}`);
+  }
+
+  // ✅ Appointment Note Methods
+  async getAppointmentNotes(query?: QueryAppointmentNotesRequest): Promise<PagedResponse<GetAppointmentNoteResponse>> {
+    return this.getPaged('/notes', query as Record<string, unknown>);
+  }
+
+  async createAppointmentNote(note: CreateAppointmentNoteRequest & { appointmentId: number }): Promise<ApiResponse<GetAppointmentNoteResponse>> {
+    return this.post('/notes', note);
+  }
+
+  async updateAppointmentNote(id: number, note: UpdateAppointmentNoteRequest): Promise<ApiResponse<GetAppointmentNoteResponse>> {
+    return this.put(`/notes/${id}`, note);
+  }
+
+  async deleteAppointmentNote(id: number): Promise<ApiResponse<void>> {
+    return this.delete(`/notes/${id}`);
+  }
+}
+
+// ✅ Service instance (Rehberinizden: Singleton pattern)
+export const appointmentService = new AppointmentService();

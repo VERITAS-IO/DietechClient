@@ -1,21 +1,15 @@
-export enum AppointmentType {
-  Initial = 'Initial',
-  FollowUp = 'FollowUp',
-  Assessment = 'Assessment',
-  Emergency = 'Emergency'
-}
+// ✅ Union Types (Rehberinizden: Enum yerine union kullan)
+export type AppointmentType = 'Initial' | 'FollowUp' | 'Assessment' | 'Emergency';
+export type AppointmentStatus = 'Scheduled' | 'Confirmed' | 'Cancelled' | 'Completed';
+export type NoteType = 'PreAppointment' | 'DuringAppointment' | 'AfterAppointment';
 
-export enum AppointmentStatus {
-  Scheduled = 'Scheduled',
-  Confirmed = 'Confirmed',
-  Cancelled = 'Cancelled',
-  Completed = 'Completed'
-}
-
-export enum NoteType {
-  PreAppointment = 'PreAppointment',
-  DuringAppointment = 'DuringAppointment',
-  AfterAppointment = 'AfterAppointment'
+export interface Client {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface CreateAppointmentRequest {

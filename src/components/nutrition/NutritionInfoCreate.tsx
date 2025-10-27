@@ -35,8 +35,8 @@ import { t } from 'i18next';
 const formSchema = z.object({
     name: z.string().min(1, { message: t('validation.required') }),
     servingSize: z.number().min(0.1, { message: t('validation.min', { min: 0.1 }) }),
-    servingUnit: z.nativeEnum(ServingUnit),
-    foodCategory: z.nativeEnum(FoodCategory),
+    servingUnit: z.enum(['Grams', 'Milliliters', 'Pieces', 'Cups', 'Tablespoons']),
+    foodCategory: z.enum(['Dairy', 'Proteins', 'Grains', 'Vegetables', 'Fruits']),
     totalCalories: z.number().min(0, { message: t('validation.min', { min: 0 }) }).optional(),
     protein: z.number().min(0).optional(),
     carbohydrates: z.number().min(0).optional(),
@@ -70,14 +70,13 @@ export const NutritionInfoCreate = ({
         defaultValues: {
             name: '',
             servingSize: 100,
-            servingUnit: ServingUnit.Grams,
-            foodCategory: FoodCategory.Unknown,
+            servingUnit: 'Grams',
+            foodCategory: 'Dairy',
             totalCalories: 0,
         },
     });
 
     const onSubmit = async (data: CreateNutritionInfoRequest) => {
-        console.log('Submitting request:', data);
 
         try {
             // Ensure numeric fields are properly converted, but keep string enums as is
@@ -114,7 +113,6 @@ export const NutritionInfoCreate = ({
             setIsDialogOpen(false);
             form.reset();
         } catch (error) {
-            console.error('Failed to create nutrition info:', error);
         }
     };
 
@@ -197,7 +195,7 @@ export const NutritionInfoCreate = ({
                                     <FormLabel>{t('nutrition.servingUnit')}</FormLabel>
                                     <Select
                                         onValueChange={(value) => {
-                                            field.onChange(value as ServingUnit);
+                                            field.onChange(value);
                                         }}
                                         defaultValue={field.value.toString()}
                                     >
@@ -207,13 +205,11 @@ export const NutritionInfoCreate = ({
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
-                                            {Object.entries(ServingUnit)
-                                                .filter(([key]) => isNaN(Number(key)))
-                                                .map(([key, value]) => (
-                                                    <SelectItem key={key} value={value}>
-                                                        {t(`nutrition.servingUnits.${key.toLowerCase()}`)}
-                                                    </SelectItem>
-                                                ))}
+                                            <SelectItem value="Grams">{t('nutrition.servingUnits.grams')}</SelectItem>
+                                            <SelectItem value="Milliliters">{t('nutrition.servingUnits.milliliters')}</SelectItem>
+                                            <SelectItem value="Pieces">{t('nutrition.servingUnits.pieces')}</SelectItem>
+                                            <SelectItem value="Cups">{t('nutrition.servingUnits.cups')}</SelectItem>
+                                            <SelectItem value="Tablespoons">{t('nutrition.servingUnits.tablespoons')}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <FormMessage />
@@ -228,7 +224,7 @@ export const NutritionInfoCreate = ({
                                     <FormLabel>{t('nutrition.foodCategory')}</FormLabel>
                                     <Select
                                         onValueChange={(value) => {
-                                            field.onChange(value as FoodCategory);
+                                            field.onChange(value);
                                         }}
                                         defaultValue={field.value.toString()}
                                     >
@@ -238,13 +234,11 @@ export const NutritionInfoCreate = ({
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
-                                            {Object.entries(FoodCategory)
-                                                .filter(([key]) => isNaN(Number(key)))
-                                                .map(([key, value]) => (
-                                                    <SelectItem key={key} value={value}>
-                                                        {t(`nutrition.foodCategories.${key.toLowerCase()}`)}
-                                                    </SelectItem>
-                                                ))}
+                                            <SelectItem value="Dairy">{t('nutrition.foodCategories.dairy')}</SelectItem>
+                                            <SelectItem value="Proteins">{t('nutrition.foodCategories.proteins')}</SelectItem>
+                                            <SelectItem value="Grains">{t('nutrition.foodCategories.grains')}</SelectItem>
+                                            <SelectItem value="Vegetables">{t('nutrition.foodCategories.vegetables')}</SelectItem>
+                                            <SelectItem value="Fruits">{t('nutrition.foodCategories.fruits')}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <FormMessage />

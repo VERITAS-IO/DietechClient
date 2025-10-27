@@ -25,7 +25,7 @@ export default function DietCreateDialog() {
         defaultValues: {
             name: '',
             description: '',
-            type: DietType.Standard,
+            type: 'Standard',
             duration: 7,
             calories: 2000,
             startDate: new Date().toISOString().split('T')[0],
@@ -44,7 +44,7 @@ export default function DietCreateDialog() {
         const createData = {
             name: data.name,
             dietDescription: data.description,
-            dietType: Number(data.type),
+            dietType: data.type,
             dietDuration: Number(data.duration),
             totalCalories: Number(data.calories),
             tenantId: 1, 
@@ -147,8 +147,8 @@ export default function DietCreateDialog() {
                 isOpen={isCreateModalOpen}
                 onClose={handleClose}
                 title={t('diet.create')}
-                register={register}
-                setValue={setValue}
+                register={register as any}
+                setValue={setValue as any}
                 footerContent={footerContent}
             >
                 {/* Meals section */}

@@ -60,21 +60,21 @@ export function AppointmentNoteDialog({
           <div className="space-y-2">
             <label>{t('appointment.notes.type')}</label>
             <Select
-              value={noteType.toString()}
-              onValueChange={(value) => onNoteTypeChange(Number(value) as NoteType)}
+              value={noteType}
+              onValueChange={(value: string) => onNoteTypeChange(value as NoteType)}
             >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={NoteType.PreAppointment.toString()}>
-                  {t(`appointment.notes.types.${NoteType.PreAppointment}`)}
+                <SelectItem value="PreAppointment">
+                  {t(`appointment.notes.types.PreAppointment`)}
                 </SelectItem>
-                <SelectItem value={NoteType.DuringAppointment.toString()}>
-                  {t(`appointment.notes.types.${NoteType.DuringAppointment}`)}
+                <SelectItem value="DuringAppointment">
+                  {t(`appointment.notes.types.DuringAppointment`)}
                 </SelectItem>
-                <SelectItem value={NoteType.AfterAppointment.toString()}>
-                  {t(`appointment.notes.types.${NoteType.AfterAppointment}`)}
+                <SelectItem value="AfterAppointment">
+                  {t(`appointment.notes.types.AfterAppointment`)}
                 </SelectItem>
               </SelectContent>
             </Select>

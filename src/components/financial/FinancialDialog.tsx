@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { format } from 'date-fns';
 import { Search, X, AlertTriangle } from 'lucide-react';
 import {
   Dialog,
@@ -64,7 +63,7 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
 }) => {
   const { t } = useTranslation();
   const isEditing = !!financial;
-  const [prevStatus, setPrevStatus] = useState<FinancialStatus | null>(null);
+  const [prevStatus, setPrevStatus] = useState<'Pending' | 'Completed' | 'Failed' | 'Refunded' | 'Cancelled' | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [commandOpen, setCommandOpen] = useState(false);
   const { searchClients } = useClientStore();
@@ -80,8 +79,8 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      type: FinancialType.Income,
-      status: FinancialStatus.Pending,
+      type: 'Income',
+      status: 'Pending',
       amount: 0,
       date: new Date(),
       description: '',
@@ -102,7 +101,7 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
   // Track status changes
   useEffect(() => {
     if (financial) {
-      setPrevStatus(financial.status as FinancialStatus);
+      setPrevStatus(financial.status as 'Pending' | 'Completed' | 'Failed' | 'Refunded' | 'Cancelled');
     }
   }, [financial]);
 
@@ -122,8 +121,8 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
         });
       } else {
         form.reset({
-          type: FinancialType.Income,
-          status: FinancialStatus.Pending,
+          type: 'Income',
+          status: 'Pending',
           amount: 0,
           date: new Date(),
           description: '',
@@ -135,8 +134,8 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
     } else {
       // Reset form when dialog closes
       form.reset({
-        type: FinancialType.Income,
-        status: FinancialStatus.Pending,
+        type: 'Income',
+        status: 'Pending',
         amount: 0,
         date: new Date(),
         description: '',
@@ -152,8 +151,9 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
   // Handle client search
   useEffect(() => {
     if (searchQuery.trim().length >= 2) {
-      const results = searchClients(searchQuery);
-      setSearchResults(results);
+      searchClients(searchQuery).then(results => {
+        setSearchResults(results);
+      });
     } else {
       setSearchResults([]);
     }
@@ -187,13 +187,13 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
   const handleStatusChange = (newStatus: string) => {
     // If changing from PENDING to COMPLETED, update the date to today
     if (
-      prevStatus === FinancialStatus.Pending && 
-      newStatus === FinancialStatus.Completed &&
+      prevStatus === 'Pending' && 
+      newStatus === 'Completed' &&
       // Only for income-related transactions
-      (form.getValues('type') === FinancialType.Income ||
-       form.getValues('type') === FinancialType.Consultation ||
-       form.getValues('type') === FinancialType.Appointment ||
-       form.getValues('type') === FinancialType.Other)
+      (form.getValues('type') === 'Income' ||
+       form.getValues('type') === 'Consultation' ||
+       form.getValues('type') === 'Appointment' ||
+       form.getValues('type') === 'Other')
     ) {
       form.setValue('date', new Date());
     }
@@ -239,7 +239,6 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
       onSuccess?.();
       onOpenChange(false);
     } catch (error) {
-      console.error('Error submitting form:', error);
       setError(error instanceof Error ? error.message : 'An error occurred while saving');
     }
   };
@@ -249,8 +248,8 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
       if (!newOpen) {
         // Reset form when dialog is closed
         form.reset({
-          type: FinancialType.Income,
-          status: FinancialStatus.Pending,
+          type: 'Income',
+          status: 'Pending',
           amount: 0,
           date: new Date(),
           description: '',
@@ -298,11 +297,11 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {Object.values(FinancialType).filter(type => type !== FinancialType.Unknown).map((type) => (
-                        <SelectItem key={type} value={type}>
-                          {t(`financial.type.${type.toLowerCase()}`)}
-                        </SelectItem>
-                      ))}
+                      <SelectItem value="Income">{t('financial.type.income')}</SelectItem>
+                      <SelectItem value="Expense">{t('financial.type.expense')}</SelectItem>
+                      <SelectItem value="Consultation">{t('financial.type.consultation')}</SelectItem>
+                      <SelectItem value="Appointment">{t('financial.type.appointment')}</SelectItem>
+                      <SelectItem value="Other">{t('financial.type.other')}</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -328,11 +327,10 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {Object.values(FinancialStatus).filter(status => status !== FinancialStatus.Unknown).map((status) => (
-                        <SelectItem key={status} value={status}>
-                          {t(`financial.status.${status.toLowerCase()}`)}
-                        </SelectItem>
-                      ))}
+                      <SelectItem value="Completed">{t('financial.status.completed')}</SelectItem>
+                      <SelectItem value="Pending">{t('financial.status.pending')}</SelectItem>
+                      <SelectItem value="Cancelled">{t('financial.status.cancelled')}</SelectItem>
+                      <SelectItem value="Refunded">{t('financial.status.refunded')}</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -369,7 +367,7 @@ export const FinancialDialog: React.FC<FinancialDialogProps> = ({
               <FormField
                 control={form.control}
                 name="clientId"
-                render={({ field }) => (
+                render={() => (
                   <FormItem className="flex flex-col">
                     <FormLabel>{t('financial.form.client')}</FormLabel>
                     <Popover open={commandOpen} onOpenChange={setCommandOpen}>

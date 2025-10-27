@@ -7,57 +7,58 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useEffect } from "react";
 import { useClientStore } from "@/stores/client-store";
+import { CreateClientRequest } from "@/types/client";
 
+interface LifeStyleFormProps {
+  data?: Partial<CreateClientRequest>;
+  onSubmit: (data: Record<string, unknown>) => void;
+}
+
+// ✅ Basit Schema (Rehberinizden: Karmaşık nested yapma)
 const formSchema = z.object({
-  createLifeStyleInfoRequest: z.object({
-    physicalActivity: z.enum(["Unknown", "None", "Light", "Moderate", "Active", "VeryActive"]),
-    sleepHours: z.string().transform(Number),
-    stressLevel: z.enum(["Unknown", "Low", "Moderate", "High", "VeryHigh"]),
-    smoking: z.enum(["Unknown", "None", "Occasional", "Regular", "Heavy"]),
-    alcohol: z.enum(["Unknown", "None", "Occasional", "Regular", "Heavy"]),
-  }),
+  physicalActivity: z.enum(["None", "Light", "Moderate", "Active", "VeryActive"]),
+  sleepHours: z.string().transform(Number),
+  stressLevel: z.enum(["Low", "Moderate", "High", "VeryHigh"]),
+  smoking: z.enum(["None", "Occasional", "Regular", "Heavy"]),
+  alcohol: z.enum(["None", "Occasional", "Regular", "Heavy"]),
 });
 
-export function LifeStyleForm({ data, onSubmit }) {
+export function LifeStyleForm({ data, onSubmit }: LifeStyleFormProps) {
   const { formData } = useClientStore();
   
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      createLifeStyleInfoRequest: {
-        physicalActivity: formData.createLifeStyleInfoRequest.physicalActivity,
-        sleepHours: formData.createLifeStyleInfoRequest.sleepHours.toString(),
-        stressLevel: formData.createLifeStyleInfoRequest.stressLevel,
-        smoking: formData.createLifeStyleInfoRequest.smoking,
-        alcohol: formData.createLifeStyleInfoRequest.alcohol,
-        ...data,
-      },
+      physicalActivity: formData.physicalActivity,
+      sleepHours: formData.sleepHours.toString(),
+      stressLevel: formData.stressLevel,
+      smoking: formData.smoking,
+      alcohol: formData.alcohol,
+      ...data,
     },
   });
 
   useEffect(() => {
     const newData = {
       ...data,
-      physicalActivity: data?.physicalActivity || formData.createLifeStyleInfoRequest.physicalActivity,
-      sleepHours: (data?.sleepHours || formData.createLifeStyleInfoRequest.sleepHours).toString(),
-      stressLevel: data?.stressLevel || formData.createLifeStyleInfoRequest.stressLevel,
-      smoking: data?.smoking || formData.createLifeStyleInfoRequest.smoking,
-      alcohol: data?.alcohol || formData.createLifeStyleInfoRequest.alcohol,
+      physicalActivity: data?.physicalActivity || formData.physicalActivity,
+      sleepHours: (data?.sleepHours || formData.sleepHours).toString(),
+      stressLevel: data?.stressLevel || formData.stressLevel,
+      smoking: data?.smoking || formData.smoking,
+      alcohol: data?.alcohol || formData.alcohol,
     };
     
-    form.reset({
-      createLifeStyleInfoRequest: newData,
-    });
-  }, [data, formData.createLifeStyleInfoRequest, form]);
+    form.reset(newData);
+  }, [data, formData, form]);
 
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="createLifeStyleInfoRequest.physicalActivity"
-          render={({ field }) => (
+                <FormField
+                  control={form.control}
+                  name="physicalActivity"
+                  render={({ field }) => (
             <FormItem>
               <FormLabel>Physical Activity Level</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
@@ -80,10 +81,10 @@ export function LifeStyleForm({ data, onSubmit }) {
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="createLifeStyleInfoRequest.sleepHours"
-          render={({ field }) => (
+                <FormField
+                  control={form.control}
+                  name="sleepHours"
+                  render={({ field }) => (
             <FormItem>
               <FormLabel>Sleep Hours</FormLabel>
               <FormControl>
@@ -94,10 +95,10 @@ export function LifeStyleForm({ data, onSubmit }) {
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="createLifeStyleInfoRequest.stressLevel"
-          render={({ field }) => (
+                <FormField
+                  control={form.control}
+                  name="stressLevel"
+                  render={({ field }) => (
             <FormItem>
               <FormLabel>Stress Level</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
@@ -119,10 +120,10 @@ export function LifeStyleForm({ data, onSubmit }) {
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="createLifeStyleInfoRequest.smoking"
-          render={({ field }) => (
+                <FormField
+                  control={form.control}
+                  name="smoking"
+                  render={({ field }) => (
             <FormItem>
               <FormLabel>Smoking Habits</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
@@ -144,10 +145,10 @@ export function LifeStyleForm({ data, onSubmit }) {
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="createLifeStyleInfoRequest.alcohol"
-          render={({ field }) => (
+                <FormField
+                  control={form.control}
+                  name="alcohol"
+                  render={({ field }) => (
             <FormItem>
               <FormLabel>Alcohol Consumption</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>

@@ -61,7 +61,6 @@ export default function NutritionSearch({
                 
                 setSearchResults(response.items || []);
             } catch (error) {
-                console.error('Error searching nutrition info:', error);
                 setError(t('nutrition.searchError'));
                 setSearchResults([]);
             } finally {
@@ -86,7 +85,6 @@ export default function NutritionSearch({
                 );
                 setSelectedItems(items);
             } catch (error) {
-                console.error('Error fetching selected nutrition items:', error);
             }
         };
 

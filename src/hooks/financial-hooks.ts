@@ -12,7 +12,7 @@ import {
 } from '@/types/financial';
 import { useToast } from './use-toast';
 
-// Define interface for the paginated API response
+// ✅ Basit Interface (Rehberinizden: Karmaşık yapma)
 interface PaginatedResponse<T> {
   items: T[];
   totalCount: number;
@@ -28,7 +28,7 @@ export const useFinancials = () => {
   const fetchFinancials = async (request: QueryFinancialsRequest) => {
     setIsLoading(true);
     try {
-      const response = await financialService.queryFinancials(request);
+      const response = await financialService.getFinancials(request);
       
       // Handle both array responses and paginated responses
       if (Array.isArray(response)) {
@@ -71,9 +71,8 @@ export const useFinancialOverview = () => {
     setIsLoading(true);
     try {
       const response = await financialService.getFinancialOverview(request);
-      console.log('Financial overview data received:', JSON.stringify(response, null, 2));
-      setOverview(response);
-      return response;
+      setOverview(response.data);
+      return response.data;
     } catch (error) {
       toast({
         title: t('financial.fetchOverviewError'),
@@ -103,8 +102,8 @@ export const useFinancial = (id?: number) => {
     setIsLoading(true);
     try {
       const response = await financialService.getFinancial(financialId);
-      setFinancial(response);
-      return response;
+      setFinancial(response.data);
+      return response.data;
     } catch (error) {
       toast({
         title: t('financial.fetchError'),
@@ -138,10 +137,10 @@ export const useFinancial = (id?: number) => {
     }
   };
 
-  const updateFinancial = async (data: UpdateFinancialRequest) => {
+  const updateFinancial = async (id: number, data: UpdateFinancialRequest) => {
     setIsLoading(true);
     try {
-      await financialService.updateFinancial(data);
+      await financialService.updateFinancial(id, data);
       toast({
         title: t('financial.updateSuccess'),
         description: t('financial.recordUpdated'),

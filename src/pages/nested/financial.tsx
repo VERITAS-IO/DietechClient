@@ -12,7 +12,6 @@ import { useAuthStore } from '@/stores/auth-store';
 import { FinancialInterval } from '@/types/financial';
 
 export const FinancialPage: React.FC = () => {
-  console.log('FinancialPage component rendering');
   const { t } = useTranslation();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [initialLoadDone, setInitialLoadDone] = useState(false);
@@ -23,14 +22,6 @@ export const FinancialPage: React.FC = () => {
   
   const user = useAuthStore.getState().user;
   const isAuthenticated = useAuthStore.getState().isAuthenticated;
-  console.log('Auth state in FinancialPage - Details:', { 
-    isAuthenticated, 
-    user,
-    userId: user?.id,
-    userRoles: user?.roles,
-    userDieticianId: user?.dieticianId,
-    userTenantId: user?.tenantId
-  });
   
   const activeTab = useFinancialStore(state => state.activeTab);
   const setActiveTab = useFinancialStore(state => state.setActiveTab);
@@ -43,30 +34,25 @@ export const FinancialPage: React.FC = () => {
   const getDieticianId = () => {
     // Check if user exists
     if (!user) {
-      console.warn('Cannot get dieticianId: User is not authenticated');
       return undefined;
     }
 
     // If dieticianId exists, use it
     if (user.dieticianId) {
-      console.log('Using dieticianId from user profile:', user.dieticianId);
       return user.dieticianId;
     }
     
     // If user has Dietician role, use their ID as fallback
     if (user.id && user.roles && user.roles.includes('Dietician')) {
       const fallbackId = Number(user.id);
-      console.log('Using user.id as fallback dieticianId:', fallbackId);
       return fallbackId;
     }
     
     // Final fallback - just use an arbitrary ID if we need to (in development only)
     if (process.env.NODE_ENV === 'development') {
-      console.warn('Using development fallback dieticianId (1)');
       return 1; // Use a default ID in development
     }
     
-    console.error('No valid dietician ID available in user profile');
     return undefined;
   };
   
@@ -77,11 +63,9 @@ export const FinancialPage: React.FC = () => {
     
     // Last resort - use 1 as a fallback ID in development
     if (process.env.NODE_ENV === 'development') {
-      console.warn('Forcing development fallback dieticianId to 1');
       return 1;
     }
     
-    console.error('Failed to get dieticianId - this may cause API failures');
     return undefined;
   };
   
@@ -90,7 +74,6 @@ export const FinancialPage: React.FC = () => {
   // Ensure dieticianId is set in filters when component mounts
   useEffect(() => {
     if (dieticianId && !initialLoadDone) {
-      console.log('Setting initial dieticianId in financial filters:', dieticianId);
       setFilters({ dieticianId });
       setInitialLoadDone(true);
     }
@@ -99,14 +82,12 @@ export const FinancialPage: React.FC = () => {
   // Make sure dieticianId is set whenever user or filters change
   useEffect(() => {
     if (dieticianId && (!filters.dieticianId || filters.dieticianId !== dieticianId)) {
-      console.log('Updating dieticianId in financial filters:', dieticianId);
       setFilters({ dieticianId });
     }
   }, [dieticianId, filters, setFilters]);
 
   // Handler for interval changes
   const handleIntervalChange = useCallback((interval: FinancialInterval) => {
-    console.log('Interval changed to:', interval);
     setSelectedInterval(interval);
     // No need to manually refetch here - React Query will handle it based on query key changes
   }, [setSelectedInterval]);
@@ -129,7 +110,6 @@ export const FinancialPage: React.FC = () => {
   // Log any errors with the overview
   useEffect(() => {
     if (overviewError) {
-      console.error('Financial overview error:', overviewError);
     }
   }, [overviewError]);
   
@@ -152,14 +132,12 @@ export const FinancialPage: React.FC = () => {
   // Log any errors with transactions
   useEffect(() => {
     if (transactionsError) {
-      console.error('Financial transactions error:', transactionsError);
     }
   }, [transactionsError]);
   
   // Single useEffect for handling tab changes and initial data loading
   useEffect(() => {
     if (!dieticianId) {
-      console.warn('Cannot fetch financial data: dieticianId is missing');
       return;
     }
     
@@ -167,31 +145,19 @@ export const FinancialPage: React.FC = () => {
     const isInitialForTab = !initialFetchRef.current[activeTab as keyof typeof initialFetchRef.current];
     
     if (isInitialForTab) {
-      console.log(`Initial data fetch for ${activeTab} tab`);
       initialFetchRef.current[activeTab as keyof typeof initialFetchRef.current] = true;
       
       if (activeTab === 'overview') {
-        console.log('Loading overview data with dieticianId:', dieticianId);
         // Don't need to manually call refetch - React Query will handle it based on the enabled option
       } else if (activeTab === 'transactions') {
-        console.log('Loading transactions data with dieticianId:', dieticianId);
         // Don't need to manually call refetch - React Query will handle it based on the enabled option
       }
     } else {
-      console.log(`Tab ${activeTab} already loaded, skipping fetch`);
     }
   }, [activeTab, dieticianId]);
   
   useEffect(() => {
-    console.log('FinancialPage API data status:', { 
-      overviewData: overviewData ? 'loaded' : 'not loaded', 
-      isLoadingOverview,
-      transactionsData: transactionsData ? 'loaded' : 'not loaded',
-      isLoadingTransactions,
-      dieticianId,
-      selectedInterval,
-      activeTab
-    });
+    // Monitor data loading state
   }, [overviewData, isLoadingOverview, transactionsData, isLoadingTransactions, dieticianId, selectedInterval, activeTab]);
 
   const handleAddClick = () => {

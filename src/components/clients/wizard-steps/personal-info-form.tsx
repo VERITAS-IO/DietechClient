@@ -20,49 +20,51 @@ import {
 } from "@/components/ui/select";
 import { useEffect } from "react";
 import { useClientStore } from "@/stores/client-store";
+import { CreateClientRequest } from "@/types/client";
 
+interface PersonalInfoFormProps {
+  data?: Partial<CreateClientRequest>;
+  onSubmit: (data: Record<string, unknown>) => void;
+  isSubmitting?: boolean;
+}
+
+// ✅ Basit Schema (Rehberinizden: Karmaşık nested yapma)
 const formSchema = z.object({
-  createPersonaInfoRequest: z.object({
-    gender: z.enum(["Unknown", "Male", "Female", "Other"]),
-    dateOfBirth: z.string(),
-    firstName: z.string().min(2).max(50),
-    lastName: z.string().min(2).max(50),
-    email: z.string().email(),
-    phoneNumber: z.string().min(10).max(15),
-  }),
+  gender: z.enum(["Male", "Female", "Other"]),
+  dateOfBirth: z.string(),
+  firstName: z.string().min(2).max(50),
+  lastName: z.string().min(2).max(50),
+  email: z.string().email(),
+  phoneNumber: z.string().min(10).max(15),
 });
 
-export function PersonalInfoForm({ data, onSubmit, isSubmitting = false }) {
+export function PersonalInfoForm({ data, onSubmit, isSubmitting = false }: PersonalInfoFormProps) {
   const { formData } = useClientStore();
   
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      createPersonaInfoRequest: {
-        gender: "Unknown",
-        dateOfBirth: "",
-        firstName: formData.userRegistrationRequest.firstName,
-        lastName: formData.userRegistrationRequest.lastName,
-        email: formData.userRegistrationRequest.email,
-        phoneNumber: formData.userRegistrationRequest.phoneNumber,
-        ...data, 
-      },
+      gender: "Other",
+      dateOfBirth: "",
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email,
+      phoneNumber: formData.phoneNumber,
+      ...data, 
     },
   });
 
   useEffect(() => {
     const newData = {
       ...data,
-      firstName: data?.firstName || formData.userRegistrationRequest.firstName,
-      lastName: data?.lastName || formData.userRegistrationRequest.lastName,
-      email: data?.email || formData.userRegistrationRequest.email,
-      phoneNumber: data?.phoneNumber || formData.userRegistrationRequest.phoneNumber,
+      firstName: data?.firstName || formData.firstName,
+      lastName: data?.lastName || formData.lastName,
+      email: data?.email || formData.email,
+      phoneNumber: data?.phoneNumber || formData.phoneNumber,
     };
     
-    form.reset({
-      createPersonaInfoRequest: newData,
-    });
-  }, [data, formData.userRegistrationRequest, form]);
+    form.reset(newData);
+  }, [data, formData, form]);
 
   return (
     <Form {...form}>
@@ -70,7 +72,7 @@ export function PersonalInfoForm({ data, onSubmit, isSubmitting = false }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={form.control}
-            name="createPersonaInfoRequest.firstName"
+            name="firstName"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>First Name</FormLabel>
@@ -84,7 +86,7 @@ export function PersonalInfoForm({ data, onSubmit, isSubmitting = false }) {
           
           <FormField
             control={form.control}
-            name="createPersonaInfoRequest.lastName"
+            name="lastName"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Last Name</FormLabel>
@@ -99,7 +101,7 @@ export function PersonalInfoForm({ data, onSubmit, isSubmitting = false }) {
 
         <FormField
           control={form.control}
-          name="createPersonaInfoRequest.gender"
+            name="gender"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Gender</FormLabel>
@@ -123,7 +125,7 @@ export function PersonalInfoForm({ data, onSubmit, isSubmitting = false }) {
 
         <FormField
           control={form.control}
-          name="createPersonaInfoRequest.dateOfBirth"
+            name="dateOfBirth"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Date of Birth</FormLabel>
@@ -137,7 +139,7 @@ export function PersonalInfoForm({ data, onSubmit, isSubmitting = false }) {
 
         <FormField
           control={form.control}
-          name="createPersonaInfoRequest.email"
+            name="email"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Email</FormLabel>
@@ -151,7 +153,7 @@ export function PersonalInfoForm({ data, onSubmit, isSubmitting = false }) {
 
         <FormField
           control={form.control}
-          name="createPersonaInfoRequest.phoneNumber"
+            name="phoneNumber"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Phone Number</FormLabel>

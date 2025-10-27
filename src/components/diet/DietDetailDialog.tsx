@@ -111,9 +111,9 @@ export default function DietDetailDialog() {
         setMealCreateModalOpen(true);
     };
 
-    const { data: diet, isLoading } = selectedDietId !== null
+    const { diet, isLoading } = selectedDietId !== null
         ? useGetDiet(selectedDietId)
-        : { data: undefined, isLoading: false };
+        : { diet: undefined, isLoading: false };
 
     const updateMutation = useUpdateDiet();
 
@@ -139,7 +139,7 @@ export default function DietDetailDialog() {
             const nameValue = diet.name || '';
             // Ensure dietType is handled correctly whether it's a string or a number
             const dietType = typeof diet.dietType === 'string' 
-                ? DietType[diet.dietType as keyof typeof DietType] 
+                ? diet.dietType as DietType
                 : diet.dietType as DietType;
 
             reset({
@@ -214,7 +214,7 @@ export default function DietDetailDialog() {
     } : {
         name: '',
         description: '',
-        type: DietType.Standard,
+        type: 'Standard',
         duration: 0,
         calories: 0,
         isActive: false

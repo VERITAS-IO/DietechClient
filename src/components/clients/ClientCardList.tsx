@@ -6,7 +6,7 @@ import { CardDataGridFilter, FilterOption } from '@/components/ui/card-data-grid
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
-import { Mail, Phone, Calendar, Clock } from 'lucide-react';
+import { Mail, Phone, Calendar } from 'lucide-react';
 import { QueryClientResponse } from '@/types/client';
 import { useQueryClients } from '@/hooks/client-hooks';
 
@@ -19,12 +19,12 @@ export default function ClientCardList({ onClientClick }: ClientCardListProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(6);
   const [sortBy, setSortBy] = useState('name-asc');
-  const [filters, setFilters] = useState<Record<string, any>>({
+  const [filters, setFilters] = useState<Record<string, unknown>>({
     search: '',
     status: '',
     sort: 'name-asc'
   });
-  const [activeFilters, setActiveFilters] = useState<Record<string, any>>({
+  const [activeFilters, setActiveFilters] = useState<Record<string, unknown>>({
     search: '',
     status: '',
     sort: 'name-asc'
@@ -35,25 +35,12 @@ export default function ClientCardList({ onClientClick }: ClientCardListProps) {
     pageNumber: currentPage,
     pageSize: pageSize,
     // Add any additional filters from activeFilters as needed
-    ...(activeFilters.status && activeFilters.status !== 'all' ? { status: activeFilters.status } : {}),
-    ...(activeFilters.search ? { search: activeFilters.search } : {})
+    ...(activeFilters.status && activeFilters.status !== 'all' ? { status: activeFilters.status as string } : {}),
+    ...(activeFilters.search ? { search: activeFilters.search as string } : {})
   });
 
   // Filter and sort clients based on active filters
   const filteredClients = clients
-    .filter((client) => {
-      // Status filter - this should be handled by the API, but we'll keep it here as a fallback
-      if (activeFilters.status && activeFilters.status !== 'all') {
-        return true; // Already filtered by API
-      }
-      
-      // Search filter - this should be handled by the API, but we'll keep it here as a fallback
-      if (activeFilters.search) {
-        return true; // Already filtered by API
-      }
-      
-      return true;
-    })
     .sort((a, b) => {
       switch (activeFilters.sort || sortBy) {
         case 'name-desc':
@@ -74,8 +61,7 @@ export default function ClientCardList({ onClientClick }: ClientCardListProps) {
   const paginatedClients = filteredClients;
 
   // Handle filter changes - now only triggered when the user clicks the apply button
-  const handleFilterChange = (newFilters: Record<string, any>) => {
-    console.log('ClientCardList handleFilterChange:', newFilters);
+  const handleFilterChange = (newFilters: Record<string, unknown>) => {
     
     // Convert 'all' values to empty strings for internal handling
     const processedFilters = { ...newFilters };
@@ -85,7 +71,7 @@ export default function ClientCardList({ onClientClick }: ClientCardListProps) {
     setCurrentPage(1); // Reset to first page when filters change
     
     if ('sort' in newFilters) {
-      setSortBy(newFilters.sort || 'name-asc');
+      setSortBy((newFilters.sort as string) || 'name-asc');
     }
   };
 

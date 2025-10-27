@@ -1,22 +1,8 @@
-import { IntervalData } from './financial';
 import { PagedRequest } from './request-parameters';
 
-export enum ServingUnit {
-    Grams = "Grams",
-    Milliliters = "Milliliters",
-    Pieces = "Pieces",
-    Cups = "Cups",
-    Tablespoons = "Tablespoons"
-}
-
-
-export enum FoodCategory {
-    Dairy = "Dairy",
-    Proteins = "Proteins",
-    Grains = "Grains",
-    Vegetables = "Vegetables",
-    Fruits = "Fruits"
-}
+// ✅ Union Types (Rehberinizden: Enum yerine union kullan)
+export type ServingUnit = 'Grams' | 'Milliliters' | 'Pieces' | 'Cups' | 'Tablespoons';
+export type FoodCategory = 'Dairy' | 'Proteins' | 'Grains' | 'Vegetables' | 'Fruits';
 
 export interface CreateNutritionInfoRequest {
     name: string;
@@ -122,28 +108,3 @@ export interface NutritionInfoDetail {
     lastModifiedAt: Date;
 }
 
-export enum FinancialInterval {
-    Unknown = 0,
-    Daily = 1,
-    Weekly = 2,
-    Monthly = 3,
-    Yearly = 4
-}
-
-export interface GetFinancialOverviewInitRequest {
-    startDate?: Date;
-    endDate?: Date;
-    interval?: FinancialInterval;
-    dieticianId?: number;
-}
-
-export interface GetFinancialOverviewInitResponse {
-    intervals: Record<FinancialInterval, IntervalData[]>;
-    totalNetIncome: number;
-    totalExpenses: number;
-    pendingExpenses: number;
-    pendingIncome: number;
-    pendingNetIncome: number;
-    completedIncomes: number;
-    totalTransactions: number;
-}

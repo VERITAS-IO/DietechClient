@@ -1,34 +1,36 @@
 import { CreateMealRequest, MealListResponse } from "./meal";
 import { PagedRequest } from "./request-parameters";
 
-export enum DietType {
-    Standard = 'Standard',
-    Mediterranean = 'Mediterranean',
-    LowCarb = 'LowCarb',
-    Ketogenic = 'Ketogenic',
-    Vegetarian = 'Vegetarian',
-    Vegan = 'Vegan',
-    PaleoStyle = 'PaleoStyle',
-    GlutenFree = 'GlutenFree',
-    DairyFree = 'DairyFree',
-    LowFat = 'LowFat',
-    LowSodium = 'LowSodium',
-    DiabetesFriendly = 'DiabetesFriendly',
-    HighProtein = 'HighProtein',
-    WeightLoss = 'WeightLoss',
-    WeightGain = 'WeightGain',
-    Elimination = 'Elimination',
-    Custom = 'Custom'
-}
+// ✅ Union Types (Rehberinizden: Enum yerine union kullan)
+export type DietType = 
+  | 'Standard'
+  | 'Mediterranean'
+  | 'LowCarb'
+  | 'Ketogenic'
+  | 'Vegetarian'
+  | 'Vegan'
+  | 'PaleoStyle'
+  | 'GlutenFree'
+  | 'DairyFree'
+  | 'LowFat'
+  | 'LowSodium'
+  | 'DiabetesFriendly'
+  | 'HighProtein'
+  | 'WeightLoss'
+  | 'WeightGain'
+  | 'Elimination'
+  | 'Custom';
 
+// ✅ Basit Interface (Rehberinizden: Karmaşık yapma)
 export interface CreateDietRequest {
-    name: string;
-    dietDescription: string;
-    dietType: DietType;
-    dietDuration: number;
-    totalCalories: number;
-    tenantId: number;
-    meals?: CreateMealRequest[]; 
+  name: string;
+  dietDescription: string;
+  dietType: DietType;
+  dietDuration: number;
+  totalCalories: number;
+  isActive: boolean;
+  tenantId: number;
+  meals?: CreateMealRequest[];
 }
 
 export interface CreateDietResponse {
@@ -67,7 +69,7 @@ export interface DietListResponse {
     startDate: string;
     endDate: string;
     isActive: boolean;
-    nutritionInfoList: any[];
+    nutritionInfoList: unknown[];
 }
 
 export interface PaginatedDietListResponse {

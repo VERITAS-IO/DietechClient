@@ -4,7 +4,6 @@ import { Plus } from "lucide-react";
 import { useDietStore } from "@/stores/diet-store";
 import DietCreateDialog from "@/components/diet/DietCreateDialog";
 import DietCardList from "@/components/diet/DietCardList";
-import { useState } from "react";
 
 const DietsPage = () => {
   const { t } = useTranslation();

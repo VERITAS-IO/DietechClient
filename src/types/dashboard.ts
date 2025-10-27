@@ -1,9 +1,5 @@
-export enum MainPageInterval {
-  Daily = 'Daily',
-  Weekly = 'Weekly',
-  Monthly = 'Monthly',
-  Yearly = 'Yearly'
-}
+// ✅ Union Type (Rehberinizden: Enum yerine union kullan)
+export type MainPageInterval = 'Daily' | 'Weekly' | 'Monthly' | 'Yearly';
 
 export interface MainPageOverviewItem {
   totalCount: number;

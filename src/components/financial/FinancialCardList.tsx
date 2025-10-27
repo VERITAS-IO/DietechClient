@@ -5,7 +5,7 @@ import { CardDataGrid, CardColumn } from '@/components/ui/card-data-grid';
 import { CardDataGridFilter, FilterOption } from '@/components/ui/card-data-grid-filter';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { DollarSign, Calendar, Plus, AlignLeft, AlertTriangle } from 'lucide-react';
+import { Calendar, Plus,  AlertTriangle } from 'lucide-react';
 import { Financial, FinancialType, FinancialStatus } from '@/types/financial';
 import { useFinancialStore } from '@/stores/financial-store';
 import { useFinancials } from '@/hooks/financial-hooks';
@@ -86,7 +86,6 @@ export default function FinancialCardList() {
           dieticianId: user.dieticianId
         });
       } catch (err) {
-        console.error('Error fetching financials:', err);
         setError(err instanceof Error ? err.message : 'Failed to fetch financial data');
       }
     }
@@ -155,13 +154,13 @@ export default function FinancialCardList() {
   // Get Status badge 
   const getStatusBadge = (status: FinancialStatus) => {
     switch (status) {
-      case FinancialStatus.Completed:
+      case 'Completed':
         return <Badge className="bg-green-100 text-green-800 hover:bg-green-200">{t(`financial.status.${status.toLowerCase()}`)}</Badge>;
-      case FinancialStatus.Pending:
+      case 'Pending':
         return <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200">{t(`financial.status.${status.toLowerCase()}`)}</Badge>;
-      case FinancialStatus.Cancelled:
+      case 'Cancelled':
         return <Badge className="bg-red-100 text-red-800 hover:bg-red-200">{t(`financial.status.${status.toLowerCase()}`)}</Badge>;
-      case FinancialStatus.Refunded:
+      case 'Refunded':
         return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200">{t(`financial.status.${status.toLowerCase()}`)}</Badge>;
       default:
         return <Badge variant="secondary">{t('financial.unknown')}</Badge>;
@@ -171,15 +170,15 @@ export default function FinancialCardList() {
   // Get Type badge
   const getTypeBadge = (type: FinancialType) => {
     switch (type) {
-      case FinancialType.Income:
+      case 'Income':
         return <Badge className="bg-green-100 text-green-800 hover:bg-green-200">{t(`financial.type.${type.toLowerCase()}`)}</Badge>;
-      case FinancialType.Expense:
+      case 'Expense':
         return <Badge className="bg-red-100 text-red-800 hover:bg-red-200">{t(`financial.type.${type.toLowerCase()}`)}</Badge>;
-      case FinancialType.Consultation:
+      case 'Consultation':
         return <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-200">{t(`financial.type.${type.toLowerCase()}`)}</Badge>;
-      case FinancialType.Appointment:
+      case 'Appointment':
         return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200">{t(`financial.type.${type.toLowerCase()}`)}</Badge>;
-      case FinancialType.Other:
+      case 'Other':
         return <Badge className="bg-gray-100 text-gray-800 hover:bg-gray-200">{t(`financial.type.${type.toLowerCase()}`)}</Badge>;
       default:
         return <Badge variant="secondary">{t('financial.unknown')}</Badge>;
@@ -192,20 +191,25 @@ export default function FinancialCardList() {
       id: 'type',
       label: t('financial.filters.type'),
       type: 'select',
-      options: Object.values(FinancialType).map(type => ({
-        value: type,
-        label: t(`financial.type.${type.toLowerCase()}`)
-      })),
+      options: [
+        { value: 'Income', label: t('financial.type.income') },
+        { value: 'Expense', label: t('financial.type.expense') },
+        { value: 'Consultation', label: t('financial.type.consultation') },
+        { value: 'Appointment', label: t('financial.type.appointment') },
+        { value: 'Other', label: t('financial.type.other') }
+      ],
       placeholder: t('financial.filters.selectType')
     },
     {
       id: 'status',
       label: t('financial.filters.status'),
       type: 'select',
-      options: Object.values(FinancialStatus).map(status => ({
-        value: status,
-        label: t(`financial.status.${status.toLowerCase()}`)
-      })),
+      options: [
+        { value: 'Completed', label: t('financial.status.completed') },
+        { value: 'Pending', label: t('financial.status.pending') },
+        { value: 'Cancelled', label: t('financial.status.cancelled') },
+        { value: 'Refunded', label: t('financial.status.refunded') }
+      ],
       placeholder: t('financial.filters.selectStatus')
     },
     {
@@ -235,8 +239,8 @@ export default function FinancialCardList() {
       title: t('financial.amount'),
       secondary: true,
       render: (item) => (
-        <div className={`font-medium ${item.type === FinancialType.Income ? 'text-green-600' : 'text-red-600'}`}>
-          {item.type === FinancialType.Income ? '+' : '-'} {formatCurrency(item.amount)}
+        <div className={`font-medium ${item.type === 'Income' ? 'text-green-600' : 'text-red-600'}`}>
+          {item.type === 'Income' ? '+' : '-'} {formatCurrency(item.amount)}
         </div>
       )
     },

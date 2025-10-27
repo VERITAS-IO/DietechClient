@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Financial, GetFinancialOverviewInitResponse, IntervalData, FinancialInterval, FinancialIntervalMapping } from '@/types/financial';
+import { GetFinancialOverviewInitResponse, IntervalData } from '@/types/financial';
 import { formatCurrency } from '@/lib/utils/format';
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { ArrowDownIcon, ArrowUpIcon, ClockIcon, CheckCircleIcon, RefreshCwIcon } from 'lucide-react';
@@ -10,27 +10,27 @@ import { format, parseISO } from 'date-fns';
 
 interface FinancialOverviewProps {
   overviewData: GetFinancialOverviewInitResponse;
-  selectedInterval?: FinancialInterval;
-  onIntervalChange?: (interval: FinancialInterval) => void;
+  selectedInterval?: 'Daily' | 'Weekly' | 'Monthly' | 'Yearly';
+  onIntervalChange?: (interval: 'Daily' | 'Weekly' | 'Monthly' | 'Yearly') => void;
 }
 
 export const FinancialOverview: React.FC<FinancialOverviewProps> = ({ 
   overviewData,
-  selectedInterval = FinancialInterval.Daily,
+  selectedInterval = 'Daily',
   onIntervalChange 
 }) => {
   const { t } = useTranslation();
 
   // Convert interval to tab value
-  const getTabValue = (interval: FinancialInterval): string => {
+  const getTabValue = (interval: 'Daily' | 'Weekly' | 'Monthly' | 'Yearly'): string => {
     switch (interval) {
-      case FinancialInterval.Daily:
+      case 'Daily':
         return 'daily';
-      case FinancialInterval.Weekly:
+      case 'Weekly':
         return 'weekly';
-      case FinancialInterval.Monthly:
+      case 'Monthly':
         return 'monthly';
-      case FinancialInterval.Yearly:
+      case 'Yearly':
         return 'yearly';
       default:
         return 'daily';
@@ -38,18 +38,18 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({
   };
 
   // Convert tab value to interval
-  const getIntervalFromTab = (tab: string): FinancialInterval => {
+  const getIntervalFromTab = (tab: string): 'Daily' | 'Weekly' | 'Monthly' | 'Yearly' => {
     switch (tab) {
       case 'daily':
-        return FinancialInterval.Daily;
+        return 'Daily';
       case 'weekly':
-        return FinancialInterval.Weekly;
+        return 'Weekly';
       case 'monthly':
-        return FinancialInterval.Monthly;
+        return 'Monthly';
       case 'yearly':
-        return FinancialInterval.Yearly;
+        return 'Yearly';
       default:
-        return FinancialInterval.Daily;
+        return 'Daily';
     }
   };
 
@@ -60,7 +60,7 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({
   };
 
   // Helper function to get the correct interval data array
-  const getIntervalData = (intervals: Record<string | number, IntervalData[]>, intervalType: FinancialInterval): IntervalData[] => {
+  const getIntervalData = (intervals: Record<string | number, IntervalData[]>, intervalType: 'Daily' | 'Weekly' | 'Monthly' | 'Yearly'): IntervalData[] => {
     // Try to get data using string key first
     const stringKey = intervalType;
     if (intervals[stringKey] && intervals[stringKey].length > 0) {
@@ -84,10 +84,10 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({
     }
     
     // Get data for each interval type using the helper function
-    const dailyData = getIntervalData(overviewData.intervals, FinancialInterval.Daily);
-    const weeklyData = getIntervalData(overviewData.intervals, FinancialInterval.Weekly);
-    const monthlyData = getIntervalData(overviewData.intervals, FinancialInterval.Monthly);
-    const yearlyData = getIntervalData(overviewData.intervals, FinancialInterval.Yearly);
+    const dailyData = getIntervalData(overviewData.intervals, 'Daily');
+    const weeklyData = getIntervalData(overviewData.intervals, 'Weekly');
+    const monthlyData = getIntervalData(overviewData.intervals, 'Monthly');
+    const yearlyData = getIntervalData(overviewData.intervals, 'Yearly');
     
     const formatIntervalData = (intervalData: IntervalData[]) => {
       return intervalData.map(item => {
@@ -119,7 +119,6 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({
             netIncome: item.totalNetIncome || 0,
           };
         } catch (error) {
-          console.error('Error formatting interval data:', error, item);
           return {
             label: 'Error',
             income: 0,

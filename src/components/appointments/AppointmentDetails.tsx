@@ -6,7 +6,7 @@
   import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
   import { Separator } from '@/components/ui/separator';
   import { useAppointmentStore } from '@/stores/appointment-store';
-  import { AppointmentType, AppointmentStatus, GetAppointmentResponse } from '@/types/appointment';
+  import { GetAppointmentResponse } from '@/types/appointment';
   import { AppointmentNotes } from './AppointmentNotes';
 
   interface AppointmentDetailsProps {
@@ -34,23 +34,23 @@
       return <div>{t('appointment.notFound')}</div>;
     }
 
-    const getAppointmentTypeLabel = (type: AppointmentType) => {
-      return t(`appointment.types.${AppointmentType[type].toLowerCase()}`);
+    const getAppointmentTypeLabel = (type: 'Initial' | 'FollowUp' | 'Assessment' | 'Emergency') => {
+      return t(`appointment.types.${type.toLowerCase()}`);
     };
 
-    const getAppointmentStatusLabel = (status: AppointmentStatus) => {
+    const getAppointmentStatusLabel = (status: 'Scheduled' | 'Confirmed' | 'Cancelled' | 'Completed') => {
       return t(`appointment.status.${status}`);
     };
 
-    const getStatusColor = (status: AppointmentStatus) => {
+    const getStatusColor = (status: 'Scheduled' | 'Confirmed' | 'Cancelled' | 'Completed') => {
       switch (status) {
-        case AppointmentStatus.Scheduled:
+        case 'Scheduled':
           return 'bg-yellow-500';
-        case AppointmentStatus.Confirmed:
+        case 'Confirmed':
           return 'bg-green-500';
-        case AppointmentStatus.Cancelled:
+        case 'Cancelled':
           return 'bg-red-500';
-        case AppointmentStatus.Completed:
+        case 'Completed':
           return 'bg-blue-500';
         default:
           return 'bg-gray-500';

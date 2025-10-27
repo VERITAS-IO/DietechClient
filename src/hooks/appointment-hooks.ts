@@ -12,10 +12,12 @@ import {
 export function useAppointments(query?: QueryAppointmentsRequest) {
   const queryClient = useQueryClient();
 
-  const { data: appointments = [], isLoading } = useQuery({
+  const { data: appointmentsResponse, isLoading } = useQuery({
     queryKey: ['appointments', query],
     queryFn: () => appointmentService.getAppointments(query),
   });
+
+  const appointments = appointmentsResponse?.items || [];
 
   const createMutation = useMutation({
     mutationFn: appointmentService.createAppointment,
@@ -51,10 +53,12 @@ export function useAppointments(query?: QueryAppointmentsRequest) {
 export function useAppointmentNotes(query?: QueryAppointmentNotesRequest) {
   const queryClient = useQueryClient();
 
-  const { data: notes = [], isLoading } = useQuery({
+  const { data: notesResponse, isLoading } = useQuery({
     queryKey: ['appointment-notes', query],
     queryFn: () => appointmentService.getAppointmentNotes(query),
   });
+
+  const notes = notesResponse?.items || [];
 
   const createMutation = useMutation({
     mutationFn: (note: CreateAppointmentNoteRequest & { appointmentId: number }) => 

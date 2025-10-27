@@ -71,7 +71,7 @@ export function AppointmentNoteCardList() {
         // Handle note type
         if ('noteType' in newFilters) {
             updatedFilters.noteType = newFilters.noteType && newFilters.noteType !== 'all' 
-                ? parseInt(newFilters.noteType, 10) as NoteType
+                ? newFilters.noteType
                 : undefined;
         }
         
@@ -105,15 +105,15 @@ export function AppointmentNoteCardList() {
         }
         
         switch (noteType) {
-            case NoteType.PreAppointment:
+            case 'PreAppointment':
                 return <Badge variant="secondary" className="bg-blue-100 text-blue-800 hover:bg-blue-200">
                     {t(`appointment.notes.types.${noteType}`)}
                 </Badge>;
-            case NoteType.DuringAppointment:
+            case 'DuringAppointment':
                 return <Badge variant="secondary" className="bg-green-100 text-green-800 hover:bg-green-200">
                     {t(`appointment.notes.types.${noteType}`)}
                 </Badge>;
-            case NoteType.AfterAppointment:
+            case 'AfterAppointment':
                 return <Badge variant="secondary" className="bg-amber-100 text-amber-800 hover:bg-amber-200">
                     {t(`appointment.notes.types.${noteType}`)}
                 </Badge>;
@@ -133,7 +133,6 @@ export function AppointmentNoteCardList() {
         
         // Handle case when appointment doesn't exist
         if (!appointment) {
-            console.warn(`Appointment with ID ${appointmentId} not found`);
             return t('appointment.notes.appointmentNotFound');
         }
         
@@ -145,7 +144,6 @@ export function AppointmentNoteCardList() {
             }
             return `${appointment.clientName} - ${format(date, 'dd/MM/yyyy')}`;
         } catch (err) {
-            console.error('Date formatting error:', err);
             return `${appointment.clientName} - ${t('common.invalidDate')}`;
         }
     };
@@ -164,7 +162,6 @@ export function AppointmentNoteCardList() {
                         dateDisplay = format(date, 'dd/MM/yyyy HH:mm');
                     }
                 } catch (err) {
-                    console.error('Date formatting error:', err);
                 }
                 
                 return {
@@ -179,9 +176,9 @@ export function AppointmentNoteCardList() {
             label: t('appointment.notes.type'),
             type: 'select',
             options: [
-                { value: NoteType.PreAppointment.toString(), label: t('appointment.notes.types.1') },
-                { value: NoteType.DuringAppointment.toString(), label: t('appointment.notes.types.2') },
-                { value: NoteType.AfterAppointment.toString(), label: t('appointment.notes.types.3') }
+                { value: 'PreAppointment', label: t('appointment.notes.types.1') },
+                { value: 'DuringAppointment', label: t('appointment.notes.types.2') },
+                { value: 'AfterAppointment', label: t('appointment.notes.types.3') }
             ],
             placeholder: t('appointment.notes.filter.selectType')
         },
@@ -245,7 +242,6 @@ export function AppointmentNoteCardList() {
                         {format(date, 'dd/MM/yyyy HH:mm')}
                     </div>;
                 } catch (err) {
-                    console.error('Date formatting error:', err);
                     return <div className="flex items-center">
                         <Clock className="mr-1 h-3.5 w-3.5 text-muted-foreground" />
                         {t('common.invalidDate')}

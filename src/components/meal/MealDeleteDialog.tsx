@@ -25,25 +25,20 @@ export default function MealDeleteDialog() {
     // Add debugging to track when the dialog opens and what meal ID is selected
     useEffect(() => {
         if (isDeleteModalOpen) {
-            console.log("MealDeleteDialog opened with selectedMealId:", selectedMealId);
         }
     }, [isDeleteModalOpen, selectedMealId]);
 
     const handleDelete = async () => {
-        console.log("Attempting to delete meal with ID:", selectedMealId);
         
         if (!selectedMealId) {
-            console.error("Cannot delete meal: No meal ID selected");
             setDeleteModalOpen(false);
             return;
         }
         
         try {
             await deleteMealMutation.mutateAsync(selectedMealId);
-            console.log("Successfully deleted meal with ID:", selectedMealId);
             setDeleteModalOpen(false);
         } catch (error) {
-            console.error("Error deleting meal:", error);
         }
     };
 

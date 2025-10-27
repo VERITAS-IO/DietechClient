@@ -1,15 +1,12 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { 
-  AppointmentStatus, 
-  AppointmentType,
   CreateAppointmentRequest,
   UpdateAppointmentRequest,
   QueryAppointmentsRequest,
   CreateAppointmentNoteRequest,
   UpdateAppointmentNoteRequest,
   QueryAppointmentNotesRequest,
-  NoteType,
   GetAppointmentResponse,
   GetAppointmentNoteResponse
 } from '@/types/appointment';
@@ -51,8 +48,8 @@ const mockAppointments: GetAppointmentResponse[] = [
     end: createDateWithTimezone("2024-02-01T11:00:00"),
     clientId: 1,
     clientName: "John Doe",
-    type: AppointmentType.Initial,
-    status: AppointmentStatus.Scheduled,
+    type: 'Initial',
+    status: 'Scheduled',
     preparationInstructions: "Please bring your recent blood tests",
   },
   {
@@ -62,8 +59,8 @@ const mockAppointments: GetAppointmentResponse[] = [
     end: createDateWithTimezone("2024-02-02T15:00:00"),
     clientId: 2,
     clientName: "Jane Smith",
-    type: AppointmentType.FollowUp,
-    status: AppointmentStatus.Confirmed,
+    type: 'FollowUp',
+    status: 'Confirmed',
     preparationInstructions: "Update your food diary",
   },
 ];
@@ -73,14 +70,14 @@ const mockAppointmentNotes: GetAppointmentNoteResponse[] = [
     id: 1,
     appointmentId: 1,
     note: "Client reported issues with current diet plan",
-    noteType: NoteType.PreAppointment,
+    noteType: 'PreAppointment',
     createdAt: new Date()
   },
   {
     id: 2,
     appointmentId: 1,
     note: "Discussed alternative meal options",
-    noteType: NoteType.DuringAppointment,
+    noteType: 'DuringAppointment',
     createdAt: new Date()
   },
 ];

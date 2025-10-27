@@ -13,15 +13,15 @@ export interface FilterOption<T = string> {
   type: 'text' | 'select' | 'date' | 'number' | 'checkbox' | 'custom';
   placeholder?: string;
   options?: { value: T; label: string }[];
-  defaultValue?: any;
+  defaultValue?: unknown;
   component?: React.ReactNode;
 }
 
-export interface CardDataGridFilterProps<T = any> {
+export interface CardDataGridFilterProps<T = unknown> {
   filterOptions: FilterOption[];
-  onFilterChange: (filters: Record<string, any>) => void;
+  onFilterChange: (filters: Record<string, unknown>) => void;
   onResetFilters?: () => void;
-  activeFilters?: Record<string, any>;
+  activeFilters?: Record<string, unknown>;
   className?: string;
   showFilterToggle?: boolean;
   searchColumn?: string;
@@ -42,7 +42,6 @@ export function CardDataGridFilter({
   const [searchInput, setSearchInput] = useState(activeFilters?.[searchColumn] || '');
   
   // Add debug log for initial render
-  console.log('Initial render:', { activeFilters, searchInput, pendingFilters });
   
   // Flag to prevent useEffect from overriding user's search input
   const userEditedSearch = useRef(false);
@@ -51,20 +50,12 @@ export function CardDataGridFilter({
 
   // Update local state when activeFilters prop changes, but don't override user's search input
   useEffect(() => {
-    console.log('ActiveFilters changed:', { 
-      activeFilters, 
-      userEdited: userEditedSearch.current,
-      searchInput, 
-      lastApplied: lastAppliedSearch.current 
-    });
-    
     // Update pending filters
     setPendingFilters((prev) => {
       const newFilters = { ...activeFilters };
       
       // If user edited search, preserve that value in pending filters
       if (userEditedSearch.current) {
-        console.log('Preserving user edited search:', searchInput);
         if (searchInput.trim() === '') {
           delete newFilters[searchColumn];
         } else {
@@ -82,7 +73,6 @@ export function CardDataGridFilter({
     
     // Only update search input from activeFilters if user hasn't edited it
     if (!userEditedSearch.current && activeFilters?.[searchColumn] !== searchInput) {
-      console.log('Updating search input from filters:', activeFilters?.[searchColumn]);
       setSearchInput(activeFilters?.[searchColumn] || '');
       lastAppliedSearch.current = activeFilters?.[searchColumn] || '';
     }
@@ -99,14 +89,12 @@ export function CardDataGridFilter({
 
   // Handle search input change
   const handleSearchInputChange = (value: string) => {
-    console.log('Search input changed:', value);
     userEditedSearch.current = true;
     setSearchInput(value);
   };
 
   // Apply filters - triggered by the search button
   const applyFilters = () => {
-    console.log('Apply filters called with search:', searchInput);
     
     // Reset user edited flag since we're explicitly applying filters now
     userEditedSearch.current = false;
@@ -122,15 +110,12 @@ export function CardDataGridFilter({
     if (searchInput.trim() === '') {
       // If search input is empty, remove the search filter entirely
       delete updatedFilters[searchColumn];
-      console.log('Removed search term from filters');
     } else {
       // Otherwise set the search term
       updatedFilters[searchColumn] = searchInput;
-      console.log('Applied search term to filters:', searchInput);
     }
     
     // Log what we're sending
-    console.log('Final filters being applied:', updatedFilters);
     
     // Apply all filters
     onFilterChange(updatedFilters);
@@ -138,7 +123,6 @@ export function CardDataGridFilter({
 
   // Reset filters
   const resetFilters = () => {
-    console.log('Reset filters called');
     userEditedSearch.current = false;
     lastAppliedSearch.current = '';
     
@@ -161,7 +145,6 @@ export function CardDataGridFilter({
 
   // Handle clear search specifically
   const handleClearSearch = () => {
-    console.log('Clear search called');
     setSearchInput('');
     userEditedSearch.current = true;
     

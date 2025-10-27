@@ -7,10 +7,11 @@ import { Input } from "@/components/ui/input";
 import { useEffect } from "react";
 import { useClientStore } from "@/stores/client-store";
 import { useTranslation } from "react-i18next";
+import { CreateClientRequest } from "@/types/client";
 
 interface UserRegistrationFormProps {
-  data?: any;
-  onSubmit: (data: any) => void;
+  data?: Partial<CreateClientRequest>;
+  onSubmit: (data: Record<string, unknown>) => void;
   isSubmitting?: boolean;
 }
 
@@ -19,13 +20,11 @@ export function UserRegistrationForm({ data, onSubmit, isSubmitting = false }: U
   const { formData } = useClientStore();
   
   const formSchema = z.object({
-    userRegistrationRequest: z.object({
-      firstName: z.string().min(2, t('auth.register.form.validation.firstName')).max(50, t('validation.maxLength', { max: 50 })),
-      lastName: z.string().min(2, t('auth.register.form.validation.lastName')).max(50, t('validation.maxLength', { max: 50 })),
-      email: z.string().email(t('validation.email')),
-      phoneNumber: z.string().min(10, t('validation.minLength', { min: 10 })).max(15, t('validation.maxLength', { max: 15 })),
-      roles: z.array(z.string()).default(['Client']),
-    }),
+    firstName: z.string().min(2, t('auth.register.form.validation.firstName')).max(50, t('validation.maxLength', { max: 50 })),
+    lastName: z.string().min(2, t('auth.register.form.validation.lastName')).max(50, t('validation.maxLength', { max: 50 })),
+    email: z.string().email(t('validation.email')),
+    phoneNumber: z.string().min(10, t('validation.minLength', { min: 10 })).max(15, t('validation.maxLength', { max: 15 })),
+    roles: z.array(z.string()).default(['Client']),
   });
 
   type FormValues = z.infer<typeof formSchema>;
@@ -33,30 +32,26 @@ export function UserRegistrationForm({ data, onSubmit, isSubmitting = false }: U
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      userRegistrationRequest: {
-        firstName: formData.userRegistrationRequest.firstName,
-        lastName: formData.userRegistrationRequest.lastName,
-        email: formData.userRegistrationRequest.email,
-        phoneNumber: formData.userRegistrationRequest.phoneNumber,
-        roles: formData.userRegistrationRequest.roles,
-        ...data,
-      },
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email,
+      phoneNumber: formData.phoneNumber,
+      roles: formData.roles,
+      ...data,
     },
   });
 
   useEffect(() => {
     const newData = {
-      firstName: data?.firstName || formData.userRegistrationRequest.firstName,
-      lastName: data?.lastName || formData.userRegistrationRequest.lastName,
-      email: data?.email || formData.userRegistrationRequest.email,
-      phoneNumber: data?.phoneNumber || formData.userRegistrationRequest.phoneNumber,
-      roles: data?.roles || formData.userRegistrationRequest.roles,
+      firstName: data?.firstName || formData.firstName,
+      lastName: data?.lastName || formData.lastName,
+      email: data?.email || formData.email,
+      phoneNumber: data?.phoneNumber || formData.phoneNumber,
+      roles: data?.roles || formData.roles,
     };
 
-    form.reset({
-      userRegistrationRequest: newData,
-    });
-  }, [data, form, formData.userRegistrationRequest]);
+    form.reset(newData);
+  }, [data, form, formData]);
 
   const handleSubmit = (values: FormValues) => {
     onSubmit(values);
@@ -66,23 +61,23 @@ export function UserRegistrationForm({ data, onSubmit, isSubmitting = false }: U
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="userRegistrationRequest.firstName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('auth.register.form.firstName.label')}</FormLabel>
-                <FormControl>
-                  <Input placeholder={t('auth.register.form.firstName.placeholder')} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <FormField
+          control={form.control}
+          name="firstName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t('auth.register.form.firstName.label')}</FormLabel>
+              <FormControl>
+                <Input placeholder={t('auth.register.form.firstName.placeholder')} {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
           <FormField
             control={form.control}
-            name="userRegistrationRequest.lastName"
+            name="lastName"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>{t('auth.register.form.lastName.label')}</FormLabel>
@@ -97,7 +92,7 @@ export function UserRegistrationForm({ data, onSubmit, isSubmitting = false }: U
 
         <FormField
           control={form.control}
-          name="userRegistrationRequest.email"
+          name="email"
           render={({ field }) => (
             <FormItem>
               <FormLabel>{t('auth.register.form.email.label')}</FormLabel>
@@ -111,7 +106,7 @@ export function UserRegistrationForm({ data, onSubmit, isSubmitting = false }: U
 
         <FormField
           control={form.control}
-          name="userRegistrationRequest.phoneNumber"
+          name="phoneNumber"
           render={({ field }) => (
             <FormItem>
               <FormLabel>{t('auth.register.form.phoneNumber.label')}</FormLabel>

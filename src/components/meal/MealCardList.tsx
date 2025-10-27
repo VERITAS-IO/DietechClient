@@ -102,30 +102,39 @@ export default function MealCardList() {
         return t(`meal.types.${mealType.toLowerCase()}`);
     };
 
-    // Define filter options
+    // ✅ Filter Options (Rehberinizden: String literals kullan)
     const filterOptions: FilterOption[] = [
         {
             id: 'mealType',
             label: t('meal.type'),
             type: 'select',
-            options: Object.entries(MealType)
-                .filter(([key]) => key !== 'Unknown')
-                .map(([key, value]) => ({
-                    value: value,
-                    label: t(`meal.types.${key.toLowerCase()}`)
-                })),
+            options: [
+                { value: 'Breakfast', label: t('meal.types.breakfast') },
+                { value: 'Lunch', label: t('meal.types.lunch') },
+                { value: 'Dinner', label: t('meal.types.dinner') },
+                { value: 'Snack', label: t('meal.types.snack') },
+                { value: 'PreWorkout', label: t('meal.types.preworkout') },
+                { value: 'PostWorkout', label: t('meal.types.postworkout') },
+                { value: 'Custom', label: t('meal.types.custom') },
+            ],
             placeholder: t('meal.filterType')
         },
         {
             id: 'mealOrder',
             label: t('meal.order'),
             type: 'select',
-            options: Object.entries(MealOrder)
-                .filter(([key]) => key !== 'Unknown' && key !== 'Custom')
-                .map(([key, value]) => ({
-                    value: value,
-                    label: t(`meal.orders.${key.toLowerCase()}`)
-                })),
+            options: [
+                { value: 'FirstMeal', label: t('meal.orders.firstmeal') },
+                { value: 'SecondMeal', label: t('meal.orders.secondmeal') },
+                { value: 'ThirdMeal', label: t('meal.orders.thirdmeal') },
+                { value: 'FourthMeal', label: t('meal.orders.fourthmeal') },
+                { value: 'FifthMeal', label: t('meal.orders.fifthmeal') },
+                { value: 'SixthMeal', label: t('meal.orders.sixthmeal') },
+                { value: 'SeventhMeal', label: t('meal.orders.seventhmeal') },
+                { value: 'EighthMeal', label: t('meal.orders.eighthmeal') },
+                { value: 'NinthMeal', label: t('meal.orders.ninthmeal') },
+                { value: 'TenthMeal', label: t('meal.orders.tenthmeal') },
+            ],
             placeholder: t('meal.filterOrder')
         },
         {

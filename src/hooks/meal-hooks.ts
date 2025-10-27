@@ -19,12 +19,17 @@ export const useQueryMeals = (request: QueryMealRequest) => {
     });
 };
 
-export const useGetMeal = (id: number, options = {}) => {
-    return useQuery({
+export const useGetMeal = (id: number, options: Record<string, unknown> = {}) => {
+    const query = useQuery({
         queryKey: MEAL_KEYS.detail(id),
         queryFn: () => mealService.getById(id),
         ...options
     });
+    
+    return {
+        ...query,
+        meal: query.data?.data
+    };
 };
 
 export const useCreateMeal = () => {

@@ -11,45 +11,41 @@ interface ClientStore {
   clients: QueryClientResponse[];
   setFormData: (data: Partial<CreateClientRequest>) => void;
   setCurrentStep: (step: number) => void;
-  updateStepData: (step: StepKey, data: any) => void;
+  updateStepData: (step: StepKey, data: Record<string, unknown>) => void;
   resetForm: () => void;
   getClients: (request: QueryClientRequest) => Promise<QueryClientResponse[]>;
   searchClients: (query: string) => Promise<QueryClientResponse[]>;
 }
 
+// ✅ Basit Interface (Rehberinizden: Karmaşık nested yapma)
 const initialFormData: CreateClientRequest = {
-  userRegistrationRequest: {
-    firstName: "",
-    lastName: "",
-    email: "",
-    phoneNumber: "",
-    roles: ["Client"],
-  },
-  createPersonaInfoRequest: {
-    gender: "Unknown",
-    dateOfBirth: "",
-    firstName: "",
-    lastName: "",
-    email: "",
-    phoneNumber: "",
-  },
-  createLifeStyleInfoRequest: {
-    physicalActivity: "Unknown",
-    sleepHours: 7,
-    stressLevel: "Unknown",
-    smoking: "Unknown",
-    alcohol: "Unknown",
-  },
-  createHealthInfoRequest: {
-    bloodPressure: "Unknown",
-    bloodType: "Unknown",
-    bloodSugarLevel: undefined,
-    weight: 70,
-    height: 170,
-    chronicConditions: "",
-    allergies: "",
-    activelyUsedDrugs: "",
-  },
+  // User Registration
+  firstName: "",
+  lastName: "",
+  email: "",
+  phoneNumber: "",
+  roles: ["Client"],
+  
+  // Persona Info
+  gender: "Other",
+  dateOfBirth: "",
+  
+  // Lifestyle Info
+  physicalActivity: "None",
+  sleepHours: 7,
+  stressLevel: "Low",
+  smoking: "None",
+  alcohol: "None",
+  
+  // Health Info
+  bloodPressure: "Normal",
+  bloodType: "O_Positive",
+  bloodSugarLevel: undefined,
+  weight: 70,
+  height: 170,
+  chronicConditions: "",
+  allergies: "",
+  activelyUsedDrugs: "",
 };
 
 export const useClientStore = create<ClientStore>()(
@@ -69,7 +65,7 @@ export const useClientStore = create<ClientStore>()(
         set((state) => ({
           formData: {
             ...state.formData,
-            [step]: { ...state.formData[step], ...data },
+            ...data,
           },
         })),
       
@@ -82,7 +78,6 @@ export const useClientStore = create<ClientStore>()(
           set({ clients });
           return clients;
         } catch (error) {
-          console.error('Error fetching clients:', error);
           return [];
         }
       },
@@ -94,7 +89,6 @@ export const useClientStore = create<ClientStore>()(
           const results = await searchClientsByName(query);
           return results;
         } catch (error) {
-          console.error('Error searching clients:', error);
           return [];
         }
       },

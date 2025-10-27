@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -18,7 +18,7 @@ export function AppointmentNotes({ appointmentId }: AppointmentNotesProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedNote, setSelectedNote] = useState<GetAppointmentNoteResponse | null>(null);
   const [noteText, setNoteText] = useState('');
-  const [noteType, setNoteType] = useState<NoteType>(NoteType.PreAppointment);
+  const [noteType, setNoteType] = useState<'PreAppointment' | 'DuringAppointment' | 'AfterAppointment'>('PreAppointment');
 
   // Use the new hooks
   const {
@@ -74,7 +74,7 @@ export function AppointmentNotes({ appointmentId }: AppointmentNotesProps) {
       setIsDialogOpen(false);
       setSelectedNote(null);
       setNoteText('');
-      setNoteType(NoteType.PreAppointment);
+      setNoteType('PreAppointment');
     } catch (error) {
       toast({
         variant: 'destructive',
@@ -102,11 +102,11 @@ export function AppointmentNotes({ appointmentId }: AppointmentNotesProps) {
 
   const getNoteTypeLabel = useCallback((type: NoteType) => {
     switch (type) {
-      case NoteType.PreAppointment:
+      case 'PreAppointment':
         return t('appointment.notes.types.pre');
-      case NoteType.DuringAppointment:
+      case 'DuringAppointment':
         return t('appointment.notes.types.during');
-      case NoteType.AfterAppointment:
+      case 'AfterAppointment':
         return t('appointment.notes.types.after');
       default:
         return t('appointment.notes.types.unknown');
@@ -116,7 +116,7 @@ export function AppointmentNotes({ appointmentId }: AppointmentNotesProps) {
   const handleOpenNewNote = useCallback(() => {
     setSelectedNote(null);
     setNoteText('');
-    setNoteType(NoteType.PreAppointment);
+    setNoteType('PreAppointment');
     setIsDialogOpen(true);
   }, []);
 

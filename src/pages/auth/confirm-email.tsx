@@ -49,7 +49,6 @@ export default function ConfirmEmailPage() {
       const token = searchParams.get("token");
       const changedEmail = searchParams.get("changedEmail") || "";
 
-      console.log(`userId:${userId}\ntoken:${token}\nchangedEmail:${changedEmail}`);
 
       if (!userId || !token) {
         setValidationError("Missing required parameters in the confirmation link.");

@@ -1,5 +1,3 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { ClientStats } from "@/components/clients/client-stats";
 import { CreateClientDialog } from "@/components/clients/create-client-dialog";

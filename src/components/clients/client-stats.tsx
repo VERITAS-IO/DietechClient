@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Calendar, TrendingUp, Clock } from "lucide-react";
+import { Users, Calendar, Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 export function ClientStats() {

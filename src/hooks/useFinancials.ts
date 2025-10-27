@@ -28,21 +28,12 @@ const FINANCIAL_KEYS = {
 const DEFAULT_STALE_TIME = 5 * 60 * 1000;
 
 // Function to log cache status
-const logQueryStatus = (isFetching: boolean, isStale: boolean, queryKey: any) => {
-  if (isFetching) {
-    console.log(`Query ${JSON.stringify(queryKey)} is being fetched from network`);
-  } else if (!isStale) {
-    console.log(`Query ${JSON.stringify(queryKey)} using fresh cached data`);
-  } else {
-    console.log(`Query ${JSON.stringify(queryKey)} using stale cached data`);
-  }
-};
+// Remove the logging function entirely
 
 export const useGetFinancials = (
   request: QueryFinancialsRequest,
   options?: Omit<UseQueryOptions<QueryFinancialsResponse[], Error>, 'queryKey' | 'queryFn'>
 ) => {
-  console.log('useGetFinancials hook called with request:', request);
   const { toast } = useToast();
   const { t } = useTranslation();
   
@@ -54,15 +45,11 @@ export const useGetFinancials = (
     const user = useAuthStore.getState().user;
     if (user?.dieticianId) {
       mutableRequest.dieticianId = user.dieticianId;
-      console.log('Added dieticianId from user profile:', user.dieticianId);
     } else if (user?.id && user.roles?.includes('Dietician')) {
       mutableRequest.dieticianId = Number(user.id);
-      console.log('Using user ID as dieticianId fallback:', user.id);
     } else {
-      console.warn('No dieticianId available for financial request!');
     }
   } else {
-    console.log('Using provided dieticianId for financials request:', mutableRequest.dieticianId);
   }
   
   const queryKey = FINANCIAL_KEYS.list(mutableRequest);
@@ -70,19 +57,15 @@ export const useGetFinancials = (
   const result = useQuery<QueryFinancialsResponse[], Error>({
     queryKey,
     queryFn: async ({ signal }) => {
-      console.log('queryFn executing with request:', mutableRequest);
       try {
         if (!mutableRequest.dieticianId) {
           const errorMsg = 'DieticianId is required but not available';
-          console.error(errorMsg);
           throw new Error(errorMsg);
         }
         
-        const response = await financialService.queryFinancials(mutableRequest);
-        console.log('Financial service returned data:', response.length, 'items');
-        return response;
+        const response = await financialService.getFinancials(mutableRequest);
+        return response.items;
       } catch (error) {
-        console.error('Error in queryFinancials:', error);
         toast({
           title: t('financial.fetchError'),
           description: error instanceof Error 
@@ -113,7 +96,6 @@ export const useGetFinancialOverview = (
   request: GetFinancialOverviewInitRequest = {},
   options?: Omit<UseQueryOptions<GetFinancialOverviewInitResponse, Error>, 'queryKey' | 'queryFn'>
 ) => {
-  console.log('useGetFinancialOverview hook called with request:', request);
   const { toast } = useToast();
   const { t } = useTranslation();
   
@@ -125,15 +107,11 @@ export const useGetFinancialOverview = (
     const user = useAuthStore.getState().user;
     if (user?.dieticianId) {
       mutableRequest.dieticianId = user.dieticianId;
-      console.log('Added dieticianId to overview request from user profile:', user.dieticianId);
     } else if (user?.id && user.roles?.includes('Dietician')) {
       mutableRequest.dieticianId = Number(user.id);
-      console.log('Using user ID as dieticianId fallback for overview:', user.id);
     } else {
-      console.warn('No dieticianId available for financial overview request!');
     }
   } else {
-    console.log('Using provided dieticianId for overview request:', mutableRequest.dieticianId);
   }
   
   const queryKey = FINANCIAL_KEYS.overview(mutableRequest);
@@ -141,20 +119,15 @@ export const useGetFinancialOverview = (
   const result = useQuery<GetFinancialOverviewInitResponse, Error>({
     queryKey,
     queryFn: async ({ signal }) => {
-      console.log('Financial overview queryFn executing with request:', mutableRequest);
       try {
         if (!mutableRequest.dieticianId) {
           const errorMsg = 'DieticianId is required for financial overview but not available';
-          console.error(errorMsg);
           throw new Error(errorMsg);
         }
         
         const response = await financialService.getFinancialOverview(mutableRequest);
-        console.log('Financial overview service returned data with intervals:', 
-          Object.keys(response.intervals || {}).length);
-        return response;
+        return response.data;
       } catch (error) {
-        console.error('Error in getFinancialOverview:', error);
         toast({
           title: t('financial.fetchError'),
           description: error instanceof Error 
@@ -226,10 +199,10 @@ export const useUpdateFinancial = () => {
   
   return useMutation({
     mutationFn: (request: UpdateFinancialRequest) => 
-      financialService.updateFinancial(request),
-    onSuccess: (_, { id }) => {
+      financialService.updateFinancial(request.id, request),
+    onSuccess: (_, request) => {
       // Precise invalidation to avoid unnecessary refetches
-      queryClient.invalidateQueries({ queryKey: FINANCIAL_KEYS.detail(id) });
+      queryClient.invalidateQueries({ queryKey: FINANCIAL_KEYS.detail(request.id) });
       
       // Since this affects aggregates, invalidate related lists and overview
       queryClient.invalidateQueries({ queryKey: FINANCIAL_KEYS.lists() });

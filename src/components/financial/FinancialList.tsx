@@ -40,7 +40,7 @@ interface FinancialListProps {
   onAddClick?: () => void;
 }
 
-export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
+export const FinancialList: React.FC<FinancialListProps> = () => {
   const { t } = useTranslation();
   const [showFilters, setShowFilters] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -57,7 +57,6 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
     resetFilters,
     selectedFinancial,
     setSelectedFinancial,
-    isDeleteModalOpen,
     setDeleteModalOpen
   } = useFinancialStore();
 
@@ -67,19 +66,16 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
   // Helper function to get dieticianId with fallback
   const getDieticianId = () => {
     if (user?.dieticianId) {
-      console.log('FinancialList - Using dieticianId from user profile:', user.dieticianId);
       return user.dieticianId;
     }
     
     if (user?.id && user.roles?.includes('Dietician')) {
       const fallbackId = Number(user.id);
-      console.log('FinancialList - Using user ID as fallback dieticianId:', fallbackId);
       return fallbackId;
     }
     
     // Development fallback
     if (process.env.NODE_ENV === 'development') {
-      console.warn('FinancialList - Using development fallback dieticianId (1)');
       return 1;
     }
     
@@ -93,7 +89,6 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
     if (!availableDieticianId) {
       setErrorMessage('DieticianId is not available. Please check your profile settings.');
     } else {
-      console.log('FinancialList - Using dieticianId:', availableDieticianId);
       setErrorMessage(null);
     }
     
@@ -103,18 +98,14 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
     }
   }, [user, filters, setFilters]);
 
-  console.log('FinancialList - current filters:', filters);
-
   // Create a stable query object to prevent unnecessary rerenders
   const queryParams = useMemo(() => {
     // Get current user from auth store if needed
     const dieticianId = filters.dieticianId || (user?.dieticianId ? user.dieticianId : undefined);
     
     if (!dieticianId) {
-      console.error('FinancialList - No dieticianId available for request');
       setErrorMessage('DieticianId is required but not available');
     } else {
-      console.log('FinancialList - Using dieticianId:', dieticianId);
       setErrorMessage(null);
     }
     
@@ -136,16 +127,12 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
   // Handle errors from API calls
   useEffect(() => {
     if (error) {
-      console.error('Error fetching financials:', error);
       setErrorMessage(error instanceof Error ? error.message : 'Failed to load financial data');
     }
   }, [error]);
 
-  console.log('FinancialList - useGetFinancials result:', { data, isLoading, error });
-
   // Initial data load when component mounts
   useEffect(() => {
-    console.log('FinancialList - Component mounted, loading data');
     // Ensure we have a dieticianId before making the request
     if (queryParams.dieticianId) {
       refetch();
@@ -155,7 +142,6 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
   useEffect(() => {
     // When data changes, update our local state
     if (data) {
-      console.log('FinancialList - received data, updating state:', data);
       setFinancials(data);
       setTotalItems(data.length);
     }
@@ -164,7 +150,6 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
   // Only refetch when filters, page or page size actually change
   // This uses a memorized query params object to prevent unnecessary refetches
   useEffect(() => {
-    console.log('FinancialList - query params changed, refetching data');
     if (queryParams.dieticianId) {
       refetch();
     }
@@ -181,7 +166,7 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
     setCurrentPage(1); // Reset to first page when changing page size
   };
 
-  const handleFilterChange = (field: keyof QueryFinancialsRequest, value: any) => {
+  const handleFilterChange = (field: keyof QueryFinancialsRequest, value: unknown) => {
     const newFilters = { ...filters };
     
     if (value === 'all' || !value) {
@@ -200,11 +185,8 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
 
   // Apply filters with debounce to prevent rapid-fire API calls
   const applyFilters = () => {
-    console.log('Applying filters manually');
     refetch();
   };
-
-  const deleteFinancialMutation = useDeleteFinancial();
 
   // Handle edit click
   const handleEditClick = (financial: Financial) => {
@@ -236,13 +218,13 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
   // Get badge color for status
   const getStatusBadgeColor = (status: FinancialStatus) => {
     switch (status) {
-      case FinancialStatus.Completed:
+      case 'Completed':
         return 'bg-green-500';
-      case FinancialStatus.Pending:
+      case 'Pending':
         return 'bg-yellow-500';
-      case FinancialStatus.Cancelled:
+      case 'Cancelled':
         return 'bg-red-500';
-      case FinancialStatus.Refunded:
+      case 'Refunded':
         return 'bg-blue-500';
       default:
         return 'bg-gray-500';
@@ -252,15 +234,15 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
   // Get badge color for type
   const getTypeBadgeColor = (type: FinancialType) => {
     switch (type) {
-      case FinancialType.Income:
+      case 'Income':
         return 'bg-green-500';
-      case FinancialType.Expense:
+      case 'Expense':
         return 'bg-red-500';
-      case FinancialType.Consultation:
+      case 'Consultation':
         return 'bg-purple-500';
-      case FinancialType.Appointment:
+      case 'Appointment':
         return 'bg-blue-500';
-      case FinancialType.Other:
+      case 'Other':
         return 'bg-gray-500';
       default:
         return 'bg-gray-500';
@@ -270,13 +252,13 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
   // Get text for status
   const getStatusText = (status: FinancialStatus) => {
     switch (status) {
-      case FinancialStatus.Pending:
+      case 'Pending':
         return t('financial.status.pending');
-      case FinancialStatus.Completed:
+      case 'Completed':
         return t('financial.status.completed');
-      case FinancialStatus.Cancelled:
+      case 'Cancelled':
         return t('financial.status.cancelled');
-      case FinancialStatus.Refunded:
+      case 'Refunded':
         return t('financial.status.refunded');
       default:
         return t('financial.unknown');
@@ -286,15 +268,15 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
   // Get text for type
   const getTypeText = (type: FinancialType) => {
     switch (type) {
-      case FinancialType.Income:
+      case 'Income':
         return t('financial.type.income');
-      case FinancialType.Expense:
+      case 'Expense':
         return t('financial.type.expense');
-      case FinancialType.Consultation:
+      case 'Consultation':
         return t('financial.type.consultation');
-      case FinancialType.Appointment:
+      case 'Appointment':
         return t('financial.type.appointment');
-      case FinancialType.Other:
+      case 'Other':
         return t('financial.type.other');
       default:
         return t('financial.unknown');
@@ -383,11 +365,21 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
                     <SelectItem value="all">
                       {t('common.all')}
                     </SelectItem>
-                    {Object.values(FinancialType).map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {getTypeText(type)}
-                      </SelectItem>
-                    ))}
+                    <SelectItem value="Income">
+                      {getTypeText('Income')}
+                    </SelectItem>
+                    <SelectItem value="Expense">
+                      {getTypeText('Expense')}
+                    </SelectItem>
+                    <SelectItem value="Consultation">
+                      {getTypeText('Consultation')}
+                    </SelectItem>
+                    <SelectItem value="Appointment">
+                      {getTypeText('Appointment')}
+                    </SelectItem>
+                    <SelectItem value="Other">
+                      {getTypeText('Other')}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -413,11 +405,18 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
                     <SelectItem value="all">
                       {t('common.all')}
                     </SelectItem>
-                    {Object.values(FinancialStatus).map((status) => (
-                      <SelectItem key={status} value={status}>
-                        {getStatusText(status)}
-                      </SelectItem>
-                    ))}
+                    <SelectItem value="Completed">
+                      {getStatusText('Completed')}
+                    </SelectItem>
+                    <SelectItem value="Pending">
+                      {getStatusText('Pending')}
+                    </SelectItem>
+                    <SelectItem value="Cancelled">
+                      {getStatusText('Cancelled')}
+                    </SelectItem>
+                    <SelectItem value="Refunded">
+                      {getStatusText('Refunded')}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -497,7 +496,7 @@ export const FinancialList: React.FC<FinancialListProps> = ({ onAddClick }) => {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right font-medium">
-                    <span className={financial.type === FinancialType.Income ? 'text-green-600' : 'text-red-600'}>
+                    <span className={financial.type === 'Income' ? 'text-green-600' : 'text-red-600'}>
                       {formatCurrency(financial.amount)}
                     </span>
                   </TableCell>

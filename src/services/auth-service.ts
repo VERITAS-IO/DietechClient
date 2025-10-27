@@ -10,7 +10,6 @@ export const authService = {
         return response.data;
       } catch (error: any) {
         if (error.response) {
-          console.log("Error triggered:", error);
           throw new Error(error.response.data.detail || 'Login failed');
         }
         throw new Error('Network error occurred');
@@ -36,7 +35,6 @@ export const authService = {
     try {
       await api.post('/authentication/confirmEmail', data);
     } catch (error: any) {
-      console.log("error tach of confirmEmail triggered, error:", error);
       if (error.response) {
         throw new Error(error.response.data.detail || 'Email confirmation failed');
       }

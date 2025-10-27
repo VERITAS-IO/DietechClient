@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Financial, QueryFinancialsRequest, FinancialType, FinancialStatus, FinancialInterval } from '../types/financial';
+import { Financial, QueryFinancialsRequest } from '../types/financial';
 import { useAuthStore } from '@/stores/auth-store';
 
 interface FinancialState {
@@ -26,8 +26,8 @@ interface FinancialState {
     chartView: 'daily' | 'weekly' | 'monthly' | 'yearly';
     setChartView: (view: 'daily' | 'weekly' | 'monthly' | 'yearly') => void;
     
-    selectedInterval: FinancialInterval;
-    setSelectedInterval: (interval: FinancialInterval) => void;
+    selectedInterval: 'Daily' | 'Weekly' | 'Monthly' | 'Yearly';
+    setSelectedInterval: (interval: 'Daily' | 'Weekly' | 'Monthly' | 'Yearly') => void;
 }
 
 // Helper function to get current dieticianId from auth store
@@ -36,20 +36,17 @@ const getCurrentDieticianId = (): number | undefined => {
     
     // If user is not authenticated, cannot get dieticianId
     if (!user) {
-        console.warn('User is not authenticated');
         return getFallbackDieticianId();
     }
     
     // If dieticianId exists, use it
     if (user.dieticianId) {
-        console.log('Using dieticianId from user profile:', user.dieticianId);
         return user.dieticianId;
     }
     
     // If no dieticianId, but user has Dietician role, try to use their ID as a fallback
     if (user.id && user.roles && user.roles.includes('Dietician')) {
         const fallbackId = Number(user.id);
-        console.warn('DieticianId not found in user profile, using user ID as fallback for Dietician role:', fallbackId);
         return fallbackId;
     }
     
@@ -60,11 +57,10 @@ const getCurrentDieticianId = (): number | undefined => {
 const getFallbackDieticianId = (): number | undefined => {
     // In development, provide a fallback ID for testing
     if (process.env.NODE_ENV === 'development') {
-        console.warn('Using development fallback dieticianId (1)');
         return 1;
     }
     
-    console.error('Neither dieticianId nor userId with Dietician role available in user profile');
+    // Fallback to undefined if no dieticianId can be determined
     return undefined;
 };
 
@@ -125,7 +121,7 @@ export const useFinancialStore = create<FinancialState>()(
             setChartView: (view) => set({ chartView: view }),
             
             // Selected interval for overview charts
-            selectedInterval: FinancialInterval.Daily,
+            selectedInterval: 'Daily',
             setSelectedInterval: (interval) => set({ selectedInterval: interval }),
         }),
         {

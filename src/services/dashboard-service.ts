@@ -49,28 +49,28 @@ class DashboardService {
   getIntervalFromTimeRange(timeRange: string): MainPageInterval {
     switch (timeRange) {
       case 'daily':
-        return MainPageInterval.Daily;
+        return 'Daily';
       case 'weekly':
-        return MainPageInterval.Weekly;
+        return 'Weekly';
       case 'monthly':
-        return MainPageInterval.Monthly;
+        return 'Monthly';
       case 'yearly':
-        return MainPageInterval.Yearly;
+        return 'Yearly';
       default:
-        return MainPageInterval.Monthly; 
+        return 'Monthly'; 
     }
   }
 
   // Get display name for interval value
   getIntervalDisplayName(interval: MainPageInterval): string {
     switch (interval) {
-      case MainPageInterval.Daily:
+      case 'Daily':
         return 'Daily';
-      case MainPageInterval.Weekly:
+      case 'Weekly':
         return 'Weekly';
-      case MainPageInterval.Monthly:
+      case 'Monthly':
         return 'Monthly';
-      case MainPageInterval.Yearly:
+      case 'Yearly':
         return 'Yearly';
       default:
         return 'Monthly';

@@ -20,11 +20,16 @@ export const useQueryDiets = (request: QueryDietsRequest) => {
 };
 
 export const useGetDiet = (id: number | null) => {
-    return useQuery({
+    const query = useQuery({
         queryKey: DIET_KEYS.detail(id as number),
         queryFn: () => dietService.getDiet(id as number),
         enabled: id !== null && id !== undefined,
     });
+    
+    return {
+        ...query,
+        diet: query.data?.data
+    };
 };
 
 export const useCreateDiet = () => {

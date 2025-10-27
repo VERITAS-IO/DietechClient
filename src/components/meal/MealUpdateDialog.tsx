@@ -74,7 +74,7 @@ export default function MealUpdateDialog() {
   const setEditMode = useMealStore((state) => state.setEditMode);
   const selectedMealId = useMealStore((state) => state.selectedMealId);
   
-  const { data: meal, isLoading: isMealLoading } = useGetMeal(selectedMealId || 0, {
+  const { meal, isLoading: isMealLoading } = useGetMeal(selectedMealId || 0, {
     enabled: !!selectedMealId && isEditMode
   });
   const { mutate: updateMeal, isPending } = useUpdateMeal();
@@ -133,8 +133,8 @@ export default function MealUpdateDialog() {
         const nutritionInfo: CreateNutritionInfoRequest = {
           name: info.name,
           servingSize: info.servingSize || 100,
-          servingUnit: ServingUnit.Grams, // Default to grams
-          foodCategory: FoodCategory.Unknown, // Default to unknown
+          servingUnit: 'Grams', // Default to grams
+          foodCategory: 'Dairy', // Default to dairy
           totalCalories: info.totalCalories,
           protein: info.proteinPerServing,
           carbohydrates: info.carbsPerServing,
@@ -222,13 +222,13 @@ export default function MealUpdateDialog() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {Object.entries(MealType)
-                          .filter(([key]) => key !== 'Unknown')
-                          .map(([key, value]) => (
-                            <SelectItem key={key} value={value}>
-                              {t(`meal.types.${value.toLowerCase()}`)}
-                            </SelectItem>
-                          ))}
+                        <SelectItem value="Breakfast">{t('meal.types.breakfast')}</SelectItem>
+                        <SelectItem value="Lunch">{t('meal.types.lunch')}</SelectItem>
+                        <SelectItem value="Dinner">{t('meal.types.dinner')}</SelectItem>
+                        <SelectItem value="Snack">{t('meal.types.snack')}</SelectItem>
+                        <SelectItem value="PreWorkout">{t('meal.types.preworkout')}</SelectItem>
+                        <SelectItem value="PostWorkout">{t('meal.types.postworkout')}</SelectItem>
+                        <SelectItem value="Custom">{t('meal.types.custom')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -251,13 +251,16 @@ export default function MealUpdateDialog() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {Object.entries(MealOrder)
-                          .filter(([key]) => key !== 'Unknown' && key !== 'Custom')
-                          .map(([key, value]) => (
-                            <SelectItem key={key} value={value}>
-                              {t(`meal.orders.${value.toLowerCase()}`)}
-                            </SelectItem>
-                          ))}
+                        <SelectItem value="FirstMeal">{t('meal.orders.firstmeal')}</SelectItem>
+                        <SelectItem value="SecondMeal">{t('meal.orders.secondmeal')}</SelectItem>
+                        <SelectItem value="ThirdMeal">{t('meal.orders.thirdmeal')}</SelectItem>
+                        <SelectItem value="FourthMeal">{t('meal.orders.fourthmeal')}</SelectItem>
+                        <SelectItem value="FifthMeal">{t('meal.orders.fifthmeal')}</SelectItem>
+                        <SelectItem value="SixthMeal">{t('meal.orders.sixthmeal')}</SelectItem>
+                        <SelectItem value="SeventhMeal">{t('meal.orders.seventhmeal')}</SelectItem>
+                        <SelectItem value="EighthMeal">{t('meal.orders.eighthmeal')}</SelectItem>
+                        <SelectItem value="NinthMeal">{t('meal.orders.ninthmeal')}</SelectItem>
+                        <SelectItem value="TenthMeal">{t('meal.orders.tenthmeal')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />

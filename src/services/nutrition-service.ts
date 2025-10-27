@@ -40,7 +40,6 @@ export const nutritionService = {
         
         return data;
         } catch (error) {
-            console.error('Error querying nutrition info:', error);
             // Return empty response on error to prevent UI crashes
             return {
                 items: [],
@@ -59,7 +58,6 @@ export const nutritionService = {
         const { data } = await api.get<NutritionInfoDetail>(`${BASE_URL}/${id}`);
         return data;
         } catch (error) {
-            console.error(`Error fetching nutrition info with id ${id}:`, error);
             throw error;
         }
     },
@@ -69,7 +67,6 @@ export const nutritionService = {
         const { data } = await api.post<{ id: number }>(BASE_URL, request);
         return data;
         } catch (error) {
-            console.error('Error creating nutrition info:', error);
             throw error;
         }
     },
@@ -78,7 +75,6 @@ export const nutritionService = {
         try {
         await api.put(`${BASE_URL}/${id}`, request);
         } catch (error) {
-            console.error(`Error updating nutrition info with id ${id}:`, error);
             throw error;
         }
     },
@@ -87,7 +83,6 @@ export const nutritionService = {
         try {
         await api.delete(`${BASE_URL}/${id}`);
         } catch (error) {
-            console.error(`Error deleting nutrition info with id ${id}:`, error);
             throw error;
         }
     }

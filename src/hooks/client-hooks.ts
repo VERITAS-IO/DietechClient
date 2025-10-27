@@ -16,7 +16,6 @@ export const useCreateClient = () => {
     return useMutation({
       mutationFn: createClient,
       onError: (error: Error) => {
-        console.error('Failed to create client:', error);
       },
     });
   };

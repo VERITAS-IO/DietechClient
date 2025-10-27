@@ -25,7 +25,6 @@ export default function DietCardList() {
     });
 
     // Debug log
-    console.log('DietCardList rendered:', { filters, activeFilters });
 
     // Update activeFilters when filters change
     useEffect(() => {
@@ -72,7 +71,6 @@ export default function DietCardList() {
             updatedFilters.maxCalories = newFilters.maxCalories ? Number(newFilters.maxCalories) : undefined;
         }
         
-        console.log('Setting new filters:', updatedFilters);
         
         // Update filters and reset to first page
         setFilters({ 
@@ -83,7 +81,6 @@ export default function DietCardList() {
 
     // Reset all filters including search
     const handleResetFilters = () => {
-        console.log('handleResetFilters called');
         resetFilters();
         setActiveFilters({
             search: '',
@@ -99,12 +96,25 @@ export default function DietCardList() {
             id: 'dietType',
             label: t('diet.type'),
             type: 'select',
-            options: Object.entries(DietType)
-                .filter(([key]) => !isNaN(Number(key))) // Only use numeric keys
-                .map(([key, value]) => ({
-                    value: key,
-                    label: t(`diet.types.${key}`)
-                })),
+            options: [
+                { value: 'Standard', label: t('diet.types.Standard') },
+                { value: 'Mediterranean', label: t('diet.types.Mediterranean') },
+                { value: 'LowCarb', label: t('diet.types.LowCarb') },
+                { value: 'Ketogenic', label: t('diet.types.Ketogenic') },
+                { value: 'Vegetarian', label: t('diet.types.Vegetarian') },
+                { value: 'Vegan', label: t('diet.types.Vegan') },
+                { value: 'PaleoStyle', label: t('diet.types.PaleoStyle') },
+                { value: 'GlutenFree', label: t('diet.types.GlutenFree') },
+                { value: 'DairyFree', label: t('diet.types.DairyFree') },
+                { value: 'LowFat', label: t('diet.types.LowFat') },
+                { value: 'LowSodium', label: t('diet.types.LowSodium') },
+                { value: 'DiabetesFriendly', label: t('diet.types.DiabetesFriendly') },
+                { value: 'HighProtein', label: t('diet.types.HighProtein') },
+                { value: 'WeightLoss', label: t('diet.types.WeightLoss') },
+                { value: 'WeightGain', label: t('diet.types.WeightGain') },
+                { value: 'Elimination', label: t('diet.types.Elimination') },
+                { value: 'Custom', label: t('diet.types.Custom') },
+            ],
             placeholder: t('diet.filterType')
         },
         {

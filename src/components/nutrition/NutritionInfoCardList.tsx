@@ -49,7 +49,6 @@ export const NutritionInfoCardList = () => {
             setSelectedNutritionInfo(details);
             setDetailModalOpen(true);
         } catch (error) {
-            console.error('Failed to fetch nutrition info details:', error);
         }
     };
 
@@ -62,17 +61,17 @@ export const NutritionInfoCardList = () => {
             updatedFilters.name = newFilters.search || undefined;
         }
         
-        // Handle serving unit - ServingUnit is a string enum
+        // Handle serving unit
         if ('servingUnit' in newFilters) {
             updatedFilters.servingUnit = newFilters.servingUnit && newFilters.servingUnit !== 'all' 
-                ? newFilters.servingUnit as ServingUnit
+                ? newFilters.servingUnit
                 : undefined;
         }
         
-        // Handle food category - FoodCategory is a string enum
+        // Handle food category
         if ('foodCategory' in newFilters) {
             updatedFilters.foodCategory = newFilters.foodCategory && newFilters.foodCategory !== 'all' 
-                ? newFilters.foodCategory as FoodCategory
+                ? newFilters.foodCategory
                 : undefined;
         }
         
@@ -110,24 +109,26 @@ export const NutritionInfoCardList = () => {
             id: 'servingUnit',
             label: t('dashboard.nutrition.list.columns.unit'),
             type: 'select',
-            options: Object.entries(ServingUnit)
-                .filter(([key]) => key !== 'Unknown')
-                .map(([key, value]) => ({
-                    value: value,
-                    label: key
-                })),
+            options: [
+                { value: 'Grams', label: 'Grams' },
+                { value: 'Milliliters', label: 'Milliliters' },
+                { value: 'Pieces', label: 'Pieces' },
+                { value: 'Cups', label: 'Cups' },
+                { value: 'Tablespoons', label: 'Tablespoons' }
+            ],
             placeholder: t('dashboard.nutrition.filters.selectUnit')
         },
         {
             id: 'foodCategory',
             label: t('dashboard.nutrition.list.columns.category'),
             type: 'select',
-            options: Object.entries(FoodCategory)
-                .filter(([key]) => key !== 'Unknown')
-                .map(([key, value]) => ({
-                    value: value,
-                    label: key
-                })),
+            options: [
+                { value: 'Dairy', label: 'Dairy' },
+                { value: 'Proteins', label: 'Proteins' },
+                { value: 'Grains', label: 'Grains' },
+                { value: 'Vegetables', label: 'Vegetables' },
+                { value: 'Fruits', label: 'Fruits' }
+            ],
             placeholder: t('dashboard.nutrition.filters.selectCategory')
         },
         {

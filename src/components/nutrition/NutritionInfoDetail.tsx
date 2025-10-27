@@ -51,8 +51,8 @@ export const NutritionInfoDetail = () => {
         const formattedData: UpdateNutritionInfoRequest = {
             ...data,
             servingSize: Number(data.servingSize),
-            servingUnit: data.servingUnit as ServingUnit,
-            foodCategory: data.foodCategory as FoodCategory,
+            servingUnit: data.servingUnit,
+            foodCategory: data.foodCategory,
             caloriesPerServing: Number(data.caloriesPerServing),
             totalFat: Number(data.totalFat),
             protein: Number(data.protein),
@@ -104,20 +104,18 @@ export const NutritionInfoDetail = () => {
                             <label>Serving Unit</label>
                             <Select
                                 disabled={!isEditMode}
-                                onValueChange={(value) => setValue('servingUnit', value as ServingUnit)}
+                                onValueChange={(value) => setValue('servingUnit', value)}
                                 defaultValue={String(selectedNutritionInfo.servingUnit)}
                             >
                                 <SelectTrigger>
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {Object.entries(ServingUnit)
-                                        .filter(([key]) => isNaN(Number(key)))
-                                        .map(([key, value]) => (
-                                            <SelectItem key={value} value={String(value)}>
-                                                {key}
-                                            </SelectItem>
-                                        ))}
+                                    <SelectItem value="Grams">Grams</SelectItem>
+                                    <SelectItem value="Milliliters">Milliliters</SelectItem>
+                                    <SelectItem value="Pieces">Pieces</SelectItem>
+                                    <SelectItem value="Cups">Cups</SelectItem>
+                                    <SelectItem value="Tablespoons">Tablespoons</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -126,20 +124,18 @@ export const NutritionInfoDetail = () => {
                             <label>Category</label>
                             <Select
                                 disabled={!isEditMode}
-                                onValueChange={(value) => setValue('foodCategory', value as FoodCategory)}
+                                onValueChange={(value) => setValue('foodCategory', value)}
                                 defaultValue={String(selectedNutritionInfo.foodCategory)}
                             >
                                 <SelectTrigger>
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {Object.entries(FoodCategory)
-                                        .filter(([key]) => isNaN(Number(key)))
-                                        .map(([key, value]) => (
-                                            <SelectItem key={value} value={String(value)}>
-                                                {key}
-                                            </SelectItem>
-                                        ))}
+                                    <SelectItem value="Dairy">Dairy</SelectItem>
+                                    <SelectItem value="Proteins">Proteins</SelectItem>
+                                    <SelectItem value="Grains">Grains</SelectItem>
+                                    <SelectItem value="Vegetables">Vegetables</SelectItem>
+                                    <SelectItem value="Fruits">Fruits</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>

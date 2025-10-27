@@ -7,67 +7,68 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useEffect } from "react";
+import { useClientStore } from "@/stores/client-store";
+import { CreateClientRequest } from "@/types/client";
 
+interface HealthInfoFormProps {
+  data?: Partial<CreateClientRequest>;
+  onSubmit: (data: Record<string, unknown>) => void;
+}
+
+// ✅ Basit Schema (Rehberinizden: Karmaşık nested yapma)
 const formSchema = z.object({
-  createHealthInfoRequest: z.object({
-    bloodPressure: z.enum(["Unknown", "Normal", "HighStageOne", "HighStageTwo", "HypertensiveCrisis"]),
-    bloodType: z.enum([
-      "Unknown",
-      "A_Postive",
-      "A_Negative",
-      "B_Positive",
-      "B_Negative",
-      "AB_Positive",
-      "AB_Negative",
-      "O_Positive",
-      "O_Negative",
-    ]),
-    bloodSugarLevel: z.string().transform((val) => val ? Number(val) : null).optional(),
-    weight: z.string().transform(Number),
-    height: z.string().transform(Number),
-    chronicConditions: z.string(),
-    allergies: z.string(),
-    activelyUsedDrugs: z.string(),
-  }),
+  bloodPressure: z.enum(["Normal", "HighStageOne", "HighStageTwo", "HypertensiveCrisis"]),
+  bloodType: z.enum([
+    "A_Positive",
+    "A_Negative", 
+    "B_Positive",
+    "B_Negative",
+    "AB_Positive",
+    "AB_Negative",
+    "O_Positive",
+    "O_Negative",
+  ]),
+  bloodSugarLevel: z.string().transform((val) => val ? Number(val) : null).optional(),
+  weight: z.string().transform(Number),
+  height: z.string().transform(Number),
+  chronicConditions: z.string(),
+  allergies: z.string(),
+  activelyUsedDrugs: z.string(),
 });
 
-export function HealthInfoForm({ data, onSubmit }) {
+export function HealthInfoForm({ data, onSubmit }: HealthInfoFormProps) {
   const { formData } = useClientStore();
   
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      createHealthInfoRequest: {
-        bloodPressure: formData.createHealthInfoRequest.bloodPressure,
-        bloodType: formData.createHealthInfoRequest.bloodType,
-        bloodSugarLevel: formData.createHealthInfoRequest.bloodSugarLevel?.toString() || "",
-        weight: formData.createHealthInfoRequest.weight.toString(),
-        height: formData.createHealthInfoRequest.height.toString(),
-        chronicConditions: formData.createHealthInfoRequest.chronicConditions,
-        allergies: formData.createHealthInfoRequest.allergies,
-        activelyUsedDrugs: formData.createHealthInfoRequest.activelyUsedDrugs,
-        ...data,
-      },
+      bloodPressure: formData.bloodPressure,
+      bloodType: formData.bloodType,
+      bloodSugarLevel: formData.bloodSugarLevel?.toString() || "",
+      weight: formData.weight.toString(),
+      height: formData.height.toString(),
+      chronicConditions: formData.chronicConditions,
+      allergies: formData.allergies,
+      activelyUsedDrugs: formData.activelyUsedDrugs,
+      ...data,
     },
   });
 
   useEffect(() => {
     const newData = {
       ...data,
-      bloodPressure: data?.bloodPressure || formData.createHealthInfoRequest.bloodPressure,
-      bloodType: data?.bloodType || formData.createHealthInfoRequest.bloodType,
-      bloodSugarLevel: (data?.bloodSugarLevel || formData.createHealthInfoRequest.bloodSugarLevel)?.toString() || "",
-      weight: (data?.weight || formData.createHealthInfoRequest.weight).toString(),
-      height: (data?.height || formData.createHealthInfoRequest.height).toString(),
-      chronicConditions: data?.chronicConditions || formData.createHealthInfoRequest.chronicConditions,
-      allergies: data?.allergies || formData.createHealthInfoRequest.allergies,
-      activelyUsedDrugs: data?.activelyUsedDrugs || formData.createHealthInfoRequest.activelyUsedDrugs,
+      bloodPressure: data?.bloodPressure || formData.bloodPressure,
+      bloodType: data?.bloodType || formData.bloodType,
+      bloodSugarLevel: (data?.bloodSugarLevel || formData.bloodSugarLevel)?.toString() || "",
+      weight: (data?.weight || formData.weight).toString(),
+      height: (data?.height || formData.height).toString(),
+      chronicConditions: data?.chronicConditions || formData.chronicConditions,
+      allergies: data?.allergies || formData.allergies,
+      activelyUsedDrugs: data?.activelyUsedDrugs || formData.activelyUsedDrugs,
     };
     
-    form.reset({
-      createHealthInfoRequest: newData,
-    });
-  }, [data, formData.createHealthInfoRequest, form]);
+    form.reset(newData);
+  }, [data, formData, form]);
 
   return (
     <Form {...form}>
@@ -75,7 +76,7 @@ export function HealthInfoForm({ data, onSubmit }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={form.control}
-            name="createHealthInfoRequest.bloodPressure"
+            name="bloodPressure"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Blood Pressure</FormLabel>
@@ -100,7 +101,7 @@ export function HealthInfoForm({ data, onSubmit }) {
 
           <FormField
             control={form.control}
-            name="createHealthInfoRequest.bloodType"
+            name="bloodType"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Blood Type</FormLabel>
@@ -130,7 +131,7 @@ export function HealthInfoForm({ data, onSubmit }) {
 
         <FormField
           control={form.control}
-          name="createHealthInfoRequest.bloodSugarLevel"
+            name="bloodSugarLevel"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Blood Sugar Level (mg/dL)</FormLabel>
@@ -145,7 +146,7 @@ export function HealthInfoForm({ data, onSubmit }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={form.control}
-            name="createHealthInfoRequest.weight"
+            name="weight"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Weight (kg)</FormLabel>
@@ -159,7 +160,7 @@ export function HealthInfoForm({ data, onSubmit }) {
 
           <FormField
             control={form.control}
-            name="createHealthInfoRequest.height"
+            name="height"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Height (cm)</FormLabel>
@@ -174,7 +175,7 @@ export function HealthInfoForm({ data, onSubmit }) {
 
         <FormField
           control={form.control}
-          name="createHealthInfoRequest.chronicConditions"
+            name="chronicConditions"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Chronic Conditions</FormLabel>
@@ -191,7 +192,7 @@ export function HealthInfoForm({ data, onSubmit }) {
 
         <FormField
           control={form.control}
-          name="createHealthInfoRequest.allergies"
+            name="allergies"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Allergies</FormLabel>
@@ -208,7 +209,7 @@ export function HealthInfoForm({ data, onSubmit }) {
 
         <FormField
           control={form.control}
-          name="createHealthInfoRequest.activelyUsedDrugs"
+            name="activelyUsedDrugs"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Actively Used Drugs</FormLabel>

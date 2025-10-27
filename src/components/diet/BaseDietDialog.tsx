@@ -16,7 +16,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { DietType } from '@/types/diet';
 import { Loader2 } from 'lucide-react';
 import { UseFormRegister, UseFormSetValue } from 'react-hook-form';
@@ -27,8 +26,8 @@ interface BaseDietDialogProps {
     title: string;
     children?: ReactNode;
     isLoading?: boolean;
-    register: UseFormRegister<any>;
-    setValue: UseFormSetValue<any>;
+    register: UseFormRegister<Record<string, unknown>>;
+    setValue: UseFormSetValue<Record<string, unknown>>;
     defaultValues?: {
         name?: string;
         description?: string;
@@ -58,26 +57,25 @@ export default function BaseDietDialog({
 }: BaseDietDialogProps) {
     const { t } = useTranslation();
 
-    // Create an array of diet types for rendering select options
+    // ✅ Union Type Usage (Rehberinizden: String literals kullan)
     const dietTypes = [
-        { value: DietType.Unknown, label: t('diet.types.0') },
-        { value: DietType.Standard, label: t('diet.types.1') },
-        { value: DietType.Mediterranean, label: t('diet.types.2') },
-        { value: DietType.LowCarb, label: t('diet.types.3') },
-        { value: DietType.Ketogenic, label: t('diet.types.4') },
-        { value: DietType.Vegetarian, label: t('diet.types.5') },
-        { value: DietType.Vegan, label: t('diet.types.6') },
-        { value: DietType.PaleoStyle, label: t('diet.types.7') },
-        { value: DietType.GlutenFree, label: t('diet.types.8') },
-        { value: DietType.DairyFree, label: t('diet.types.9') },
-        { value: DietType.LowFat, label: t('diet.types.10') },
-        { value: DietType.LowSodium, label: t('diet.types.11') },
-        { value: DietType.DiabetesFriendly, label: t('diet.types.12') },
-        { value: DietType.HighProtein, label: t('diet.types.13') },
-        { value: DietType.WeightLoss, label: t('diet.types.14') },
-        { value: DietType.WeightGain, label: t('diet.types.15') },
-        { value: DietType.Elimination, label: t('diet.types.16') },
-        { value: DietType.Custom, label: t('diet.types.99') }
+        { value: 'Standard', label: t('diet.types.Standard') },
+        { value: 'Mediterranean', label: t('diet.types.Mediterranean') },
+        { value: 'LowCarb', label: t('diet.types.LowCarb') },
+        { value: 'Ketogenic', label: t('diet.types.Ketogenic') },
+        { value: 'Vegetarian', label: t('diet.types.Vegetarian') },
+        { value: 'Vegan', label: t('diet.types.Vegan') },
+        { value: 'PaleoStyle', label: t('diet.types.PaleoStyle') },
+        { value: 'GlutenFree', label: t('diet.types.GlutenFree') },
+        { value: 'DairyFree', label: t('diet.types.DairyFree') },
+        { value: 'LowFat', label: t('diet.types.LowFat') },
+        { value: 'LowSodium', label: t('diet.types.LowSodium') },
+        { value: 'DiabetesFriendly', label: t('diet.types.DiabetesFriendly') },
+        { value: 'HighProtein', label: t('diet.types.HighProtein') },
+        { value: 'WeightLoss', label: t('diet.types.WeightLoss') },
+        { value: 'WeightGain', label: t('diet.types.WeightGain') },
+        { value: 'Elimination', label: t('diet.types.Elimination') },
+        { value: 'Custom', label: t('diet.types.Custom') }
     ];
 
     if (isLoading) {
@@ -121,7 +119,7 @@ export default function BaseDietDialog({
                                     onValueChange={(value) => setValue('type', Number(value))}
                                     defaultValue={defaultValues.type !== undefined 
                                         ? String(defaultValues.type) 
-                                        : String(DietType.Standard)}
+                                        : 'Standard'}
                                 >
                                     <SelectTrigger>
                                         <SelectValue />

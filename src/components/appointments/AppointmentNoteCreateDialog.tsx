@@ -39,7 +39,7 @@ export function AppointmentNoteCreateDialog() {
   
   // Form state
   const [noteText, setNoteText] = useState('');
-  const [noteType, setNoteType] = useState<NoteType>(NoteType.PreAppointment);
+  const [noteType, setNoteType] = useState<NoteType>('PreAppointment');
   const [appointmentId, setAppointmentId] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   
@@ -54,7 +54,7 @@ export function AppointmentNoteCreateDialog() {
       setAppointmentId(selectedNote.appointmentId.toString());
     } else {
       setNoteText('');
-      setNoteType(NoteType.PreAppointment);
+      setNoteType('PreAppointment');
       setAppointmentId('');
     }
   }, [selectedNote, isOpen]);
@@ -166,7 +166,6 @@ export function AppointmentNoteCreateDialog() {
                         ? date.toLocaleDateString() 
                         : t('common.invalidDate');
                     } catch (err) {
-                      console.error('Date formatting error:', err);
                       dateDisplay = t('common.invalidDate');
                     }
                     
@@ -189,20 +188,20 @@ export function AppointmentNoteCreateDialog() {
               {t('appointment.notes.type')}
             </Label>
             <Select
-              value={noteType.toString()}
-              onValueChange={(value) => setNoteType(parseInt(value) as NoteType)}
+              value={noteType}
+              onValueChange={(value: string) => setNoteType(value as NoteType)}
             >
               <SelectTrigger id="noteType">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={NoteType.PreAppointment.toString()}>
+                <SelectItem value="PreAppointment">
                   {t('appointment.notes.types.1')}
                 </SelectItem>
-                <SelectItem value={NoteType.DuringAppointment.toString()}>
+                <SelectItem value="DuringAppointment">
                   {t('appointment.notes.types.2')}
                 </SelectItem>
-                <SelectItem value={NoteType.AfterAppointment.toString()}>
+                <SelectItem value="AfterAppointment">
                   {t('appointment.notes.types.3')}
                 </SelectItem>
               </SelectContent>

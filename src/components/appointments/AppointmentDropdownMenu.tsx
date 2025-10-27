@@ -6,16 +6,13 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useTranslation } from 'react-i18next';
-import { Appointment } from '@/types/appointment';
 
 interface AppointmentDropdownMenuProps {
-  appointment: Appointment;
   onEditClick: () => void;
   onNotesClick: () => void;
 }
 
 export function AppointmentDropdownMenu({
-  appointment,
   onEditClick,
   onNotesClick,
 }: AppointmentDropdownMenuProps) {

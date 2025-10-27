@@ -1,38 +1,37 @@
 import { api } from '@/lib/axios';
 import { CreateDietRequest, CreateDietResponse, DietDetailResponse, DietListResponse, QueryDietsRequest, UpdateDietRequest } from '../types/diet';
+import { ApiService } from '@/types/api';
+import { ApiResponse, PagedResponse } from '@/types/common';
 
 const BASE_URL = '/diets';
 
-export const dietService = {
-    async queryDiets(request: QueryDietsRequest): Promise<{ items: DietListResponse[]; totalCount: number; pageNumber: number; pageSize: number }> {
-        const { data } = await api.get(BASE_URL, { params: request });
-        
-        // Handle the array response from the API
-        const items = Array.isArray(data) ? data : [];
-        
-        return {
-            items,
-            totalCount: items.length,
-            pageNumber: request.pageNumber || 1,
-            pageSize: request.pageSize || 10
-        };
-    },
+// ✅ Diet Service Class (Rehberinizden: API template kullan)
+class DietService extends ApiService {
+  constructor() {
+    super(BASE_URL);
+  }
 
-    async getDiet(id: number): Promise<DietDetailResponse> {
-        const { data } = await api.get(`${BASE_URL}/${id}`);
-        return data;
-    },
+  // ✅ Generic methods using template
+  async queryDiets(request: QueryDietsRequest): Promise<PagedResponse<DietListResponse>> {
+    return this.getPaged('', request as Record<string, unknown>);
+  }
 
-    async createDiet(request: CreateDietRequest): Promise<CreateDietResponse> {
-        const { data } = await api.post(BASE_URL, request);
-        return data;
-    },
+  async getDiet(id: number): Promise<ApiResponse<DietDetailResponse>> {
+    return this.get(`/${id}`);
+  }
 
-    async updateDiet(id: number, request: UpdateDietRequest): Promise<void> {
-        await api.put(`${BASE_URL}/${id}`, request);
-    },
+  async createDiet(request: CreateDietRequest): Promise<ApiResponse<CreateDietResponse>> {
+    return this.post('', request);
+  }
 
-    async deleteDiet(id: number): Promise<void> {
-        await api.delete(`${BASE_URL}/${id}`);
-    }
-};
+  async updateDiet(id: number, request: UpdateDietRequest): Promise<ApiResponse<void>> {
+    return this.put(`/${id}`, request);
+  }
+
+  async deleteDiet(id: number): Promise<ApiResponse<void>> {
+    return this.delete(`/${id}`);
+  }
+}
+
+// ✅ Service instance (Rehberinizden: Singleton pattern)
+export const dietService = new DietService();

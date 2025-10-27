@@ -135,7 +135,6 @@ export function RegisterForm({ className, ...props }: React.ComponentPropsWithou
     try {
       await registerMutation.mutateAsync(registrationData);
     } catch (error) {
-      console.error("Registration error:", error);
     }
   }
 

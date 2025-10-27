@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { ApiResponse } from '@/types/common';
 import {
   Form,
   FormControl,
@@ -15,11 +16,11 @@ import {
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useTranslation } from 'react-i18next';
-import { GetAppointmentResponse, CreateAppointmentNoteRequest, NoteType } from '@/types/appointment';
+import { GetAppointmentResponse, CreateAppointmentNoteRequest } from '@/types/appointment';
 import { QueryClientResponse } from '@/types/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { AppointmentType, AppointmentStatus, CreateAppointmentRequest, UpdateAppointmentRequest } from '@/types/appointment';
+import { CreateAppointmentRequest, UpdateAppointmentRequest } from '@/types/appointment';
 import { useAppointmentStore } from '@/stores/appointment-store';
 import { useClientStore } from '@/stores/client-store';
 import { Check } from "lucide-react";
@@ -28,12 +29,12 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from '@/lib/utils/utils';
 import { UseMutateFunction } from '@tanstack/react-query';
 import { QueryAppointmentResponse } from '@/types/appointment';
-import { format, parse, formatISO } from 'date-fns';
+import { format, parse } from 'date-fns';
 
 const appointmentSchema = z.object({
   clientName: z.string().min(1, 'Client name is required'),
   isNewClient: z.boolean().default(false),
-  type: z.nativeEnum(AppointmentType),
+  type: z.enum(['Initial', 'FollowUp', 'Assessment', 'Emergency']),
   start: z.string().min(1, 'Start time is required'),
   end: z.string().min(1, 'End time is required'),
   notes: z.string().optional(),
@@ -45,9 +46,9 @@ interface AppointmentDialogProps {
   onClose: () => void;
   selectedDate: Date | null;
   appointment: GetAppointmentResponse | null;
-  createAppointment?: UseMutateFunction<QueryAppointmentResponse, Error, CreateAppointmentRequest, unknown>;
-  updateAppointment?: UseMutateFunction<null, Error, { id: number; data: Partial<UpdateAppointmentRequest> }, unknown>;
-  deleteAppointment?: UseMutateFunction<void, Error, number, unknown>;
+  createAppointment?: UseMutateFunction<ApiResponse<QueryAppointmentResponse>, Error, CreateAppointmentRequest, unknown>;
+  updateAppointment?: UseMutateFunction<ApiResponse<void>, Error, { id: number; data: Partial<UpdateAppointmentRequest> }, unknown>;
+  deleteAppointment?: UseMutateFunction<ApiResponse<void>, Error, number, unknown>;
 }
 
 // Helper function to format date to local ISO string for the form input
@@ -86,7 +87,7 @@ export function AppointmentDialog({
 }: AppointmentDialogProps) {
   const { t } = useTranslation();
   // Use store as fallback for backward compatibility
-  const { createAppointment: storeCreateAppointment, updateAppointment: storeUpdateAppointment, deleteAppointment: storeDeleteAppointment, appointments } = useAppointmentStore();
+  const { createAppointment: storeCreateAppointment, updateAppointment: storeUpdateAppointment, deleteAppointment: storeDeleteAppointment } = useAppointmentStore();
   const { searchClients } = useClientStore();
   const [open, setOpen] = useState(false);
   const [selectedClient, setSelectedClient] = useState<QueryClientResponse | null>(null);
@@ -111,7 +112,7 @@ export function AppointmentDialog({
     defaultValues: {
       clientName: appointment?.clientName ?? '',
       isNewClient: false,
-      type: appointment?.type ?? AppointmentType.Initial,
+      type: appointment?.type ?? 'Initial',
       start: appointment?.start 
         ? formatLocalISOString(new Date(appointment.start))
         : selectedDate 
@@ -127,11 +128,21 @@ export function AppointmentDialog({
     },
   });
 
+  const [filteredClients, setFilteredClients] = useState<QueryClientResponse[]>([]);
+
   useEffect(() => {
     setSelectedClient(null);
   }, []);
 
-  const filteredClients = searchClients(searchQuery);
+  useEffect(() => {
+    if (searchQuery.trim().length >= 2) {
+      searchClients(searchQuery).then(results => {
+        setFilteredClients(results);
+      });
+    } else {
+      setFilteredClients([]);
+    }
+  }, [searchQuery, searchClients]);
 
   const handleClientSelect = (client: QueryClientResponse) => {
     setSelectedClient(client);
@@ -156,7 +167,7 @@ export function AppointmentDialog({
       form.reset({
         clientName: '',
         isNewClient: false,
-        type: AppointmentType.Initial,
+        type: 'Initial',
         start: formatLocalISOString(selectedDate),
         end: formatLocalISOString(endDate),
         notes: '',
@@ -168,21 +179,13 @@ export function AppointmentDialog({
   const onSubmit = (values: z.infer<typeof appointmentSchema>) => {
     const note: CreateAppointmentNoteRequest = {
       note: values.notes ?? '',
-      noteType: NoteType.PreAppointment
+      noteType: 'PreAppointment'
     };
 
     // Create dates properly preserving local time
     const startDate = preserveLocalDateTime(values.start);
     const endDate = preserveLocalDateTime(values.end);
     
-    console.log('Form submitted with dates:',
-      'Start Input:', values.start,
-      'End Input:', values.end,
-      'Start Created:', startDate.toISOString(),
-      'Start UTC?:', startDate.getTimezoneOffset() === 0 ? 'Yes' : 'No',
-      'End Created:', endDate.toISOString(),
-      'End UTC?:', endDate.getTimezoneOffset() === 0 ? 'Yes' : 'No'
-    );
 
     const baseAppointmentData = {
       title: `${values.clientName} - ${values.type}`,
@@ -204,10 +207,9 @@ export function AppointmentDialog({
     } else {
       const createData: CreateAppointmentRequest = {
         ...baseAppointmentData,
-        status: AppointmentStatus.Scheduled
+        status: 'Scheduled'
       };
 
-      console.log("createAppointmentRequest:", createData)
       createAppointment(createData);
     }
 
@@ -336,10 +338,10 @@ export function AppointmentDialog({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value={AppointmentType.Initial.toString()}>{t('appointment.types.initial')}</SelectItem>
-                      <SelectItem value={AppointmentType.FollowUp.toString()}>{t('appointment.types.followUp')}</SelectItem>
-                      <SelectItem value={AppointmentType.Assessment.toString()}>{t('appointment.types.assessment')}</SelectItem>
-                      <SelectItem value={AppointmentType.Emergency.toString()}>{t('appointment.types.emergency')}</SelectItem>
+                      <SelectItem value="Initial">{t('appointment.types.initial')}</SelectItem>
+                      <SelectItem value="FollowUp">{t('appointment.types.followUp')}</SelectItem>
+                      <SelectItem value="Assessment">{t('appointment.types.assessment')}</SelectItem>
+                      <SelectItem value="Emergency">{t('appointment.types.emergency')}</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

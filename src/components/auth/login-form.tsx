@@ -24,7 +24,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { authService } from "@/services/auth-service";
 import { useAuthStore } from "@/stores/auth-store";
@@ -76,9 +75,6 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
     e.preventDefault();
     try {
       await loginMutation.mutateAsync(values);
-    } catch (error) {
-      console.error("Login error:", error);
-    }
   }
 
   return (

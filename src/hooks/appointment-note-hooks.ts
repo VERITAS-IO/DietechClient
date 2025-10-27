@@ -21,7 +21,6 @@ const safeGetTimestamp = (dateStr: string | Date | undefined): number => {
     }
     return date.getTime();
   } catch (err) {
-    console.error('Error parsing date:', err);
     return 0;
   }
 };
@@ -40,7 +39,8 @@ export function useQueryAppointmentNotes(filters: AppointmentNoteFilters) {
     queryFn: async () => {
       try {
         // Fetch the notes
-        const notes = await appointmentService.getAppointmentNotes(queryParams);
+        const notesResponse = await appointmentService.getAppointmentNotes(queryParams);
+        const notes = notesResponse.items;
         
         // Sort the notes by created date with safe handling
         const sortedNotes = [...notes].sort((a, b) => {
@@ -58,7 +58,6 @@ export function useQueryAppointmentNotes(filters: AppointmentNoteFilters) {
           totalPages: Math.ceil(notes.length / filters.pageSize)
         };
       } catch (error) {
-        console.error('Error fetching appointment notes:', error);
         throw error;
       }
     }

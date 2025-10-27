@@ -41,7 +41,6 @@ export function AppointmentNoteDetailDialog() {
           
           setAppointmentInfo(`${appointment.clientName} - ${formattedDate}`);
         } catch (err) {
-          console.error('Date formatting error:', err);
           setAppointmentInfo(`${appointment.clientName} - ${t('common.invalidDate')}`);
         }
       } else {
@@ -69,11 +68,11 @@ export function AppointmentNoteDetailDialog() {
     if (!noteType) return null;
     
     switch (noteType) {
-      case NoteType.PreAppointment:
+      case 'PreAppointment':
         return <Badge className="bg-blue-100 text-blue-800">{getNoteTypeLabel(noteType)}</Badge>;
-      case NoteType.DuringAppointment:
+      case 'DuringAppointment':
         return <Badge className="bg-green-100 text-green-800">{getNoteTypeLabel(noteType)}</Badge>;
-      case NoteType.AfterAppointment:
+      case 'AfterAppointment':
         return <Badge className="bg-amber-100 text-amber-800">{getNoteTypeLabel(noteType)}</Badge>;
       default:
         return <Badge variant="secondary">{getNoteTypeLabel(noteType)}</Badge>;
@@ -129,7 +128,6 @@ export function AppointmentNoteDetailDialog() {
                   }
                   return format(date, 'PPpp');
                 } catch (err) {
-                  console.error('Date formatting error:', err);
                   return t('common.invalidDate');
                 }
               })()}

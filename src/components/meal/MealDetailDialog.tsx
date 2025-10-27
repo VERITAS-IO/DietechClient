@@ -16,7 +16,7 @@ export default function MealDetailDialog() {
     const setEditMode = useMealStore((state) => state.setEditMode);
     const setDeleteModalOpen = useMealStore((state) => state.setDeleteModalOpen);
 
-    const { data: meal, isLoading, error, isError } = useGetMeal(selectedMealId || 0, {
+    const { meal, isLoading, error, isError } = useGetMeal(selectedMealId || 0, {
         enabled: !!selectedMealId && isDetailModalOpen
     });
 

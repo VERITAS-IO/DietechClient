@@ -39,7 +39,7 @@ export function CreateClientWizard({ onComplete }: CreateClientWizardProps) {
   const currentStepData = STEPS[currentStep];
   const isLastStep = currentStep === STEPS.length - 1;
 
-  const handleStepSubmit = async (stepData: any) => {
+  const handleStepSubmit = async (stepData: Record<string, unknown>) => {
     try {
       // Now TypeScript knows this is a valid step key
       const stepKey = currentStepData.key;
@@ -67,7 +67,6 @@ export function CreateClientWizard({ onComplete }: CreateClientWizardProps) {
         });
       }
     } catch (error) {
-      console.error("Error handling step submission:", error);
       toast({
         title: t('common.error'),
         description: t('client.createError'),
@@ -79,8 +78,6 @@ export function CreateClientWizard({ onComplete }: CreateClientWizardProps) {
   const handleBack = () => {
     setCurrentStep(Math.max(0, currentStep - 1));
   };
-
-  const StepComponent = currentStepData.component;
 
   return (
     <div className="space-y-6 py-4">
@@ -96,7 +93,7 @@ export function CreateClientWizard({ onComplete }: CreateClientWizardProps) {
 
       {currentStepData.key === "userRegistrationRequest" && (
         <UserRegistrationForm
-          data={formData.userRegistrationRequest}
+          data={formData}
           onSubmit={handleStepSubmit}
           isSubmitting={createClientMutation.isPending}
         />
@@ -104,7 +101,7 @@ export function CreateClientWizard({ onComplete }: CreateClientWizardProps) {
       
       {currentStepData.key === "createPersonaInfoRequest" && (
         <PersonalInfoForm
-          data={formData.createPersonaInfoRequest}
+          data={formData}
           onSubmit={handleStepSubmit}
           isSubmitting={createClientMutation.isPending}
         />
@@ -112,14 +109,14 @@ export function CreateClientWizard({ onComplete }: CreateClientWizardProps) {
       
       {currentStepData.key === "createLifeStyleInfoRequest" && (
         <LifeStyleForm
-          data={formData.createLifeStyleInfoRequest}
+          data={formData}
           onSubmit={handleStepSubmit}
         />
       )}
       
       {currentStepData.key === "createHealthInfoRequest" && (
         <HealthInfoForm
-          data={formData.createHealthInfoRequest}
+          data={formData}
           onSubmit={handleStepSubmit}
         />
       )}

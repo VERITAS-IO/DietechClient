@@ -1,43 +1,42 @@
-import { Gender } from "@/enums/gender";
+import { Gender, PhysicalActivity, StressLevel, Smoking, Alcohol, BloodPressure, BloodType } from './common';
 import { PagedRequest } from "./request-parameters";
 
+// ✅ Basit Interface (Rehberinizden: Karmaşık nested yapma)
 export interface CreateClientRequest {
-  userRegistrationRequest: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    phoneNumber: string;
-    roles: string[];
-  };
-  createPersonaInfoRequest: {
-    gender: 'Male' | 'Female' | 'Other';
-    dateOfBirth: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    phoneNumber: string;
-  };
-  createLifeStyleInfoRequest: {
-    physicalActivity: 'None' | 'Light' | 'Moderate' | 'Active' | 'VeryActive';
-    sleepHours: number;
-    stressLevel: 'Low' | 'Moderate' | 'High' | 'VeryHigh';
-    smoking: 'None' | 'Occasional' | 'Regular' | 'Heavy';
-    alcohol: 'None' | 'Occasional' | 'Regular' | 'Heavy';
-  };
-  createHealthInfoRequest: {
-    bloodPressure: 'Normal' | 'HighStageOne' | 'HighStageTwo' | 'HypertensiveCrisis';
-    bloodType: 'A_Postive' | 'A_Negative' | 'B_Positive' | 'B_Negative' | 'AB_Positive' | 'AB_Negative' | 'O_Positive' | 'O_Negative';
-    bloodSugarLevel?: number;
-    weight: number;
-    height: number;
-    chronicConditions: string;
-    allergies: string;
-    activelyUsedDrugs: string;
-  };
+  // User Registration
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  roles: string[];
+  
+  // Persona Info
+  gender: Gender;
+  dateOfBirth: string;
+  
+  // Lifestyle Info
+  physicalActivity: PhysicalActivity;
+  sleepHours: number;
+  stressLevel: StressLevel;
+  smoking: Smoking;
+  alcohol: Alcohol;
+  
+  // Health Info
+  bloodPressure: BloodPressure;
+  bloodType: BloodType;
+  bloodSugarLevel?: number;
+  weight: number;
+  height: number;
+  chronicConditions: string;
+  allergies: string;
+  activelyUsedDrugs: string;
 }
 
+// ✅ Basit Query Interface
 export interface QueryClientRequest extends PagedRequest {
   tenantId?: number;
+  status?: string;
+  search?: string;
 }
 
 export interface QueryClientResponse {

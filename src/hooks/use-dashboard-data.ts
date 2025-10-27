@@ -41,16 +41,16 @@ export function useDashboardData({ timeRange }: UseDashboardDataOptions) {
     
     let formattedDate = '';
     switch (currentInterval) {
-      case MainPageInterval.Daily:
+      case 'Daily':
         formattedDate = date.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
         break;
-      case MainPageInterval.Weekly:
+      case 'Weekly':
         formattedDate = date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
         break;
-      case MainPageInterval.Monthly:
+      case 'Monthly':
         formattedDate = date.toLocaleDateString(undefined, { month: 'short', year: 'numeric' });
         break;
-      case MainPageInterval.Yearly:
+      case 'Yearly':
         formattedDate = date.toLocaleDateString(undefined, { year: 'numeric' });
         break;
       default:

@@ -3,9 +3,10 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import { DateSelectArg, EventClickArg, EventContentArg } from '@fullcalendar/core';
 import { Button } from '@/components/ui/button';
 import { Calendar, Plus } from 'lucide-react';
-import { GetAppointmentResponse, AppointmentType, QueryAppointmentsRequest } from '@/types/appointment';
+import { GetAppointmentResponse, QueryAppointmentsRequest } from '@/types/appointment';
 import { cn } from '@/lib/utils/utils';
 import { AppointmentDialog } from './AppointmentDialog';
 import { AppointmentNotesDialog } from './AppointmentNotesDialog';
@@ -19,7 +20,7 @@ import './calendar.css';
 export function AppointmentCalendar() {
   const { t } = useTranslation();
   const [query, setQuery] = useState<QueryAppointmentsRequest>({});
-  const { appointments = [], isLoading, createAppointment, updateAppointment, deleteAppointment } = useAppointments(query);
+  const { appointments = [], createAppointment, updateAppointment, deleteAppointment } = useAppointments(query);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedAppointment, setSelectedAppointment] = useState<GetAppointmentResponse | null>(null);
   const [isAppointmentDialogOpen, setIsAppointmentDialogOpen] = useState(false);
@@ -37,13 +38,13 @@ export function AppointmentCalendar() {
     });
   }, []);
 
-  const handleDateSelect = (selectInfo: any) => {
+  const handleDateSelect = (selectInfo: DateSelectArg) => {
     setSelectedDate(selectInfo.start);
     setSelectedAppointment(null);
     setIsAppointmentDialogOpen(true);
   };
 
-  const handleEventClick = (clickInfo: any) => {
+  const handleEventClick = (clickInfo: EventClickArg) => {
     clickInfo.jsEvent.preventDefault();
     const appointment = appointments.find(apt => apt.id === parseInt(clickInfo.event.id));
     if (appointment) {
@@ -103,13 +104,13 @@ export function AppointmentCalendar() {
   
   const getEventColor = (appointment: GetAppointmentResponse) => {
     switch (appointment.type) {
-      case AppointmentType.Initial:
+      case 'Initial':
         return 'dark:bg-red-700 bg-[#FF5A5F]';
-      case AppointmentType.FollowUp:
+      case 'FollowUp':
         return 'dark:bg-teal-700 bg-[#00A699]';
-      case AppointmentType.Assessment:
+      case 'Assessment':
         return 'dark:bg-orange-700 bg-[#FC642D]';
-      case AppointmentType.Emergency:
+      case 'Emergency':
         return 'dark:bg-gray-700 bg-[#484848]';
       default:
         return 'dark:bg-gray-600 bg-[#767676]';
@@ -129,7 +130,7 @@ export function AppointmentCalendar() {
     }
   }));
 
-  const renderEventContent = (eventInfo: any) => {
+  const renderEventContent = (eventInfo: EventContentArg) => {
     // Create a container for the event content
     const container = document.createElement('div');
     container.className = 'fc-event-main-content relative';
